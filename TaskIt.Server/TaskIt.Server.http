@@ -1,0 +1,6 @@
+@TaskIt.Server_HostAddress = http://localhost:5171
+
+GET {{TaskIt.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
