@@ -1,0 +1,12 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "WebApiDatabase": "Host=localhost,5432;Database=xxxxxx; uid=xxxxx; Password=xxxxxx; SearchPath=xxxxxx"
+  },
+  "AllowedHosts": "*"
+}
