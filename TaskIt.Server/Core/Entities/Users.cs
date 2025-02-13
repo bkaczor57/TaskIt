@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TaskIt.Server.Core.Entities
+{
+    public class Users
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required, MaxLength(20)]
+        public string Username { get; set; }
+        [Required, MaxLength(30)]
+        public string Password { get; set; }
+        [Required, MaxLength(100)]
+        public string Email { get; set; }
+        public string FirstName{ get; set; }
+        public string LastName { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+            
+        public ICollection<UsersTeams> UsersTeams { get; set; }
+        public ICollection<Teams> OwnedTeams { get; set; }
+    }
+}

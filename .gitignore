@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/TaskIt.Server/appsettings.json
+/TaskIt.Server/appsettings.Development.json 
+ 
