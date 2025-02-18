@@ -8,5 +8,11 @@
   "ConnectionStrings": {
     "WebApiDatabase": "Host=localhost,5432;Database=xxxxxx; uid=xxxxx; Password=xxxxxx; SearchPath=xxxxxx"
   },
+  "Jwt": {
+    "Key":      "xxxxxxxxxxxxxxxxxxxxxxxxx",
+    "Issuer":   "xxxxxxxxxx",
+    "Audience": "xxxxxxxxxx",
+    "ExpireMinutes": 360
+  },
   "AllowedHosts": "*"
 }
