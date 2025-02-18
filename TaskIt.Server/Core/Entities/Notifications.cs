@@ -26,7 +26,7 @@ namespace TaskIt.Server.Core.Entities
 
         public int? TeamId { get; set; }
         public Teams? Team { get; set; }
-
+        
 
         public bool IsRead { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;

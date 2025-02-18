@@ -9,8 +9,8 @@ namespace TaskIt.Server.Core.Entities
 
         [Required, MaxLength(20)]
         public string Username { get; set; }
-        [Required, MaxLength(30)]
-        public string Password { get; set; }
+        [Required]
+        public string PasswordHash { get; set; }
         [Required, MaxLength(100)]
         public string Email { get; set; }
         public string FirstName{ get; set; }
