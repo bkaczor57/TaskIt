@@ -1,13 +1,41 @@
-﻿namespace TaskIt.Server.Services
+﻿using TaskIt.Server.DTOs;
+using TaskIt.Server.Mappings;
+using TaskIt.Server.Repository;
+using TaskIt.Server.Requests;
+
+namespace TaskIt.Server.Services
 {
     public class AuthService : IAuthService
     {
-        public string Register(string email, string username, string password)
+        //Adding Repository 
+        private readonly IUserRepository _userRepository;
+        public AuthService(IUserRepository userRepository)
         {
-            throw new NotImplementedException();
+            _userRepository = userRepository;
+        }
+        public async Task<ServiceResult<UserDTO>> Register(UserRegisterRequest request)
+        {
+            // Check if data already exists
+            if (await _userRepository.GetUserByEmail(request.Email) != null)
+            {
+                return ServiceResult<UserDTO>.Fail("EmailAlreadyExists");
+            }
+            if (await _userRepository.GetUserByUsername(request.Username) != null)
+            {
+                return ServiceResult<UserDTO>.Fail("UsernameAlreadyExists");
+            }
+
+            // Parse Request To Entity
+            var userEntity = UserMapper.ToUserEntity(request);
+            // Save User to db
+            _userRepository.AddUser(userEntity);
+            await _userRepository.SaveChangesAsync();
+
+            var userDTO = UserMapper.ToUserDTO(userEntity);
+            return ServiceResult<UserDTO>.Ok(userDTO);
         }
 
-        public string Login(string email, string password)
+        public async Task<ServiceResult<UserDTO>> Login(UserLoginRequest request)
         {
             throw new NotImplementedException();
         }

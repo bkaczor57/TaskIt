@@ -10,10 +10,10 @@ namespace TaskIt.Server.Core.Entities
         public int TeamId { get; set; }
         public Teams? Team { get; set; }
         [Required, MaxLength(30)]
-        public string Title { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public required string Title { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Tasks> Tasks { get; set; }
+        public ICollection<Tasks>? Tasks { get; set; }
 
     }
 }

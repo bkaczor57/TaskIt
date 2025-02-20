@@ -18,13 +18,13 @@ namespace TaskIt.Server.Core.Entities
         public string? Title { get; set; }
         [Required,MaxLength(300)]
         public string? Description { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? DueDate { get; set; }
         public DateTime? CompletedAt { get; set; }
 
-        public ICollection<Comments> Comments { get; set; }
+        public ICollection<Comments>? Comments { get; set; }
 
-        public ICollection<Notifications>  Notifications { get; set; }
+        public ICollection<Notifications>?  Notifications { get; set; }
 
     }
 }

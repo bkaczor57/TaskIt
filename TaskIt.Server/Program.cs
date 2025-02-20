@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskIt.Server.Data;
+using TaskIt.Server.Repository;
+using TaskIt.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
-// Add Auto Mapper
-builder.Services.AddAutoMapper(typeof(Program));
+
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -43,6 +44,11 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddAuthorization();
+
+// Add Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Add Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 //===============BUILDING==================

@@ -16,13 +16,11 @@ namespace TaskIt.Server.Core.Entities
         public Users? User { get; set; }
 
         [Required, MaxLength(300)]
-        public string Content { get; set; }
+        public required string Content { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-
-        ICollection<Notifications> Notifications { get; set; }
-
+        public ICollection<Notifications>? Notifications { get; set; }
 
 
     }

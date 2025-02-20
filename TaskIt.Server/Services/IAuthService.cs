@@ -1,8 +1,11 @@
-﻿namespace TaskIt.Server.Services
+﻿using TaskIt.Server.DTOs;
+using TaskIt.Server.Requests;
+
+namespace TaskIt.Server.Services
 {
     public interface IAuthService
     {
-        string Register(string email, string username, string password);
-        string Login(string email, string password);
+        Task<ServiceResult<UserDTO>> Register(UserRegisterRequest request);
+        Task<ServiceResult<UserDTO>> Login(UserLoginRequest request);
     }
 }

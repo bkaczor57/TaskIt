@@ -19,7 +19,7 @@ namespace TaskIt.Server.Core.Entities
         public Users? InvitingUser { get; set; }
 
         public InviteStatus Status { get; set; } = InviteStatus.Pending;
-        public DateTime InviteDate { get; set; } = DateTime.Now;
+        public DateTime InviteDate { get; set; } = DateTime.UtcNow;
         public DateTime? ResponseDate { get; set; }
 
 
