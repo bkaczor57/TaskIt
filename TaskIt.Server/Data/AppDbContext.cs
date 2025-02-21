@@ -33,6 +33,10 @@ namespace TaskIt.Server.Data
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
+            modelBuilder.Entity<Users>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
+
             // Tabela UsersTeams
             // Relacja User -> UserTeams, kaskadowe usuwanie 
             modelBuilder.Entity<UsersTeams>()
@@ -54,6 +58,8 @@ namespace TaskIt.Server.Data
             modelBuilder.Entity<UsersTeams>()
                 .Property(ut => ut.Role)
                 .HasConversion<string>(); // Zapisuje enum jako string w bazie
+
+
 
             // Tabela Teams
             // Relacje

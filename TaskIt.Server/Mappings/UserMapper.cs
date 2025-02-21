@@ -23,6 +23,7 @@ namespace TaskIt.Server.Mappings
         {
             return new UserDTO
             { 
+                Id = user.Id,
                 Email = user.Email,
                 Username = user.Username,
                 FirstName = user.FirstName,

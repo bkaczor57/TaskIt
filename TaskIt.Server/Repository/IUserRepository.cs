@@ -9,6 +9,7 @@ namespace TaskIt.Server.Repository
         Task<Users?> GetUserById(int id);
         Task<Users?> GetUserByEmail(string email);
         Task<Users?> GetUserByUsername(string username);
+        Task<List<Users>> GetUsers();
         //Create
         void AddUser(Users user);
         //Update

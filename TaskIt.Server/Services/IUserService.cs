@@ -8,5 +8,9 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<UserDTO>> GetUserById(int userId);
         Task<ServiceResult<UserDTO>> UpdateUser(int userId, UserUpdateRequest updateRequest);
         Task<ServiceResult<bool>> DeleteUser(int userId);
+
+        Task<ServiceResult<UserDTO>> GetUserByEmail(string email);
+        Task<ServiceResult<UserDTO>> GetUserByUsername(string username);
+        Task<ServiceResult<List<UserDTO>>> GetUsers();
     }
 }

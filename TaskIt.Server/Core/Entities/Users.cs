@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.Core.Entities
 {
@@ -19,7 +20,9 @@ namespace TaskIt.Server.Core.Entities
         [Required, MinLength(2), MaxLength(30)]
         public required string LastName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-            
+
+        public UserRole Role { get; set; } = UserRole.User;
+
         public ICollection<UsersTeams>? UsersTeams { get; set; }
         public ICollection<Teams>? OwnedTeams { get; set; }
         public ICollection<TeamInvites>? UserInvitationsSent { get; set; }

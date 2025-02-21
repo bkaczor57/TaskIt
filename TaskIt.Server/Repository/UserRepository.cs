@@ -24,6 +24,10 @@ namespace TaskIt.Server.Repository
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
+        public async Task<List<Users>> GetUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
         public void AddUser(Users user)
         {
             _context.Users.Add(user);
@@ -46,5 +50,7 @@ namespace TaskIt.Server.Repository
         {
             return await _context.SaveChangesAsync();
         }
+
+
     }
 }

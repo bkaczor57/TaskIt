@@ -54,5 +54,38 @@ namespace TaskIt.Server.Controllers
 
             return NoContent();
         }
+
+
+        //Admin Only
+        [Authorize(Policy = "AdminOnly")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var result = await _userService.GetUserById(id);
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+            return Ok(result.Data);
+        }
+        [Authorize(Policy = "AdminOnly")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var result = await _userService.DeleteUser(id);
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+            return NoContent();
+        }
+        [Authorize(Policy = "AdminOnly")]
+        [HttpGet("list")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var result = await _userService.GetUsers();
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+            return Ok(result.Data);
+        }
+
+
+
     }
 }

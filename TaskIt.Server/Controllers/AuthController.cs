@@ -53,6 +53,8 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

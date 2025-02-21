@@ -51,6 +51,35 @@ namespace TaskIt.Server.Services
 
             return ServiceResult<bool>.Ok(true);
         }
+
+        public async Task<ServiceResult<UserDTO>> GetUserByEmail(string email)
+        {
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user == null)
+                return ServiceResult<UserDTO>.Fail("User not found");
+            return ServiceResult<UserDTO>.Ok(UserMapper.ToUserDTO(user));
+        }
+
+        public async Task<ServiceResult<UserDTO>> GetUserByUsername(string username)
+        {
+            var user = await _userRepository.GetUserByUsername(username);
+            if (user == null)
+                return ServiceResult<UserDTO>.Fail("User not found");
+            return ServiceResult<UserDTO>.Ok(UserMapper.ToUserDTO(user));
+        }
+
+        public async Task<ServiceResult<List<UserDTO>>> GetUsers()
+        {
+            var users = await _userRepository.GetUsers();
+            if (users == null)
+                return ServiceResult<List<UserDTO>>.Fail("Users not found");
+
+            var userDTOs = users.Select(UserMapper.ToUserDTO).ToList();
+            return ServiceResult<List<UserDTO>>.Ok(userDTOs);
+        }
+
+
+
     }
 
 }
