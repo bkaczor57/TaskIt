@@ -70,7 +70,7 @@ namespace TaskIt.Server.Services
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("username", user.Username)
+            new Claim(JwtRegisteredClaimNames.Name, user.Username)
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

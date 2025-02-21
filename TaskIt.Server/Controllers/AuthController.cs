@@ -54,25 +54,12 @@ namespace TaskIt.Server.Controllers
         }
 
         [HttpPost("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             // W stateless JWT logout usuwa tokeny na froncie, backend nie musi nic robić
             return Ok("Wylogowano poprawnie");
         }
 
-        [Authorize]
-        [HttpGet("secured-data")]
-        public IActionResult GetSecuredData()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Ok($"To są zabezpieczone dane dla użytkownika {userId}");
-        }
-
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok("Test");
-        }
     }
 
 

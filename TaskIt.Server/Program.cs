@@ -53,12 +53,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
@@ -102,8 +102,6 @@ builder.Services.AddAuthorization();
 //===============BUILDING==================
 
 var app = builder.Build();
-
-
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

@@ -13,7 +13,10 @@ namespace TaskIt.Server.Core.Entities
         public required string PasswordHash { get; set; }
         [Required, MinLength(8), MaxLength(100)]
         public required string Email { get; set; }
+
+        [Required, MinLength(2), MaxLength(30)]
         public required string FirstName{ get; set; }
+        [Required, MinLength(2), MaxLength(30)]
         public required string LastName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
             
