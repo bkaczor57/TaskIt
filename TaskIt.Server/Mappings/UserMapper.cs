@@ -29,5 +29,6 @@ namespace TaskIt.Server.Mappings
                 LastName = user.LastName
             };
         }
+
     }
 }

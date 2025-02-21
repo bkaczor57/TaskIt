@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TaskIt.Server.Requests;
 using TaskIt.Server.Services;
 
@@ -18,20 +20,21 @@ namespace TaskIt.Server.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult>Register(UserRegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
-            if (request == null) {
+            if (request == null)
+            {
                 return BadRequest();
             }
 
             var result = await _authService.Register(request);
-            
-            if(!result.Success)
+
+            if (!result.Success)
             {
-                if (result.ErrorMessage == "EmailAlreadyExists")
+                if (result.ErrorMessage == "emailExist")
                     return Conflict(new { error = "Ten e-mail jest już używany." }); // Kod 409 Conflict
 
-                if (result.ErrorMessage == "UsernameAlreadyExists")
+                if (result.ErrorMessage == "usernameExist")
                     return Conflict(new { error = "Ta nazwa użytkownika jest już zajęta." }); // Kod 409 Conflict
 
                 return BadRequest(new { error = result.ErrorMessage });
@@ -41,9 +44,38 @@ namespace TaskIt.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
-            return Ok();
+            var result = await _authService.Login(request);
+            if (!result.Success)
+                return Unauthorized(new { error = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // W stateless JWT logout usuwa tokeny na froncie, backend nie musi nic robić
+            return Ok("Wylogowano poprawnie");
+        }
+
+        [Authorize]
+        [HttpGet("secured-data")]
+        public IActionResult GetSecuredData()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Ok($"To są zabezpieczone dane dla użytkownika {userId}");
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok("Test");
         }
     }
+
+
+
+
 }
