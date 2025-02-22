@@ -51,9 +51,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IUserTeamRepository, UserTeamRepository>();
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IUserTeamService, UserTeamService>();
 
 
 // Add JWT Authentication
@@ -83,12 +87,16 @@ builder.Services.AddAuthentication(options =>
                 context.Response.ContentType = "application/json";
                 return context.Response.WriteAsync("{ \"error\": \"Niepoprawny lub wygas³y token JWT.\" }");
             },
-            OnChallenge = context =>
+            OnChallenge = async context =>
             {
-                context.HandleResponse();
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync("{ \"error\": \"Brak autoryzacji – musisz podaæ poprawny token JWT.\" }");
+                if (!context.Response.HasStarted) // Upewniamy siê, ¿e odpowiedŸ jeszcze nie zosta³a wys³ana
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync("{ \"error\": \"Brak autoryzacji.\" }");
+                }
+
+                context.HandleResponse(); // Zatrzymuje domyœlne przetwarzanie odpowiedzi
             }
         };
     });
