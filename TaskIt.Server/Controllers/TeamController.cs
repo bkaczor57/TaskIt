@@ -28,7 +28,7 @@ namespace TaskIt.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTeam([FromBody] TeamCreateRequest teamCreateRequest)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!); // Pobieramy userId z tokenu
+            var userId = GetUserId();
             var result = await _teamService.CreateTeam(userId, teamCreateRequest);
             if (!result.Success)
                 return BadRequest(new { error = result.ErrorMessage });
@@ -40,7 +40,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> GetTeam(int teamId)
         {
             // Check if User is Admin or is In the Team
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!); // Pobieramy userId z tokenu
+            var userId = GetUserId();
             var isAdmin = User.IsInRole("Admin");
             var isMemberResult =  _userTeamService.IsUserInTeam(teamId, userId);
             var isMember = isMemberResult.Success && isMemberResult.Data;
@@ -58,7 +58,7 @@ namespace TaskIt.Server.Controllers
         [HttpGet("{teamId}/members")]
         public async Task<IActionResult> GetTeamMembers(int teamId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!); // Pobieramy userId z tokenu
+            var userId = GetUserId();
             var isAdmin = User.IsInRole("Admin");
             var isMemberResult =  _userTeamService.IsUserInTeam(teamId,userId);
             bool isMember = isMemberResult.Success && isMemberResult.Data;
@@ -75,7 +75,7 @@ namespace TaskIt.Server.Controllers
         [HttpDelete("{teamId}")]
         public async Task<IActionResult> DeleteTeam(int teamId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!); // Pobieramy userId z tokenu
+            var userId = GetUserId();
 
             var isAdmin = User.IsInRole("Admin");
             var isOwnerResult = await _teamService.IsUserOwner(userId, teamId);
@@ -95,7 +95,7 @@ namespace TaskIt.Server.Controllers
         [HttpPut("{teamId}")]
         public async Task<IActionResult> UpdateTeam([FromBody] TeamUpdateRequest updateRequest, int teamId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!); // Pobieramy userId z tokenu
+            var userId = GetUserId();
 
             var isAdmin = User.IsInRole("Admin");
             var isOwnerResult = await _teamService.IsUserOwner(userId, teamId);
@@ -111,5 +111,10 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+
+        private int GetUserId()
+        {
+            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        }
     }
 }

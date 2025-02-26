@@ -9,9 +9,6 @@ namespace TaskIt.Server.Services
 
         Task<ServiceResult<TeamDTO>> CreateTeam(int ownerId, TeamCreateRequest request);
         Task<ServiceResult<TeamDTO>> GetTeamById(int teamId);
-        Task<ServiceResult<List<TeamDTO>>> GetTeamsByOwnerId(int ownerId);
-        Task<ServiceResult<List<TeamDTO>>> GetUserTeams(int userId);
-
         Task<ServiceResult<TeamDTO>> UpdateTeam (int teamId, TeamUpdateRequest request);
         Task<ServiceResult<bool>> DeleteTeam(int teamId);
 

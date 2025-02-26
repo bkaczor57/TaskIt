@@ -2,9 +2,10 @@
 
 namespace TaskIt.Server.Requests
 {
-    public class UserTeamAddUserToTeamRequest
+    public class UserTeamUpdateRequest
     {
         public int UserId { get; set; }
+        public int TeamId { get; set; }
         public UserTeamRole? Role { get; set; } // Opcjonalnie, domyślnie Member
     }
 }

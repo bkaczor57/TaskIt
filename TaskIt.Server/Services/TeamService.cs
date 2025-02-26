@@ -9,12 +9,12 @@ namespace TaskIt.Server.Services
     public class TeamService : ITeamService
     {
         private readonly ITeamRepository _teamRepository;
-        private readonly IUserTeamRepository _userTeamRepository;
+        private readonly IUserTeamService _userTeamService;
 
-        public TeamService(ITeamRepository teamRepository, IUserTeamRepository userTeamRepository, IUserRepository userRepository)
+        public TeamService(ITeamRepository teamRepository, IUserTeamService userTeamService)
         {
             _teamRepository = teamRepository;
-            _userTeamRepository = userTeamRepository;
+            _userTeamService = userTeamService;
         }
         public async Task<ServiceResult<TeamDTO>> CreateTeam(int ownerId, TeamCreateRequest request)
         {
@@ -24,15 +24,15 @@ namespace TaskIt.Server.Services
             _teamRepository.AddTeam(team);
             await _teamRepository.SaveChangesAsync();
 
-            var userTeam = new UsersTeams
+            var userTeamRequest = new UserTeamAddRequest
             {
                 TeamId = team.Id,
                 UserId = ownerId,
                 Role = Core.Enums.UserTeamRole.Admin
             };
 
-            _userTeamRepository.AddUserToTeam(userTeam);
-            await _userTeamRepository.SaveChangesAsync();
+            _userTeamService.AddUserToTeam(userTeamRequest);
+
 
             var userDTO = TeamMapper.ToTeamDTO(team);
 
@@ -50,26 +50,8 @@ namespace TaskIt.Server.Services
             return ServiceResult<TeamDTO>.Ok(TeamMapper.ToTeamDTO(team));
 
         }
-        public async Task<ServiceResult<List<TeamDTO>>> GetTeamsByOwnerId(int ownerId)
-        {
-            var teams = await _teamRepository.GetTeamsByOwnerId(ownerId);
-            if (teams.Count == 0 || teams == null)
-            {
-                return ServiceResult<List<TeamDTO>>.Fail("Teams not Found");
-            }
-            return ServiceResult<List<TeamDTO>>.Ok(teams.Select(TeamMapper.ToTeamDTO).ToList());
 
-        }
-        public async Task<ServiceResult<List<TeamDTO>>> GetUserTeams(int userId)
-        {
-            var teams = await _userTeamRepository.GetTeamsByUserId(userId);
-            if (teams.Count == 0 || teams == null)
-            {
-                return ServiceResult<List<TeamDTO>>.Fail("Teams not Found");
-            }
-            return ServiceResult<List<TeamDTO>>.Ok(teams.Select(TeamMapper.ToTeamDTO).ToList());
 
-        }
         public async Task<ServiceResult<bool>> DeleteTeam(int teamId)
         {
             var team = await _teamRepository.GetTeamById(teamId);
@@ -85,22 +67,24 @@ namespace TaskIt.Server.Services
 
         public async Task<ServiceResult<TeamDTO>> UpdateTeam(int teamId, TeamUpdateRequest request)
         {
-            var user = await _teamRepository.GetTeamById(teamId);
-            if (user == null)
+            var team = await _teamRepository.GetTeamById(teamId);
+            if (team == null)
             {
                 return ServiceResult<TeamDTO>.Fail("Team not Found");
             }
+
+
             if (request.Name != null)
             {
-                user.Name = request.Name;
+                team.Name = request.Name;
             }
             if (request.Description != null)
             {
-                user.Description = request.Description;
+                team.Description = request.Description;
             }
-            _teamRepository.UpdateTeam(user);
+            _teamRepository.UpdateTeam(team);
             await _teamRepository.SaveChangesAsync();
-            return ServiceResult<TeamDTO>.Ok(TeamMapper.ToTeamDTO(user));
+            return ServiceResult<TeamDTO>.Ok(TeamMapper.ToTeamDTO(team));
         }
 
         public async Task<ServiceResult<bool>> IsUserOwner(int userId, int teamId)

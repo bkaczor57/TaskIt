@@ -29,7 +29,7 @@ namespace TaskIt.Server.Services
             if (user == null)
                 return ServiceResult<UserDTO>.Fail("User not found");
 
-            if(updateRequest.FirstName!=null)
+            if(updateRequest.FirstName!= null)
                 user.FirstName = updateRequest.FirstName;
             if(updateRequest.LastName != null)
                 user.LastName = updateRequest.LastName;

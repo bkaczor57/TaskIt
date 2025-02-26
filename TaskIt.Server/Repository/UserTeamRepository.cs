@@ -12,6 +12,12 @@ public class UserTeamRepository : IUserTeamRepository
         _context = context;
     }
 
+    public async Task<UsersTeams?> GetUsersInTeam(int teamId, int userId)
+    {
+        return await _context.UsersTeams
+            .FirstOrDefaultAsync(ut => ut.TeamId == teamId && ut.UserId == userId);
+    }
+
 
     public bool IsUserInTeam(int teamId, int userId)
     {
@@ -40,7 +46,7 @@ public class UserTeamRepository : IUserTeamRepository
         _context.UsersTeams.Add(userTeam);
     }
 
-    public void RemoveUserFromTeam(UsersTeams userTeam)
+    public void DeleteUserFromTeam(UsersTeams userTeam)
     {
          _context.UsersTeams.Remove(userTeam);
     }
