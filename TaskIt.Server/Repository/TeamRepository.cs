@@ -17,23 +17,25 @@ namespace TaskIt.Server.Repository
             return await _context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
         }
 
-        public async Task<Teams?> GetTeamByOwnerId(int ownerId)
+        public async Task<List<Teams>> GetTeamsByOwnerId(int ownerId)
         {
-            return await _context.Teams.FirstOrDefaultAsync(t => t.OwnerId == ownerId);
+            return await _context.Teams
+                .Where(t => t.OwnerId == ownerId)
+                .ToListAsync();
         }
 
 
-        public async Task AddTeam(Teams team)
+        public void AddTeam(Teams team)
         {
-            await _context.Teams.AddAsync(team);
+            _context.Teams.Add(team);
         }
 
-        public async Task UpdateTeamAsync(Teams team)
+        public void UpdateTeam(Teams team)
         {
             _context.Teams.Update(team);
         }
 
-        public async Task DeleteTeamAsync(Teams team)
+        public void DeleteTeam(Teams team)
         {
             _context.Teams.Remove(team);
         }

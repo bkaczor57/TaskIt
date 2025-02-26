@@ -7,12 +7,10 @@ namespace TaskIt.Server.Repository
     {
              
         Task<Teams?> GetTeamById(int teamId);
-        Task<Teams?> GetTeamByOwnerId(int ownerId);
-
-        Task AddTeam(Teams team);
-        Task UpdateTeamAsync(Teams team);
-        Task DeleteTeamAsync(Teams team);
-
+        Task<List<Teams?>> GetTeamsByOwnerId(int ownerId);
+        void AddTeam(Teams team);
+        void UpdateTeam(Teams team);
+        void DeleteTeam(Teams team);
         Task<int> SaveChangesAsync();
 
     }

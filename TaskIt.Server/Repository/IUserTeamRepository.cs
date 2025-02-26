@@ -6,10 +6,9 @@ public interface IUserTeamRepository
 
     Task<List<Teams?>> GetTeamsByUserId(int userId);
     Task<List<Users?>> GetUsersByTeamId(int teamId);
-    Task AddUserToTeamAsync(int teamId, int userId);
-    Task AddUserToTeamAsync(int teamId, int userId, UserTeamRole role); // Domyślna rola
-    Task<bool> IsUserInTeamAsync(int teamId, int userId);
-    Task RemoveUserFromTeamAsync(int teamId, int userId);
-    Task UpdateUserRoleInTeamAsync(int teamId, int userId, UserTeamRole newRole);
+    bool IsUserInTeam(int teamId, int userId);
+    void AddUserToTeam(UsersTeams userTeams);
+    void RemoveUserFromTeam(UsersTeams userTeams);
+    void UpdateUserRoleInTeam(UsersTeams userTeams);
     Task SaveChangesAsync();
 }

@@ -56,7 +56,7 @@ builder.Services.AddScoped<IUserTeamRepository, UserTeamRepository>();
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserTeamService, UserTeamService>();
 
 
