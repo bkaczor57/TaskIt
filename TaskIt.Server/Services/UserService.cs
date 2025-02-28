@@ -1,4 +1,5 @@
-﻿using TaskIt.Server.DTOs;
+﻿using TaskIt.Server.Core.Enums;
+using TaskIt.Server.DTOs;
 using TaskIt.Server.Mappings;
 using TaskIt.Server.Repository;
 using TaskIt.Server.Requests;
@@ -76,6 +77,14 @@ namespace TaskIt.Server.Services
 
             var userDTOs = users.Select(UserMapper.ToUserDTO).ToList();
             return ServiceResult<List<UserDTO>>.Ok(userDTOs);
+        }
+
+        public async Task<ServiceResult<UserRole>> GetUserRole(int userId)
+        {
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                return ServiceResult<UserRole>.Fail("User not found");
+            return ServiceResult<UserRole>.Ok(user.Role);
         }
 
 

@@ -18,9 +18,10 @@ namespace TaskIt.Server.Core.Entities
         public int InvitingUserId { get; set; }
         public Users? InvitingUser { get; set; }
 
+        public UserTeamRole TeamRole{ get; set; } = UserTeamRole.Member;
         public InviteStatus Status { get; set; } = InviteStatus.Pending;
         public DateTime InviteDate { get; set; } = DateTime.UtcNow;
-        public DateTime? ResponseDate { get; set; }
+        public DateTime? ResponseDate { get; set;}
 
 
     }

@@ -12,17 +12,18 @@ public class UserTeamRepository : IUserTeamRepository
         _context = context;
     }
 
-    public async Task<UsersTeams?> GetUsersInTeam(int teamId, int userId)
+    public async Task<UsersTeams?> GetUserTeam(int teamId, int userId)
     {
         return await _context.UsersTeams
             .FirstOrDefaultAsync(ut => ut.TeamId == teamId && ut.UserId == userId);
     }
 
-
-    public bool IsUserInTeam(int teamId, int userId)
+    public async Task<UserTeamRole?> GetUserRole(int teamId, int userId)
     {
-        return  _context.UsersTeams
-            .Any(ut => ut.TeamId == teamId && ut.UserId == userId);
+        return await _context.UsersTeams
+            .Where(ut => ut.TeamId == teamId && ut.UserId == userId)
+            .Select(ut => ut.Role)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<List<Users?>> GetUsersByTeamId(int teamId)

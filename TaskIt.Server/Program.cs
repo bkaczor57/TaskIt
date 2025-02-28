@@ -58,6 +58,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserTeamService, UserTeamService>();
+builder.Services.AddScoped<IServiceHelper, ServiceHelper>(); 
 
 
 // Add JWT Authentication

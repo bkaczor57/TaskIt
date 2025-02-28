@@ -2,8 +2,8 @@
 {
     public enum UserTeamRole
     {
-        Member,
-        Manager,
-        Admin
+        Member = 1 ,
+        Manager = 2,
+        Admin = 3
     }
 }

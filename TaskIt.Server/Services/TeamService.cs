@@ -31,7 +31,7 @@ namespace TaskIt.Server.Services
                 Role = Core.Enums.UserTeamRole.Admin
             };
 
-            _userTeamService.AddUserToTeam(userTeamRequest);
+            await _userTeamService.AddUserToTeam(userTeamRequest);
 
 
             var userDTO = TeamMapper.ToTeamDTO(team);

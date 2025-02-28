@@ -1,4 +1,5 @@
 ﻿using TaskIt.Server.Core.Entities;
+using TaskIt.Server.Core.Enums;
 using TaskIt.Server.DTOs;
 using TaskIt.Server.Requests;
 
@@ -14,9 +15,12 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(UserTeamUpdateRequest userTeamRequest);
 
         // Get Users in Team
-        ServiceResult<bool> IsUserInTeam(int teamId, int userId);
+        Task<ServiceResult<bool>> IsUserInTeam(int teamId, int userId);
+        Task<ServiceResult<UserTeamRole?>> GetUserRole(int teamId, int userId);
         Task<ServiceResult<List<UserDTO?>>> GetUsersByTeamId(int teamId);
         Task<ServiceResult<List<TeamDTO?>>> GetTeamsByUserId(int userId);
+
+       
 
 
     }

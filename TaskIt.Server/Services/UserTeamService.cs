@@ -1,5 +1,6 @@
 ﻿using System.Reflection.Metadata.Ecma335;
 using TaskIt.Server.Core.Entities;
+using TaskIt.Server.Core.Enums;
 using TaskIt.Server.DTOs;
 using TaskIt.Server.Mappings;
 using TaskIt.Server.Repository;
@@ -17,14 +18,33 @@ namespace TaskIt.Server.Services
         }
 
 
-        public ServiceResult<bool> IsUserInTeam(int teamId, int userId)
+        public async Task<ServiceResult<bool>> IsUserInTeam(int teamId, int userId)
         {
 
-            bool result =  _userTeamRepository.IsUserInTeam(teamId, userId);
-            if (!result)
+            var result =  await _userTeamRepository.GetUserTeam(teamId, userId);
+            if (result == null)
                 return ServiceResult<bool>.Fail("User is not in team");
 
-            return ServiceResult<bool>.Ok(result);
+            return ServiceResult<bool>.Ok(true);
+        }
+
+        public async Task<ServiceResult<bool>> IsUserInRoleOrHigher(int teamId, int userId, UserTeamRole requiredRole)
+        {
+            var userRole = await _userTeamRepository.GetUserRole(teamId, userId);
+            if (userRole == null)
+                return ServiceResult<bool>.Fail("User is not in team");
+            if ((int)userRole<(int)requiredRole)
+                return ServiceResult<bool>.Fail($"Insufficient permissions. Required: {requiredRole}, but user has: {userRole}.");
+
+            return ServiceResult<bool>.Ok(true);
+        }
+
+        public async Task<ServiceResult<UserTeamRole?>> GetUserRole(int teamId, int userId)
+        {
+            var userRole = await _userTeamRepository.GetUserRole(teamId, userId);
+            if (userRole == null)
+                return ServiceResult<UserTeamRole?>.Fail("User is not in team");
+            return ServiceResult<UserTeamRole?>.Ok(userRole);
         }
 
         public async Task<ServiceResult<List<UserDTO?>>> GetUsersByTeamId(int teamId)
@@ -53,8 +73,8 @@ namespace TaskIt.Server.Services
         public async Task<ServiceResult<UserTeamDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest)
         {
             // Check if user is already in the team
-            var existingUser =  _userTeamRepository.IsUserInTeam(userTeamRequest.UserId, userTeamRequest.TeamId);
-            if (!existingUser)
+            var existingUser = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
+            if (existingUser!=null)
             {
                 return ServiceResult<UserTeamDTO>.Fail("User is already in this team.");
             }
@@ -78,7 +98,7 @@ namespace TaskIt.Server.Services
         public async Task<ServiceResult<bool>>DeleteUserFromTeam(UserTeamDeleteRequest userTeamRequest)
         {
 
-            var userTeam = await _userTeamRepository.GetUsersInTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
+            var userTeam = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
             if (userTeam == null)
             {
                 return ServiceResult<bool>.Fail("User is not in team");
@@ -92,7 +112,7 @@ namespace TaskIt.Server.Services
 
         public async Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(UserTeamUpdateRequest userTeamRequest)
         {
-            var userTeam = await _userTeamRepository.GetUsersInTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
+            var userTeam = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
             if (userTeam == null)
             {
                 return ServiceResult<UserTeamDTO>.Fail("User is not in team");
