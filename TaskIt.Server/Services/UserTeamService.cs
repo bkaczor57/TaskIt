@@ -95,10 +95,10 @@ namespace TaskIt.Server.Services
         }
 
 
-        public async Task<ServiceResult<bool>>DeleteUserFromTeam(UserTeamDeleteRequest userTeamRequest)
+        public async Task<ServiceResult<bool>>DeleteUserFromTeam(int teamId, int userId)
         {
 
-            var userTeam = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
+            var userTeam = await _userTeamRepository.GetUserTeam(teamId, userId);
             if (userTeam == null)
             {
                 return ServiceResult<bool>.Fail("User is not in team");
@@ -110,9 +110,9 @@ namespace TaskIt.Server.Services
             return ServiceResult<bool>.Ok(true);
         }
 
-        public async Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(UserTeamUpdateRequest userTeamRequest)
+        public async Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest)
         {
-            var userTeam = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
+            var userTeam = await _userTeamRepository.GetUserTeam(teamId, userId);
             if (userTeam == null)
             {
                 return ServiceResult<UserTeamDTO>.Fail("User is not in team");

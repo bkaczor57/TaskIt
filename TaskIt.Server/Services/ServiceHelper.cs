@@ -39,7 +39,7 @@
         public async Task<bool> IsSelf(int providedUserId, int targetUserId)
         {
             var user = await _userService.GetUserById(providedUserId);
-            return targetUserId == user.Data.Id && user.Success;
+            return (targetUserId == user.Data.Id) && user.Success;
         }
 
         public async Task<bool> IsOwner(int userId, int teamId)
@@ -51,7 +51,6 @@
         // Master Function: Checks if the user has any permission to manage a team
         public async Task<bool> CanPerformAction(int providedUserId, int teamId, int resuourceOwnerId, UserTeamRole requiredRole)
         {
-
 
             if (await IsGlobalAdmin(providedUserId)) return true; // Global Admins always have access
             if (await IsUserRoleOrHigher(teamId, providedUserId, requiredRole)) return true; // Team Admin check

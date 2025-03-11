@@ -10,6 +10,7 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<TeamDTO>> CreateTeam(int ownerId, TeamCreateRequest request);
         Task<ServiceResult<TeamDTO>> GetTeamById(int teamId);
         Task<ServiceResult<TeamDTO>> UpdateTeam (int teamId, TeamUpdateRequest request);
+        Task<ServiceResult<TeamDTO>> ChangeOwner(int teamId, TeamChangeOwnerRequest request);
         Task<ServiceResult<bool>> DeleteTeam(int teamId);
 
         Task<ServiceResult<bool>> IsUserOwner(int userId, int teamId);

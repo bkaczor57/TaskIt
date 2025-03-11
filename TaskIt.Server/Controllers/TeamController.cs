@@ -17,15 +17,12 @@ namespace TaskIt.Server.Controllers
     {
 
         private readonly ITeamService  _teamService;
-        private readonly IUserTeamService _userTeamService;
         private readonly IServiceHelper _servicerHelper;
 
-        public TeamController(ITeamService teamService, IUserTeamService userTeamService, IServiceHelper servicerHelper)
+        public TeamController(ITeamService teamService, IServiceHelper servicerHelper)
         {
             _teamService = teamService;
-            _userTeamService = userTeamService;
             _servicerHelper = servicerHelper;
-
         }
 
         [HttpPost]
@@ -50,18 +47,6 @@ namespace TaskIt.Server.Controllers
                 return NotFound(new { error = result.ErrorMessage });
             return Ok(result.Data);
         }
-
-        [HttpGet("{teamId}/members")]
-        public async Task<IActionResult> GetTeamMembers(int teamId)
-        {
-            if (!await _servicerHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
-                return Unauthorized(new { error = "You are not a member of this team" });
-            var result = await _userTeamService.GetUsersByTeamId(teamId);
-            if (!result.Success)
-                return NotFound(new { error = result.ErrorMessage });
-            return Ok(result.Data);
-        }
-
 
         [HttpDelete("{teamId}")]
         public async Task<IActionResult> DeleteTeam(int teamId)
@@ -90,10 +75,23 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpPut("{teamId}/change-owner")]
+        public async Task<IActionResult> ChangeOwnerOfTeam([FromBody] TeamChangeOwnerRequest updateRequest, int teamId)
+        {
+            if (!await _servicerHelper.CanPerformAction(GetUserId(), teamId))
+                return Unauthorized(new { error = "You are not a owner of this team" });
 
+            var result = await _teamService.ChangeOwner(teamId, updateRequest);
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+ 
         private int GetUserId()
         {
             return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         }
+
     }
 }

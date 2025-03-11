@@ -72,8 +72,6 @@ namespace TaskIt.Server.Services
             {
                 return ServiceResult<TeamDTO>.Fail("Team not Found");
             }
-
-
             if (request.Name != null)
             {
                 team.Name = request.Name;
@@ -84,6 +82,33 @@ namespace TaskIt.Server.Services
             }
             _teamRepository.UpdateTeam(team);
             await _teamRepository.SaveChangesAsync();
+            return ServiceResult<TeamDTO>.Ok(TeamMapper.ToTeamDTO(team));
+        }
+
+        public async Task<ServiceResult<TeamDTO>> ChangeOwner(int teamId, TeamChangeOwnerRequest request)
+        {
+            var team = await _teamRepository.GetTeamById(teamId);
+            if (team == null)
+            {
+                return ServiceResult<TeamDTO>.Fail("Team not Found");
+            }
+            var isUserInTeamResult = await _userTeamService.IsUserInTeam(teamId, request.NewOwnerId);
+            if (!isUserInTeamResult.Success || !isUserInTeamResult.Data)
+            {
+                return ServiceResult<TeamDTO>.Fail("User not in Team");
+            }
+
+            var userTeamRequest = new UserTeamUpdateRequest
+            {
+                Role = Core.Enums.UserTeamRole.Admin
+            };
+            await _userTeamService.UpdateUserRoleInTeam(teamId, request.NewOwnerId, userTeamRequest);
+
+            team.OwnerId = request.NewOwnerId;
+            _teamRepository.UpdateTeam(team);
+            await _teamRepository.SaveChangesAsync();
+
+
             return ServiceResult<TeamDTO>.Ok(TeamMapper.ToTeamDTO(team));
         }
 

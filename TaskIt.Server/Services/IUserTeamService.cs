@@ -10,9 +10,9 @@ namespace TaskIt.Server.Services
         //Add User to Team
         Task<ServiceResult<UserTeamDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest);
         //Delete User From Team
-        Task<ServiceResult<bool>> DeleteUserFromTeam(UserTeamDeleteRequest userTeamRequest);
+        Task<ServiceResult<bool>> DeleteUserFromTeam(int teamId, int userId);
         // Update User Role in Team
-        Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(UserTeamUpdateRequest userTeamRequest);
+        Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest);
 
         // Get Users in Team
         Task<ServiceResult<bool>> IsUserInTeam(int teamId, int userId);
