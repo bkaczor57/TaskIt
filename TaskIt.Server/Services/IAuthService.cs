@@ -8,5 +8,6 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<UserDTO>> Register(UserRegisterRequest request);
         
         Task<ServiceResult<AuthResponseDTO>> Login(UserLoginRequest request);
+        Task<ServiceResult<AuthResponseDTO>> RefreshToken(RefreshTokenRequest request);
     }
 }

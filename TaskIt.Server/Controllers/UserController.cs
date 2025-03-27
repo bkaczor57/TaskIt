@@ -9,7 +9,7 @@ using TaskIt.Server.Services;
 namespace TaskIt.Server.Controllers
 {
     [Authorize]
-    [Route("api/user")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {

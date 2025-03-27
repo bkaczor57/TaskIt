@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -51,7 +52,7 @@ namespace TaskIt.Server.Services
                 return ServiceResult<AuthResponseDTO>.Fail("Niepoprawne dane logowania");
 
             var accessToken = GenerateAccessToken(user);
-            var refreshToken = GenerateRefreshToken();
+            var refreshToken = GenerateRefreshToken(user);
 
             var userDTO = UserMapper.ToUserDTO(user);
 
@@ -62,6 +63,32 @@ namespace TaskIt.Server.Services
                 RefreshToken = refreshToken
             });
 
+        }
+
+        public async Task<ServiceResult<AuthResponseDTO>> RefreshToken(RefreshTokenRequest request)
+        {
+            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            if (principal == null)
+                return ServiceResult<AuthResponseDTO>.Fail("Niepoprawny token");
+            var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return ServiceResult<AuthResponseDTO>.Fail("Brak e-maila.");
+
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user == null)
+                return ServiceResult<AuthResponseDTO>.Fail("Nie znaleziono użytkownika.");
+
+            var newAccessToken = GenerateAccessToken(user);
+            var newRefreshToken = GenerateRefreshToken(user);
+
+            var response = new AuthResponseDTO
+            {
+                User = UserMapper.ToUserDTO(user),
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+
+            return ServiceResult<AuthResponseDTO>.Ok(response);
         }
 
         private string GenerateAccessToken(Users user)
@@ -85,12 +112,52 @@ namespace TaskIt.Server.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private string GenerateRefreshToken()
+        private string GenerateRefreshToken(Users user)
         {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim("tokenType", "refresh")
+    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds,
+                claims: claims
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+                ValidateLifetime = false // Tu juz nie waliduje czasu tokena!
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+                if (securityToken is not JwtSecurityToken jwtToken ||
+                    !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    return null;
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

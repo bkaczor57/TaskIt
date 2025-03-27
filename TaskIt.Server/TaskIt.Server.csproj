@@ -5,7 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <SpaRoot>..\taskit.client</SpaRoot>
+	<!--
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+	-->
     <SpaProxyServerUrl>https://localhost:50699</SpaProxyServerUrl>
   </PropertyGroup>
 

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TaskIt.Server.DTOs;
+using TaskIt.Server.Mappings;
 using TaskIt.Server.Requests;
 using TaskIt.Server.Services;
 
@@ -53,7 +55,18 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.RefreshToken) || string.IsNullOrEmpty(request.AccessToken))
+                return BadRequest("Brak wymaganych danych.");
 
+            var result = await _authService.RefreshToken(request);
+            if(!result.Success)
+                return Unauthorized(new { error = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

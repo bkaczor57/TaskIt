@@ -38,6 +38,18 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("teams")]
+        public async Task<IActionResult> GetUserTeams()
+        {
+            var result = await _userTeamService.GetTeamsByUserId(GetUserId());
+
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+
         [HttpGet("users/{teamId}")]
         public async Task<IActionResult> GetAllUsers(int teamId)
         {

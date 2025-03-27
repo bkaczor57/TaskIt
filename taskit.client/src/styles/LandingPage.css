@@ -1,0 +1,94 @@
+/* Resetowanie domyslnych stylow */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Styl główny dla strony landing */
+.landing-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Blok z treścią */
+.content {
+    max-width: 90%;
+    width: 400px;
+}
+
+/* Nagłówek */
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Opis */
+p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* Kontener na przyciski */
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Styl przycisków */
+.btn {
+    display: block;
+    padding: 12px;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Przycisk logowania */
+.login-btn {
+    background: #ffffff;
+    color: #2a5298;
+    border: 2px solid #ffffff;
+}
+
+    .login-btn:hover {
+        background: transparent;
+        color: #ffffff;
+    }
+
+/* Przycisk rejestracji */
+.register-btn {
+    background: #ff9800;
+    color: white;
+    border: 2px solid #ff9800;
+}
+
+    .register-btn:hover {
+        background: transparent;
+        color: #ff9800;
+    }
+
+/* Responsywność dla mniejszych ekranów */
+@media (min-width: 768px) {
+    .buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .btn {
+        width: 150px;
+    }
+}
