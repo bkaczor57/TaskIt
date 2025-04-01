@@ -1,21 +1,31 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useContext } from "react";
 import "./Modal.css";
 import { RegisterSuccessModal } from "./RegisterSuccessModal";
+import AuthContext from "../../context/AuthContext";
 
 export const RegisterModal = ({ onClose, onOpenLogin }) => {
-    const [formData, setFormData] = useState({
-        email: "",
-        username: "",
-        password: "",
-        confirmPassword: "",
-        firstName: "",
-        lastName: "",
-      });
+  const { register, authError, registerResult,clearAuthError } = useContext(AuthContext);
 
+  const [formData, setFormData] = useState({
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+  });
+
+  
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [registeredUsername, setRegisteredUsername] = useState(null);
+  const [localError, setLocalError] = useState("");
+
+  const handleClose = () => {
+    setErrors({});
+    setLocalError("");
+    clearAuthError(); // wyczyść globalny błąd
+    onClose();        // zamyka modal z zewnątrz
+  };
+
 
   const validate = () => {
     const newErrors = {};
@@ -28,6 +38,11 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
     if (!formData.password) newErrors.password = "Hasło jest wymagane.";
     else if (formData.password.length < 8) newErrors.password = "Hasło musi mieć co najmniej 8 znaków.";
 
+    if (!formData.confirmPassword)
+      newErrors.confirmPassword = "Potwierdzenie hasła jest wymagane.";
+    else if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Hasła nie są zgodne.";
+
     if (!formData.firstName) newErrors.firstName = "Imię jest wymagane.";
     else if (formData.firstName.length < 2 || formData.firstName.length > 30)
       newErrors.firstName = "Imię musi mieć od 2 do 30 znaków.";
@@ -36,44 +51,36 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
     else if (formData.lastName.length < 2 || formData.lastName.length > 30)
       newErrors.lastName = "Nazwisko musi mieć od 2 do 30 znaków.";
 
-    if (!formData.confirmPassword) {
-        newErrors.confirmPassword = "Potwierdzenie hasła jest wymagane.";
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Hasła nie są zgodne.";
-      }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-
-
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLocalError("");
     if (!validate()) return;
 
     try {
-      const res = await axios.post("/api/Auth/register", formData);
-      setRegisteredUsername(res.data.username); // zakładamy, że backend zwraca username
+      await register(formData);
     } catch (err) {
-      if (err.response?.data?.error) {
-        setServerError(err.response.data.error);
-      } else {
-        setServerError("Wystąpił nieoczekiwany błąd.");
-      }
+      setLocalError(err.message); // Błąd obsługiwany globalnie i lokalnie
     }
   };
 
-  if (registeredUsername) {
+  if (registerResult) {
     return (
-      <RegisterSuccessModal username={registeredUsername} onClose={onClose} onOpenLogin={onOpenLogin} />
+      <RegisterSuccessModal
+        username={registerResult}
+        onClose={onClose}
+        onOpenLogin={onOpenLogin}
+      />
     );
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>✕</button>
+        <button className="close-btn" onClick={handleClose}>✕</button>
         <h2>Rejestracja</h2>
         <form onSubmit={handleRegister}>
           <input
@@ -91,7 +98,6 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           />
           {errors.username && <p className="error-message">{errors.username}</p>}
-          
 
           <input
             type="password"
@@ -106,9 +112,8 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
             placeholder="Potwierdź hasło"
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            />
-            {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-              <p className="error-message">Hasła nie są zgodne.</p>)}
+          />
+          {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
 
           <input
             type="text"
@@ -125,10 +130,13 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
           />
           {errors.lastName && <p className="error-message">{errors.lastName}</p>}
-
-          <button type="submit">Zarejestruj się</button>
+          <div className="form-buttons">
+          <button class="btn-green" type="submit">Zarejestruj się</button>
+          </div>
         </form>
-        {serverError && <p className="error-message">{serverError}</p>}
+        {(authError || localError) && (
+          <p className="error-message">{localError || authError}</p>
+        )}
       </div>
     </div>
   );

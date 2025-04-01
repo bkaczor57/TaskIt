@@ -1,45 +1,83 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
+import { loginUser, registerUser, changePassword } from "../services/AuthService";
+import UserContext from "./UserContext";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [authError, setAuthError] = useState(null);
+  const [registerResult, setRegisterResult] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const clearAuthError = () => setAuthError(null);
 
+
+  // Inicjalizacja po odświeżeniu strony
   useEffect(() => {
     const stored = localStorage.getItem("token");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setUser(parsed.user); 
-    }
+    setIsAuthenticated(!!stored);
     setIsLoading(false);
-
-    const handleLogoutEvent = () => {
-      logout();
-      navigate("/");
-    };
-
-    window.addEventListener("logout", handleLogoutEvent);
-    return () => {
-      window.removeEventListener("logout", handleLogoutEvent);
-    };
-    
   }, []);
 
-
-
-  const login = (userData) => {
-    localStorage.setItem("token", JSON.stringify(userData));
-    setUser(userData);
+  const login = async (email, password) => {
+    try {
+      const data = await loginUser(email, password);
+      localStorage.setItem("token", JSON.stringify(data));
+      setIsAuthenticated(true);
+      setAuthError(null);
+      // Wywołujemy custom event, który spowoduje ponowne załadowanie danych użytkownika
+      window.dispatchEvent(new Event('userLogin'));
+    } catch (err) {
+      setAuthError(err.message);
+      throw err;
+    }
   };
 
+  const register = async (userData) => {
+    try {
+      const result = await registerUser(userData);
+      setRegisterResult(result.username);
+      setAuthError(null);
+    } catch (err) {
+      setAuthError(err.message);
+      throw err;
+    }
+  };
+
+  const changeUserPassword = async (oldPassword, newPassword) => {
+    try {
+      await changePassword(oldPassword, newPassword);
+      setAuthError(null);
+    } catch (err) {
+      setAuthError(err.message);
+      throw err;
+    }
+  };
+
+  // Obsługa wylogowania - usuwanie wszystkiego z localStorage
   const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+    localStorage.clear();
+    setIsAuthenticated(false); 
+    setAuthError(null);
+    window.dispatchEvent(new Event("logout"));
+    
+    window.location.href = "/";
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout , isLoading}}>
+    <AuthContext.Provider
+      value={{
+        login,
+        register,
+        logout,
+        isAuthenticated,
+        authError,
+        registerResult,
+        isLoading,
+        clearAuthError,
+        changeUserPassword
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

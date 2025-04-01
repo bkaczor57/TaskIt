@@ -22,27 +22,26 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes("/Auth/refresh")
-    ) {
-      originalRequest._retry = true;
+      ) {
+        originalRequest._retry = true;
+        try {
+          const token = JSON.parse(localStorage.getItem("token"));
+          const refreshResponse = await axios.post("/api/Auth/refresh", {
+            refreshToken: token.refreshToken
+          });
 
-      try {
-        const tokens = JSON.parse(localStorage.getItem("token"));
-        const refreshResponse = await axios.post("/api/Auth/refresh", {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken
-        });
+          const newData = refreshResponse.data;
+          
+          localStorage.setItem("token", JSON.stringify(newData));
 
-        const newData = refreshResponse.data;
-        localStorage.setItem("token", JSON.stringify(newData));
-
-        originalRequest.headers.Authorization = `Bearer ${newData.accessToken}`;
-        return api(originalRequest); // ponawiamy oryginalne żądanie
-      } catch (refreshError) {
-        localStorage.removeItem("token");
-        window.dispatchEvent(new Event("logout"));
-        window.location.href = "/";
-        return Promise.reject(refreshError);
-      }
+          originalRequest.headers.Authorization = `Bearer ${newData.accessToken}`;
+          return api(originalRequest); // ponawiamy oryginalne żądanie
+        } catch (refreshError) {
+          localStorage.removeItem("token");
+          window.dispatchEvent(new Event("logout"));
+          window.location.href = "/";
+          return Promise.reject(refreshError);
+        }
     }
 
     return Promise.reject(error);

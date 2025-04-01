@@ -55,18 +55,33 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] UserPasswordRequest request)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var result = await _authService.ChangePassword(userId, request);
+
+            if (!result.Success)
+                return BadRequest(new { error = result.ErrorMessage });
+
+            return Ok(new { message = "Hasło zostało zmienione." });
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            if (request == null || string.IsNullOrEmpty(request.RefreshToken) || string.IsNullOrEmpty(request.AccessToken))
+            if (request == null || string.IsNullOrEmpty(request.RefreshToken))
                 return BadRequest("Brak wymaganych danych.");
 
             var result = await _authService.RefreshToken(request);
             if(!result.Success)
                 return Unauthorized(new { error = result.ErrorMessage });
 
-            return Ok(result.Data);
+            return Ok(result.Data); 
         }
+
+
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

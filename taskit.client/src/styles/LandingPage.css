@@ -38,52 +38,17 @@ p {
 }
 
 /* Kontener na przyciski */
-.buttons {
+.landing-buttons {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* Styl przycisków */
-.btn {
-    display: block;
-    padding: 12px;
-    font-size: 1rem;
-    text-decoration: none;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* Przycisk logowania */
-.login-btn {
-    background: #ffffff;
-    color: #2a5298;
-    border: 2px solid #ffffff;
-}
-
-    .login-btn:hover {
-        background: transparent;
-        color: #ffffff;
-    }
-
-/* Przycisk rejestracji */
-.register-btn {
-    background: #ff9800;
-    color: white;
-    border: 2px solid #ff9800;
-}
-
-    .register-btn:hover {
-        background: transparent;
-        color: #ff9800;
-    }
 
 /* Responsywność dla mniejszych ekranów */
 @media (min-width: 768px) {
-    .buttons {
+    .landing-buttons {
         flex-direction: row;
         justify-content: center;
     }

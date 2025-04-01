@@ -1,23 +1,28 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import ProtectedRoute from "./components/ProtectedRoute";
-import { RegisterSuccessModal } from './components/RegisterSuccessModal';
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import ProtectedLayout from './layouts/ProtectedLayout';
 import LandingPage from './pages/LandingPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-
+import './styles/GlobalStyles.css';
 import './App.css';
 
 function App() {
     return (
         <div className="app-container">
             <Routes>
+                {/* publiczne strony */}
                 <Route path="/" element={<LandingPage />} />
-                
-                <Route path="/dashboard" element={
+
+                {/* strony dostepne po zalogowaniu dla kazdego */}
+                <Route element ={ 
                     <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                    } />
+                        <ProtectedLayout/>
+                    </ProtectedRoute>}>
+
+                        <Route path="/dashboard" element={<Dashboard />} />
+                    
+                </Route>
             </Routes>
         </div>
     );
@@ -25,14 +30,11 @@ function App() {
 
 // function App() {
 //     return (
-//       <div>
-//         <RegisterSuccessModal
-//           username="test_user123"
-//           onClose={() => console.log("zamknij")}
-//           onOpenLogin={() => console.log("przejdź do logowania")}
-//         />
-//       </div>
+//         <div className="app-container">
+//             <Navbar/>
+//         </div>
 //     );
-//   }
+// }
+
 
 export default App;

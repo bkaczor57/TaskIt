@@ -1,21 +1,17 @@
 import { useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
-import api from "../services/Api";
+import UserContext from '../context/UserContext';
 
 const Dashboard = () => {
   const { logout } = useContext(AuthContext);
-  const [user, setUser] = useState(null);
+  const { isUserLoading } = useContext(UserContext);
 
-  useEffect(() => {
-    api.get("/User")
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error("Błąd pobierania danych:", err));
-  }, []);
+  if (isUserLoading) return null;
 
   return (
     <div>
-      <h1>Witaj, {user?.username}!</h1>
-      <button className="btn register-btn" onClick={logout}>Wyloguj się</button>
+      
+      <button className="" onClick={logout}>Wyloguj się</button>
     </div>
   );
 };

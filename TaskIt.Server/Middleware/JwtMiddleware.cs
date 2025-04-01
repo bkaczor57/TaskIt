@@ -44,6 +44,7 @@ public class JwtMiddleware
                 ValidateAudience = true,
                 ValidIssuer = issuer,
                 ValidAudience = audience,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 

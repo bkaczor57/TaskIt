@@ -185,16 +185,20 @@ namespace TaskIt.Server.Data
 
             // CHECK CONSTRAINT dla Notifications – tylko jedno powiązanie
             modelBuilder.Entity<Notifications>()
-                .ToTable(tb => tb.HasCheckConstraint("CK_Notifications_OnlyOneReference", @"
-            (""TaskId"" IS NOT NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NULL) OR
-            (""TaskId"" IS NULL AND ""CommentId"" IS NOT NULL AND ""TeamId"" IS NULL) OR
-            (""TaskId"" IS NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NOT NULL)
-        "));
+                .ToTable(tb => tb.HasCheckConstraint
+                    ("CK_Notifications_OnlyOneReference", @"
+                    (""TaskId"" IS NOT NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NULL) OR
+                    (""TaskId"" IS NULL AND ""CommentId"" IS NOT NULL AND ""TeamId"" IS NULL) OR
+                    (""TaskId"" IS NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NOT NULL)
+                    "));
             
             // CHECK CONSTRAINT dla TeamInvites – użytkownik nie może zaprosić siebie
             modelBuilder.Entity<TeamInvites>()
-                .ToTable(tb => tb.HasCheckConstraint("CK_TeamInvites_InvitingNotSelf",
-                "\"InvitedUserId\" <> \"InvitingUserId\""));
+                .ToTable(tb => tb.HasCheckConstraint
+                    ("CK_TeamInvites_InvitingNotSelf",
+                    "\"InvitedUserId\" <> \"InvitingUserId\""));
+
+            
 
         }
     }

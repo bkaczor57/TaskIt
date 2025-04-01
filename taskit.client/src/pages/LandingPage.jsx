@@ -1,16 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import UserContext from "../context/UserContext";
 import "../styles/LandingPage.css";
-import LoginModal from "../components/LoginModal"
-import RegisterModal from "../components/RegisterModal"
+import LoginModal from "../components/modals/LoginModal"
+import RegisterModal from "../components/modals/RegisterModal"
 
 
 const LandingPage = () => {
-    const { user,logout } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
+    const { user, isUserLoading } = useContext(UserContext);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister,setShowRegister] = useState(false);
-     const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    if (isUserLoading) return null;
 
      return (
     <div className="landing-container">
@@ -20,20 +24,20 @@ const LandingPage = () => {
         {user && (
           <p className="greeting-text">Witaj, {user.username}!</p>
         )}
-        <div className="buttons">
+        <div className="form-buttons">
           {user ? (
             <>
               
-              <button className="btn login-btn" onClick={() => navigate("/dashboard")}>
+              <button className="btn-green " onClick={() => navigate("/dashboard")}>
                 Przejdź do Dashboardu
               </button>
-              <button className="btn register-btn" onClick={logout}>Wyloguj się</button>
+              <button className="btn-danger" onClick={logout}>Wyloguj się</button>
               
             </>
           ) : (
             <>
-              <button className="btn login-btn" onClick={() => setShowLogin(true)}>Zaloguj się</button>
-              <button className="btn register-btn" onClick={() => setShowRegister(true)}>Zarejestruj się</button>
+              <button className="btn-full-width btn-outline-blue" onClick={() => setShowLogin(true)}>Zaloguj się</button>
+              <button className="btn-full-width btn-orange " onClick={() => setShowRegister(true)}>Zarejestruj się</button>
             </>
           )}
         </div>

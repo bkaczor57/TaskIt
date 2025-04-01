@@ -9,5 +9,6 @@ namespace TaskIt.Server.Services
         
         Task<ServiceResult<AuthResponseDTO>> Login(UserLoginRequest request);
         Task<ServiceResult<AuthResponseDTO>> RefreshToken(RefreshTokenRequest request);
+        Task<ServiceResult<bool>> ChangePassword(int userId,UserPasswordRequest request);
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using TaskIt.Server.Core.Entities;
 using TaskIt.Server.DTOs;
 using TaskIt.Server.Mappings;
@@ -18,10 +20,13 @@ namespace TaskIt.Server.Services
         //Adding Repository 
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly string _jwtKey;
         public AuthService(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _jwtKey = _configuration["Jwt:Key"];
+
         }
         public async Task<ServiceResult<UserDTO>> Register(UserRegisterRequest request)
         {
@@ -54,27 +59,55 @@ namespace TaskIt.Server.Services
             var accessToken = GenerateAccessToken(user);
             var refreshToken = GenerateRefreshToken(user);
 
-            var userDTO = UserMapper.ToUserDTO(user);
-
             return ServiceResult<AuthResponseDTO>.Ok(new AuthResponseDTO
             {
-                User = userDTO,
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
             });
+        }
+
+        public async Task<ServiceResult<bool>> ChangePassword(int userId, UserPasswordRequest request)
+        {
+            // Pobierz użytkownika z bazy
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+            {
+                return ServiceResult<bool>.Fail("Użytkownik nie istnieje.");
+            }
+
+            // Zweryfikuj stare hasło
+            var isValid = Utilis.PasswordHasher.VerifyPassword(request.OldPassword, user.PasswordHash);
+            if (!isValid)
+            {
+                return ServiceResult<bool>.Fail("Niepoprawne aktualne hasło.");
+            }
+
+            // Zhashuj nowe hasło
+            var newHashedPassword = Utilis.PasswordHasher.HashPassword(request.NewPassword);
+            user.PasswordHash = newHashedPassword;
+
+            // Zaktualizuj użytkownika
+            _userRepository.UpdateUser(user);
+            await _userRepository.SaveChangesAsync();
+
+            return ServiceResult<bool>.Ok(true);
 
         }
 
         public async Task<ServiceResult<AuthResponseDTO>> RefreshToken(RefreshTokenRequest request)
         {
-            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            var principal = GetPrincipalFromRefreshToken(request.RefreshToken);
             if (principal == null)
-                return ServiceResult<AuthResponseDTO>.Fail("Niepoprawny token");
-            var email = principal.FindFirst(ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(email))
-                return ServiceResult<AuthResponseDTO>.Fail("Brak e-maila.");
+                return ServiceResult<AuthResponseDTO>.Fail("Niepoprawny lub wygasły refresh Token");
 
-            var user = await _userRepository.GetUserByEmail(email);
+            if(principal.FindFirst("tokenType")?.Value != "refresh")
+                return ServiceResult<AuthResponseDTO>.Fail("Niepoprawny token");
+
+            var id = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrEmpty(id))
+                return ServiceResult<AuthResponseDTO>.Fail("brak id.");
+
+            var user = await _userRepository.GetUserById(Int32.Parse(id));
             if (user == null)
                 return ServiceResult<AuthResponseDTO>.Fail("Nie znaleziono użytkownika.");
 
@@ -83,9 +116,8 @@ namespace TaskIt.Server.Services
 
             var response = new AuthResponseDTO
             {
-                User = UserMapper.ToUserDTO(user),
                 AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
+                RefreshToken = newRefreshToken,
             };
 
             return ServiceResult<AuthResponseDTO>.Ok(response);
@@ -94,19 +126,18 @@ namespace TaskIt.Server.Services
         private string GenerateAccessToken(Users user)
         {
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
-        };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
+                new Claim("UserRole", user.Role.ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: creds,
                 claims: claims
+
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -115,10 +146,10 @@ namespace TaskIt.Server.Services
         private string GenerateRefreshToken(Users user)
         {
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim("tokenType", "refresh")
-    };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
+                new Claim("tokenType", "refresh")
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -132,7 +163,7 @@ namespace TaskIt.Server.Services
         }
 
 
-        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        private ClaimsPrincipal? GetPrincipalFromRefreshToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -140,7 +171,8 @@ namespace TaskIt.Server.Services
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
-                ValidateLifetime = false // Tu juz nie waliduje czasu tokena!
+                ValidateLifetime = true, 
+                ClockSkew = TimeSpan.Zero
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

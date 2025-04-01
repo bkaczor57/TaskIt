@@ -1,0 +1,145 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding: 0 1rem;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1001;
+}
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.logo {
+  font-weight: bold;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 0;
+}
+.burger-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+@media (max-width: 768px) {
+  @media (max-width: 768px) {
+    .navbar {
+      position: relative;
+    }
+    .logo {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem;
+      font-weight: bold;
+      z-index: 0;
+    }
+    .navbar-left {
+      flex: 1;
+    }
+    .navbar-right {
+      flex: 1;
+      justify-content: flex-end;
+    }
+  }
+}
+.navbar-left {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.navbar-logo {
+  height: 40px;
+  margin-right: 10px;
+}
+.navbar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+/* ========== Ikony i awatar ========== */
+.navbar-icon {
+  font-size: 1.4rem;
+  cursor: pointer;
+  position: relative;
+}
+.navbar-avatar {
+  background-color: #cce5ff;
+  color: #004085;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  user-select: none;
+}
+/* ========== Dropdowny ========== */
+.navbar-notif-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 10;
+}
+.dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dropdown li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+.dropdown li:last-child {
+  border-bottom: none;
+}
+/* ========== Badge ========== */
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  height: 18px;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+/* ========== Przyciski w dropdownie ========== */
+.navbar-dropdown-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+/* Zobacz profil – biały z niebieską ramką */

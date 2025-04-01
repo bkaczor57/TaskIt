@@ -1,0 +1,150 @@
+/* === BAZA dla wszystkich przycisków === */
+.btn,
+[class^="btn-"] {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn:hover,
+[class^="btn-"]:hover {
+  background: #222;
+}
+
+/* === WARIANTY kolorystyczne === */
+.btn-blue {
+  background-color: #2a5298;
+}
+
+.btn-blue:hover {
+  background-color: #1e3c72;
+}
+
+.btn-outline-blue {
+  background: white;
+  color: #2a5298;
+  border: 2px solid #2a5298;
+}
+
+.btn-outline-blue:hover {
+  background: #2a5298;
+  color: white;
+}
+
+.btn-orange {
+  background-color: #ff9800;
+  border: 2px solid #ff9800;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: white;
+  color: #ff9800;
+}
+
+/* Niebieski - outline z solidowym hoverem */
+.btn-outline-blue-solid-hover:hover {
+  background-color: #2a5298;
+  color: white;
+}
+
+
+/* Szary neutralny */
+.btn-gray {
+  background-color: #666;
+}
+
+.btn-gray:hover {
+  background-color: #444;
+}
+
+/* Jasnoszary - outline */
+.btn-outline-gray {
+  background: white;
+  color: #666;
+  border: 2px solid #999;
+}
+
+.btn-outline-gray:hover {
+  background-color: #f0f0f0;
+  color: #444;
+}
+
+/* Zielony */
+.btn-green {
+  background-color: #28a745;
+  border: 2px solid #28a745;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: white;
+  color: #28a745;
+}
+
+/* Czerwony - np. usuń */
+.btn-danger {
+  background-color: #dc3545;
+  border: 2px solid #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: white;
+  color: #dc3545;
+}
+
+
+/* === Layouty / narzędziowe === */
+.btn-full-width {
+  width: 100%;
+}
+
+.btn-center {
+  display: block;
+  margin: 0 auto;
+}
+
+/* === Layout dla formularzy === */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 0;
+}
+.form-buttons button {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-buttons-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.logout-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+/* === Komunikaty === */
+.success-message {
+  color: #28a745;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}

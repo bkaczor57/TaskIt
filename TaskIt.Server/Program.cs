@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using TaskIt.Server.Data;
 using TaskIt.Server.Repository;
@@ -60,7 +61,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserTeamService, UserTeamService>();
 builder.Services.AddScoped<ISectionService, SectionService>();
-builder.Services.AddScoped<IServiceHelper, ServiceHelper>(); 
+builder.Services.AddScoped<IServiceHelper, ServiceHelper>();
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 
 
 // Add JWT Authentication
@@ -79,7 +83,8 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            ClockSkew = TimeSpan.Zero
         };
 
         options.Events = new JwtBearerEvents
@@ -132,8 +137,6 @@ app.UseHttpsRedirection();
 
 
 app.UseAuthentication();
-
-app.UseMiddleware<JwtMiddleware>();
 
 app.UseAuthorization();
 

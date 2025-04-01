@@ -1,0 +1,28 @@
+.layout-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+  
+.layout-body {
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+}
+  
+  .layout-sidebar {
+    width: 240px;
+    background-color: #f8f8f8;
+    border-right: 1px solid #ddd;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+  
+  .layout-main {
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: #f3f3f3;
+  }
+  
