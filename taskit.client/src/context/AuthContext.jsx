@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import { loginUser, registerUser, changePassword } from "../services/AuthService";
 import UserContext from "./UserContext";
+import api from "../services/Api";
 
 const AuthContext = createContext();
 
@@ -11,17 +12,54 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const clearAuthError = () => setAuthError(null);
 
+  const verifyToken = async () => {
+    try {
+      const stored = localStorage.getItem("token");
+      if (!stored) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      const token = JSON.parse(stored);
+      if (!token?.accessToken) {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        return;
+      }
+
+      // Próba wykonania żądania do API, które sprawdzi ważność tokenu
+      await api.get('/User');
+      setIsAuthenticated(true);
+    } catch (error) {
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+      if (error.response?.status === 401) {
+        window.dispatchEvent(new Event("logout"));
+      }
+    }
+  };
 
   // Inicjalizacja po odświeżeniu strony
   useEffect(() => {
-    const stored = localStorage.getItem("token");
-    setIsAuthenticated(!!stored);
-    setIsLoading(false);
+    verifyToken().finally(() => setIsLoading(false));
+  }, []);
+
+  // Nasłuchiwanie na zdarzenia związane z tokenem
+  useEffect(() => {
+    const handleLogout = () => {
+      setIsAuthenticated(false);
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    };
+
+    window.addEventListener("logout", handleLogout);
+    return () => window.removeEventListener("logout", handleLogout);
   }, []);
 
   const login = async (email, password) => {
     try {
       const data = await loginUser(email, password);
+      localStorage.clear();
       localStorage.setItem("token", JSON.stringify(data));
       setIsAuthenticated(true);
       setAuthError(null);

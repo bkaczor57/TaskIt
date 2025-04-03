@@ -118,6 +118,7 @@
   gap: 10px;
   margin: 20px 0;
 }
+
 .form-buttons button {
   flex: 1;
   min-width: 0;
@@ -146,5 +147,58 @@
 .error-message {
   color: red;
   font-size: 0.9rem;
-  margin-top: 10px;
+  margin: 0.25rem 0 0.5rem 0; /* <-- dolny margines dodaje odstęp */
+}
+
+/* Tooltipy */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.tooltip.left .tooltip-bubble {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+.tooltip-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+.tooltip-bubble {
+  visibility: hidden;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+
+
+.tooltip:hover .tooltip-bubble {
+  visibility: visible;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.layout-body {
+  height: calc(100vh - 60px); /* odejmuje wysokość navbaru */
 }

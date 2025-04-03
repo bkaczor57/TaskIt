@@ -21,8 +21,16 @@
   
   .layout-main {
     flex-grow: 1;
-    padding: 2rem;
+    padding: 0rem;
     overflow-y: auto;
     background-color: #f3f3f3;
   }
+
+  @media (min-width: 769px) {
+    .layout-body.sidebar-open .layout-main {
+      margin-left: 260px; /* Taka sama szerokość jak side-menu */
+      transition: margin-left 0.3s ease-in-out;
+    }
+  }
+  
   

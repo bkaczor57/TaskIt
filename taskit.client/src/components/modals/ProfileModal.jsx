@@ -36,7 +36,7 @@ export const ProfileModal = ({ onClose }) => {
     e.preventDefault();
     setLocalError("");
     setSuccessMessage("");
-    
+
     if (!validate()) return;
 
     try {
@@ -54,10 +54,21 @@ export const ProfileModal = ({ onClose }) => {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>✕</button>
         <h2>Profil użytkownika</h2>
-        
         <div className="user-info">
-          <p><strong>Email:</strong> {user?.email}</p>
-          <p><strong>Nazwa użytkownika:</strong> {user?.username}</p>
+          <p>
+            <strong>Email:</strong>
+            <span className="tooltip">
+              <span className="tooltip-text">{user?.email}</span>
+              <span className="tooltip-bubble">{user?.email}</span>
+            </span>
+          </p>
+          <p>
+            <strong>Nazwa użytkownika:</strong>
+            <span className="tooltip">
+              <span className="tooltip-text">{user?.username}</span>
+              <span className="tooltip-bubble">{user?.username}</span>
+            </span>
+          </p>
         </div>
 
         <form onSubmit={handleUpdate}>
@@ -78,7 +89,7 @@ export const ProfileModal = ({ onClose }) => {
           {errors.lastName && <p className="error-message">{errors.lastName}</p>}
           <div className="form-buttons">
             <button type="submit" className="btn-green">Zapisz zmiany</button>
-            <button 
+            <button
               type="button"
               className="btn-orange"
               onClick={() => setShowPasswordModal(true)}
@@ -86,9 +97,9 @@ export const ProfileModal = ({ onClose }) => {
               Zmień hasło
             </button>
           </div>
-          
+
         </form>
-        <button 
+        <button
           className="btn-danger btn-full-width"
           onClick={logout}
         >

@@ -3,14 +3,33 @@
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .protected-layout {
   display: flex;
+  flex: 1;
+  margin-top: 60px; /* wysokość navbara */
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+@media (min-width: 769px) {
+  .main-content {
+    margin-left: 260px; /* szerokość SideMenu */
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
 }

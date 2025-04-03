@@ -1,37 +1,55 @@
 .side-menu {
   display: flex;
-  width: 220px;
-  height: 100vh;
-  background-color: #f8f9fa;
+  flex-direction: column;
+  width: 260px;
+  height: calc(100vh - 60px);
+  background-color: #fff;
   padding: 1rem;
   border-right: 1px solid #ddd;
   box-sizing: border-box;
   transition: transform 0.3s ease-in-out;
-  flex-direction: column;
   gap: 0.5rem;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
 }
+
 
 @media (max-width: 768px) {
   .side-menu {
     position: fixed;
-    left: 0;
+    z-index: 2;
     transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
     width: 80%;
-    max-width: 260px;
-    height: calc(100vh - 60px); /* opcjonalnie – dopasuj wysokość */
-    background-color: #fff;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    z-index: 1000;
   }
 
   .side-menu.mobile-visible {
-    transform: translateX(0%);
+    transform: translateX(0);
+  }
+
+  .side-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 999;
+  }
+
+  .side-menu-overlay.visible {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 260px;
   }
 }
-
-
-
 
 /* Styl burgera */
 .burger-button {
@@ -39,11 +57,12 @@
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 1100;
+  z-index: 3;
   background: none;
   border: none;
   font-size: 1.8rem;
   cursor: pointer;
+  color: #333;
 }
 
 @media (max-width: 768px) {
@@ -51,7 +70,6 @@
     display: block;
   }
 }
-
 
 /* Przycisk */
 .side-link {
@@ -80,6 +98,7 @@
 .side-group-section {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .group-list {

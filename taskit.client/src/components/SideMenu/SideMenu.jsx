@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SideMenu.css';
+import CreateTeamModal from '../modals/CreateTeamModal';
+import TeamContext from '../../context/TeamContext';
 
 function SideMenu() {
   const navigate = useNavigate();
+  const { teams, fetchUserTeams } = useContext(TeamContext);
+
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 768);
+  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -28,6 +33,12 @@ function SideMenu() {
     return () => window.removeEventListener("toggleSidebar", toggleHandler);
   }, []);
 
+  useEffect(() => {
+    if (groupsOpen && teams.length === 0) {
+      fetchUserTeams();
+    }
+  }, [groupsOpen, teams, fetchUserTeams]);
+
   const handleNavigate = (path) => {
     navigate(path);
     if (isMobile) setIsOpen(false);
@@ -39,48 +50,56 @@ function SideMenu() {
     { id: 'settings', label: 'Ustawienia', path: '/settings' },
   ];
 
-  const groups = [
-    { id: 1, name: 'Frontend Team' },
-    { id: 2, name: 'Backend Masters' },
-    { id: 3, name: 'Projekt Inżynierskiaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
-  ];
-
   return (
-    <aside className={`side-menu ${isMobile ? (isOpen ? 'mobile-visible' : '') : ''}`}>
-      <nav>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
-          {menuItems.map(item => (
-            <li key={item.id}>
-              <button className="side-link" onClick={() => handleNavigate(item.path)}>
-                {item.label}
+    <>
+      {isMobile && isOpen && (
+        <div 
+          className="side-menu-overlay visible"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      <aside className={`side-menu ${isMobile ? (isOpen ? 'mobile-visible' : '') : ''}`}>
+        <nav>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
+            {menuItems.map(item => (
+              <li key={item.id}>
+                <button className="side-link" onClick={() => handleNavigate(item.path)}>
+                  {item.label}
+                </button>
+              </li>
+            ))}
+
+            <li>
+              <button className="side-link" onClick={() => setGroupsOpen(!groupsOpen)}>
+                Grupy <span>{groupsOpen ? '▾' : '▸'}</span>
               </button>
-            </li>
-          ))}
-          
-          <li>
-            <button className="side-link" onClick={() => setGroupsOpen(!groupsOpen)}>
-              Grupy <span>{groupsOpen ? '▾' : '▸'}</span>
-            </button>
-            
-            {groupsOpen && (
-              <ul className="group-list">
-                {groups.map(group => (
-                  <li key={group.id} onClick={() => handleNavigate(`/groups/${group.id}`)}>
-                    {group.name}
+
+              {groupsOpen && (
+                <ul className="group-list">
+                  {teams.length === 0 && <li style={{ paddingLeft: '1rem' }}>Brak zespołów</li>}
+                  {teams.map(group => (
+                    <li key={group.id} onClick={() => handleNavigate(`/groups/${group.id}`)}>
+                      {group.name}
+                    </li>
+                  ))}
+                  <li className="create-group" onClick={() => setIsCreateTeamModalOpen(true)}>
+                    + Utwórz grupę
                   </li>
-                ))}
-                <li className="create-group" onClick={() => handleNavigate('/groups/create')}>
-                  + Utwórz grupę
-                </li>
-                <li className="create-group" onClick={() => handleNavige('/groups/join')}>
-                  + Dołącz do grupy
-                </li>
-              </ul>
-            )}
-          </li>
-        </ul>
-      </nav>
-    </aside>
+                  <li className="create-group">
+                    + Dołącz do grupy
+                  </li>
+                </ul>
+              )}
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {isCreateTeamModalOpen && (
+        <CreateTeamModal onClose={() => setIsCreateTeamModalOpen(false)} />
+      )}
+    </>
   );
 }
 
