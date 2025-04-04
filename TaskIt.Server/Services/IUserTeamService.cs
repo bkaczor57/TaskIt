@@ -8,17 +8,17 @@ namespace TaskIt.Server.Services
     public interface IUserTeamService
     {
         //Add User to Team
-        Task<ServiceResult<UserTeamDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest);
+        Task<ServiceResult<TeamUserDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest);
         //Delete User From Team
         Task<ServiceResult<bool>> DeleteUserFromTeam(int teamId, int userId);
         // Update User Role in Team
-        Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest);
+        Task<ServiceResult<TeamUserDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest);
 
         // Get Users in Team
         Task<ServiceResult<bool>> IsUserInTeam(int teamId, int userId);
         Task<ServiceResult<UserTeamRole?>> GetUserRole(int teamId, int userId);
-        Task<ServiceResult<List<UserDTO?>>> GetUsersByTeamId(int teamId);
-        Task<ServiceResult<List<TeamDTO?>>> GetTeamsByUserId(int userId);
+        Task<ServiceResult<List<TeamUserDTO?>>> GetUsersByTeamId(int teamId);
+        Task<ServiceResult<List<UserTeamDTO?>>> GetTeamsByUserId(int userId);
 
        
 

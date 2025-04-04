@@ -5,7 +5,7 @@
   width: 260px;
   height: calc(100vh - 60px);
   background-color: #fff;
-  padding: 1rem;
+  padding: 0.5rem;
   border-left: 1px solid #ddd;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -28,9 +28,9 @@
 
 @media (max-width: 768px) {
   .group-sidebar {
-    z-index: 1000;
-    width: 80%;
-    max-width: 300px;
+    z-index: 2;
+    width:80%;
+    max-width: 260px;
   }
 
   .group-sidebar-overlay {
@@ -41,7 +41,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.2);
-    z-index: 2;
+    z-index: 1;
   }
 
   .group-sidebar-overlay.visible {
@@ -61,35 +61,133 @@
   transform: translateX(100%);
 }
 
-.group-sidebar.mobile {
-  width: 80%;
-  max-width: 300px;
-}
 
 .group-sidebar.desktop {
   width: 260px;
 }
 
 .group-info {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
-.group-info h3 {
-  margin: 0 0 0.5rem 0;
+.group-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.group-title {
+  font-size: 1.2rem;
+  font-weight: 600;
   color: #333;
+  margin: 0;
+}
+
+.group-title-edit {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.group-description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.group-description {
+  padding-right: 0.5rem; 
+  word-wrap: break-word; /* starszy zapis */
+  overflow-wrap: break-word; /* nowszy, bardziej zalecany */
+  white-space: pre-wrap; /* jeśli chcesz zachować nowe linie */
+}
+
+
+.group-description-box {
+  background-color: white;
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  margin-top: 0.5rem;
 }
 
 .group-description {
   color: #666;
   font-size: 0.9rem;
   margin: 0;
+  white-space: pre-wrap;
+}
+
+.group-description-edit {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.edit-button:hover {
+  color: #0056b3;
+}
+
+.save-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.edit-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .users-section {
   flex: 1;
   overflow-y: auto;
-  margin: 1rem 0;
+  margin: 0.5rem;
 }
 
 .users-toggle {
@@ -119,17 +217,82 @@
 
 .user-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: flex-start;
   background-color: #f8f9fa;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.5rem;
   border: 1px solid #ddd;
   border-radius: 6px;
+  gap:0.5rem;
 }
 
-.user-item.owner {
+.user-role {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.user-role.member {
+  background-color: #007bff;
+  color: white;
+}
+
+.user-role.manager {
+  background-color: #28a745;
+  color: white;
+}
+
+.user-role.admin {
+  background-color: #ff8894;
+  color: #000;
+}
+
+.user-role.owner {
+  background-color:#ffc107 ;
+  color: white;
+}
+
+.group-user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+  color: #333;
+}
+
+.info-button {
+  background: none;
+  border: none;
   color: #007bff;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-button:hover {
+  color: #0056b3;
+}
+
+.role-select {
+  padding: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background-color: white;
 }
 
 .remove-user {
@@ -201,8 +364,6 @@
   font-size: 1.2rem;
   cursor: pointer;
   color: #666;
-  padding: 0.5rem;
-  margin: -0.5rem -0.5rem 0.5rem 0;
 }
 
 .close-button:hover {

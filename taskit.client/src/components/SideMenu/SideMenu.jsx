@@ -2,11 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SideMenu.css';
 import CreateTeamModal from '../modals/CreateTeamModal';
-import TeamContext from '../../context/TeamContext';
+import UserTeamContext from '../../context/UserTeamContext';
+
 
 function SideMenu() {
   const navigate = useNavigate();
-  const { teams, fetchUserTeams } = useContext(TeamContext);
+  const { userTeams, fetchUserTeams } = useContext(UserTeamContext);
+
 
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -34,10 +36,10 @@ function SideMenu() {
   }, []);
 
   useEffect(() => {
-    if (groupsOpen && teams.length === 0) {
+    if (groupsOpen && userTeams.length === 0) {
       fetchUserTeams();
     }
-  }, [groupsOpen, teams, fetchUserTeams]);
+  }, [groupsOpen, userTeams, fetchUserTeams]);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -77,8 +79,8 @@ function SideMenu() {
 
               {groupsOpen && (
                 <ul className="group-list">
-                  {teams.length === 0 && <li style={{ paddingLeft: '1rem' }}>Brak zespołów</li>}
-                  {teams.map(group => (
+                  {userTeams.length === 0 && <li style={{ paddingLeft: '1rem' }}>Brak zespołów</li>}
+                  {userTeams.map(group => (
                     <li key={group.id} onClick={() => handleNavigate(`/groups/${group.id}`)}>
                       {group.name}
                     </li>

@@ -5,8 +5,8 @@ public interface IUserTeamRepository
 {
 
     Task<UsersTeams?> GetUserTeam(int teamId, int userId);
-    Task<List<Teams?>> GetTeamsByUserId(int userId);
-    Task<List<Users?>> GetUsersByTeamId(int teamId);
+    Task<List<UsersTeams>> GetTeamsByUserId(int userId);
+    Task<List<UsersTeams>> GetUsersByTeamId(int teamId);
     Task<UserTeamRole?> GetUserRole(int teamId, int userId);
     void AddUserToTeam(UsersTeams userTeams);
     void DeleteUserFromTeam(UsersTeams userTeams);

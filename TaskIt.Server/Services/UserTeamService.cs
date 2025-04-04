@@ -47,36 +47,54 @@ namespace TaskIt.Server.Services
             return ServiceResult<UserTeamRole?>.Ok(userRole);
         }
 
-        public async Task<ServiceResult<List<UserDTO?>>> GetUsersByTeamId(int teamId)
+        public async Task<ServiceResult<List<TeamUserDTO?>>> GetUsersByTeamId(int teamId)
         {
-            var users = await _userTeamRepository.GetUsersByTeamId(teamId);
+            var userTeams = await _userTeamRepository.GetUsersByTeamId(teamId);
             
-            if (users == null || users.Count == 0)
-                return ServiceResult<List<UserDTO?>>.Fail("No users in team");
+            if (userTeams == null || userTeams.Count == 0)
+                return ServiceResult<List<TeamUserDTO?>>.Fail("No users in team");
 
-            var usersDTOs = users.Select(UserMapper.ToUserDTO).ToList();
-            return ServiceResult<List<UserDTO?>>.Ok(usersDTOs);
+            var userTeamDTO = userTeams.Select(ut => new TeamUserDTO
+            {
+                Id = ut.User.Id,
+                Email = ut.User.Email,
+                Username = ut.User.Username,
+                FirstName = ut.User.FirstName,
+                LastName = ut.User.LastName,
+                Role = ut.Role.ToString(),
+
+            }).ToList();
+
+            return ServiceResult<List<TeamUserDTO?>>.Ok(userTeamDTO);
         }
 
-        public async Task<ServiceResult<List<TeamDTO?>>> GetTeamsByUserId(int userId)
+        public async Task<ServiceResult<List<UserTeamDTO?>>> GetTeamsByUserId(int userId)
         {
             var teams = await _userTeamRepository.GetTeamsByUserId(userId);
             if (teams == null || teams.Count==0)
-                return ServiceResult<List<TeamDTO?>>.Fail("No teams for user");
+                return ServiceResult<List<UserTeamDTO?>>.Fail("No teams for user");
             
-            var teamsDTOs = teams.Select(TeamMapper.ToTeamDTO).ToList();
 
-            return ServiceResult<List<TeamDTO?>>.Ok(teamsDTOs);
+            var userTeamDTOs = teams.Select(ut => new UserTeamDTO
+            {
+                Id = ut.Team.Id,
+                Name = ut.Team.Name,
+                Description= ut.Team.Description,
+                CreatedAt = ut.Team.CreatedAt,
+                Role = ut.Role.ToString()
+            }).ToList();
+
+            return ServiceResult<List<UserTeamDTO?>>.Ok(userTeamDTOs);
          }
 
 
-        public async Task<ServiceResult<UserTeamDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest)
+        public async Task<ServiceResult<TeamUserDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest)
         {
             // Check if user is already in the team
             var existingUser = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
             if (existingUser!=null)
             {
-                return ServiceResult<UserTeamDTO>.Fail("User is already in this team.");
+                return ServiceResult<TeamUserDTO>.Fail("User is already in this team.");
             }
 
             var userTeam = new UsersTeams
@@ -89,9 +107,18 @@ namespace TaskIt.Server.Services
             _userTeamRepository.AddUserToTeam(userTeam);
             await _userTeamRepository.SaveChangesAsync();
 
-            var userTeamDTO = UserTeamMapper.ToUserTeamDTO(userTeam);
 
-            return ServiceResult<UserTeamDTO>.Ok(userTeamDTO);
+            var teamUserDTO = new TeamUserDTO
+            {
+                Id = userTeam.User.Id,
+                Email = userTeam.User.Email,
+                Username = userTeam.User.Username,
+                FirstName = userTeam.User.FirstName,
+                LastName = userTeam.User.LastName,
+                Role = userTeam.Role.ToString()
+            };
+
+            return ServiceResult<TeamUserDTO>.Ok(teamUserDTO);
         }
 
 
@@ -110,12 +137,12 @@ namespace TaskIt.Server.Services
             return ServiceResult<bool>.Ok(true);
         }
 
-        public async Task<ServiceResult<UserTeamDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest)
+        public async Task<ServiceResult<TeamUserDTO>> UpdateUserRoleInTeam(int teamId, int userId, UserTeamUpdateRequest userTeamRequest)
         {
             var userTeam = await _userTeamRepository.GetUserTeam(teamId, userId);
             if (userTeam == null)
             {
-                return ServiceResult<UserTeamDTO>.Fail("User is not in team");
+                return ServiceResult<TeamUserDTO>.Fail("User is not in team");
             }
 
             userTeam.Role = userTeamRequest.Role ?? userTeam.Role;
@@ -123,9 +150,17 @@ namespace TaskIt.Server.Services
             _userTeamRepository.UpdateUserRoleInTeam(userTeam);
             await _userTeamRepository.SaveChangesAsync();
 
-            var userTeamDTO = UserTeamMapper.ToUserTeamDTO(userTeam);
+            var teamUserDTO = new TeamUserDTO
+            {
+                Id = userTeam.User.Id,
+                Email = userTeam.User.Email,
+                Username = userTeam.User.Username,
+                FirstName = userTeam.User.FirstName,
+                LastName = userTeam.User.LastName,
+                Role = userTeam.Role.ToString()
+            };
 
-            return ServiceResult<UserTeamDTO>.Ok(userTeamDTO);
+            return ServiceResult<TeamUserDTO>.Ok(teamUserDTO);
         }
 
 

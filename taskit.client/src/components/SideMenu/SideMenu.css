@@ -24,7 +24,7 @@
     transform: translateX(-100%);
     width: 80%;
     max-width: 300px;
-    z-index: 1000;
+    z-index: 3;
   }
 
   .side-menu.mobile-visible {
@@ -39,7 +39,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.2);
-    z-index: 999;
+    z-index: 3;
   }
 
   .side-menu-overlay.visible {

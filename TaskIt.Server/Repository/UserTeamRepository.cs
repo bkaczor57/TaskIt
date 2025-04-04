@@ -26,19 +26,19 @@ public class UserTeamRepository : IUserTeamRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<Users?>> GetUsersByTeamId(int teamId)
+    public async Task<List<UsersTeams>> GetUsersByTeamId(int teamId)
     {
         return await _context.UsersTeams
+            .Include(ut => ut.User)
             .Where(ut => ut.TeamId == teamId)
-            .Select(ut => ut.User)
             .ToListAsync();
     }
 
-    public async Task<List<Teams?>> GetTeamsByUserId(int userId)
+    public async Task<List<UsersTeams>> GetTeamsByUserId(int userId)
     {
         return await _context.UsersTeams
+            .Include(ut => ut.Team)
             .Where(ut => ut.UserId == userId)
-            .Select(ut => ut.Team)
             .ToListAsync();
     }
 

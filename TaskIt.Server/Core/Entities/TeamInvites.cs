@@ -7,9 +7,10 @@ namespace TaskIt.Server.Core.Entities
     {
         [Key]
         public int Id { get; set; }
-
+        //Foreign Key
         [Required]
         public int TeamId { get; set; }
+        public Teams? Team { get; set; } 
         [Required]
         // Foreign Key
         public int InvitedUserId { get; set; }
@@ -22,7 +23,6 @@ namespace TaskIt.Server.Core.Entities
         public InviteStatus Status { get; set; } = InviteStatus.Pending;
         public DateTime InviteDate { get; set; } = DateTime.UtcNow;
         public DateTime? ResponseDate { get; set;}
-
 
     }
 }
