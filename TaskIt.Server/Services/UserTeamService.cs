@@ -47,6 +47,25 @@ namespace TaskIt.Server.Services
             return ServiceResult<UserTeamRole?>.Ok(userRole);
         }
 
+        public async Task<ServiceResult<TeamUserDTO>> GetUserInTeam(int teamId, int userId)
+        {
+            var teamUser = await _userTeamRepository.GetUserTeam(teamId, userId);
+            if (teamUser == null)
+                return ServiceResult<TeamUserDTO>.Fail("Cannot Find User in Provided Team");
+
+            var teamUserDTO = new TeamUserDTO
+            {
+                Id = teamUser.User.Id,
+                Email = teamUser.User.Email,
+                Username = teamUser.User.Username,
+                FirstName = teamUser.User.FirstName,
+                LastName = teamUser.User.LastName,
+                Role = teamUser.Role.ToString()
+
+            };
+            return ServiceResult<TeamUserDTO>.Ok(teamUserDTO);
+        }
+
         public async Task<ServiceResult<List<TeamUserDTO?>>> GetUsersByTeamId(int teamId)
         {
             var userTeams = await _userTeamRepository.GetUsersByTeamId(teamId);
@@ -81,6 +100,7 @@ namespace TaskIt.Server.Services
                 Name = ut.Team.Name,
                 Description= ut.Team.Description,
                 CreatedAt = ut.Team.CreatedAt,
+                OwnerId=ut.Team.OwnerId,
                 Role = ut.Role.ToString()
             }).ToList();
 
@@ -88,13 +108,13 @@ namespace TaskIt.Server.Services
          }
 
 
-        public async Task<ServiceResult<TeamUserDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest)
+        public async Task<ServiceResult<AddUserToTeamDTO>> AddUserToTeam(UserTeamAddRequest userTeamRequest)
         {
             // Check if user is already in the team
             var existingUser = await _userTeamRepository.GetUserTeam(userTeamRequest.TeamId, userTeamRequest.UserId);
             if (existingUser!=null)
             {
-                return ServiceResult<TeamUserDTO>.Fail("User is already in this team.");
+                return ServiceResult<AddUserToTeamDTO>.Fail("User is already in this team.");
             }
 
             var userTeam = new UsersTeams
@@ -108,17 +128,14 @@ namespace TaskIt.Server.Services
             await _userTeamRepository.SaveChangesAsync();
 
 
-            var teamUserDTO = new TeamUserDTO
+            var addUserToTeamDTO = new AddUserToTeamDTO
             {
-                Id = userTeam.User.Id,
-                Email = userTeam.User.Email,
-                Username = userTeam.User.Username,
-                FirstName = userTeam.User.FirstName,
-                LastName = userTeam.User.LastName,
-                Role = userTeam.Role.ToString()
+                UserId = userTeam.UserId,
+                TeamId = userTeam.TeamId,
+                Role = userTeam.Role
             };
 
-            return ServiceResult<TeamUserDTO>.Ok(teamUserDTO);
+            return ServiceResult<AddUserToTeamDTO>.Ok(addUserToTeamDTO);
         }
 
 

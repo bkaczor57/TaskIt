@@ -15,6 +15,7 @@ public class UserTeamRepository : IUserTeamRepository
     public async Task<UsersTeams?> GetUserTeam(int teamId, int userId)
     {
         return await _context.UsersTeams
+            .Include(ut => ut.User)
             .FirstOrDefaultAsync(ut => ut.TeamId == teamId && ut.UserId == userId);
     }
 

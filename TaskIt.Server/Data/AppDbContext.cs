@@ -89,11 +89,7 @@ namespace TaskIt.Server.Data
             modelBuilder.Entity<TeamInvites>()
                 .Property(ti => ti.Status)
                 .HasConversion<string>(); // Zapisuje enum jako string w bazie
-            //Unikalność
-            //Unikalność InvitedUserId, InvitingUser i TeamId - uzytkownik nie może być zaproszony dwa razy do tego samego zespołu
-            modelBuilder.Entity<TeamInvites>()
-                .HasIndex(ti => new { ti.InvitedUserId, ti.TeamId })
-                .IsUnique();
+            
 
             //Tabela Sections
             //Relacje

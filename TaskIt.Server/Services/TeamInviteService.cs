@@ -6,14 +6,16 @@ using TaskIt.Server.Requests;
 
 namespace TaskIt.Server.Services
 {
-    public class TeamInviteService
+    public class TeamInviteService : ITeamInviteService
     {
         private readonly ITeamInvitesRepository _teamInvitesRepository;
         private readonly IUserTeamService _userTeamService;
-        public TeamInviteService(ITeamInvitesRepository teamInvitesRepository, IUserTeamService userTeamService)
+        private readonly IUserService _userService;
+        public TeamInviteService(ITeamInvitesRepository teamInvitesRepository, IUserTeamService userTeamService, IUserService userService)
         {
             _teamInvitesRepository = teamInvitesRepository;
             _userTeamService = userTeamService;
+            _userService = userService;
         }
         public async Task<ServiceResult<List<TeamInviteDTO>>> GetAllInvites()
         {
@@ -21,7 +23,7 @@ namespace TaskIt.Server.Services
 
             if (invites == null || invites.Count == 0)
                 return ServiceResult<List<TeamInviteDTO>>.Fail("No invites found");
-            var TeamInviteDTO = invites
+            var teamInviteDTO = invites
                 .Select(ti => new TeamInviteDTO
                 {
                     Id = ti.Id,
@@ -53,7 +55,7 @@ namespace TaskIt.Server.Services
                     ResponseDate = ti.ResponseDate
                 })
                .ToList();
-            return ServiceResult<List<TeamInviteDTO>>.Ok(TeamInviteDTO);
+            return ServiceResult<List<TeamInviteDTO>>.Ok(teamInviteDTO);
         }
         public async Task<ServiceResult<TeamInviteDTO?>> GetTeamInviteById(int inviteId)
         {
@@ -172,62 +174,69 @@ namespace TaskIt.Server.Services
             return ServiceResult<List<TeamInviteDTO>>.Ok(TeamInviteDTO);
         }
 
-        public async Task<ServiceResult<TeamInviteDTO>> CreateTeamInvite(TeamInviteRequest teamInviteRequest)
+        public async Task<ServiceResult<TeamInviteDTO>> CreateTeamInvite(TeamInviteRequest teamInviteRequest, int invitingUserId)
         {
-            
-
+            //Check if invitedUserExist
+            var userExist = await _userService.GetUserByEmail(teamInviteRequest.InvitedUserEmail);
+            if (!userExist.Success || userExist.Data==null)
+                return ServiceResult<TeamInviteDTO>.Fail("Invited user does not exist");
             //Check if user is in Team
-            var isUserInTeam = await _userTeamService.IsUserInTeam(teamInviteRequest.TeamId, teamInviteRequest.InvitedUserId);
-
+            var isUserInTeam = await _userTeamService.IsUserInTeam(teamInviteRequest.TeamId, userExist.Data.Id);
             if (isUserInTeam.Success)
                 return ServiceResult<TeamInviteDTO>.Fail("User is already in Team");
 
             //Check if there is Existing Invite that isn't Pending or Accepted
-            var isPendingInvite = await _teamInvitesRepository.getTeamInviteByTeamIdAndInvitedId(teamInviteRequest.TeamId, teamInviteRequest.InvitedUserId);
-
+            var isPendingInvite = await _teamInvitesRepository.getTeamInviteByTeamIdAndInvitedId(teamInviteRequest.TeamId, userExist.Data.Id);
             if (isPendingInvite?.Status == InviteStatus.Pending)
                 return ServiceResult<TeamInviteDTO>.Fail("Invite was already send");
+
+            if (teamInviteRequest.TeamRole.HasValue && !Enum.IsDefined(typeof(UserTeamRole), teamInviteRequest.TeamRole.Value))
+            {
+                return ServiceResult<TeamInviteDTO>.Fail("Invalid role specified.");
+            }
 
             var teamInvite = new TeamInvites
             {
                 TeamId = teamInviteRequest.TeamId,
-                InvitedUserId = teamInviteRequest.InvitedUserId,
-                InvitingUserId = teamInviteRequest.InvitingUserId,
+                InvitedUserId = userExist.Data.Id,
+                InvitingUserId = invitingUserId,
                 TeamRole = teamInviteRequest.TeamRole ?? Core.Enums.UserTeamRole.Member,
                 InviteDate = DateTime.UtcNow
             };
             _teamInvitesRepository.AddInvitation(teamInvite);
             await _teamInvitesRepository.SaveChangesAsync();
 
+            var savedInvite = await _teamInvitesRepository.getTeamInviteById(teamInvite.Id);
+
             var teamInviteDTO = new TeamInviteDTO
             {
-                Id = teamInvite.Id,
-                Team = teamInvite.Team == null ? null : new TeamInviteTeamDTO
+                Id = savedInvite.Id,
+                Team = savedInvite.Team == null ? null : new TeamInviteTeamDTO
                 {
-                    Id = teamInvite.Team.Id,
-                    Name = teamInvite.Team.Name,
-                    Description = teamInvite.Team.Description
+                    Id = savedInvite.Team.Id,
+                    Name = savedInvite.Team.Name,
+                    Description = savedInvite.Team.Description
                 },
-                InvitedUser = teamInvite.InvitedUser == null ? null : new TeamInviteUserDTO
+                InvitedUser = savedInvite.InvitedUser == null ? null : new TeamInviteUserDTO
                 {
-                    Id = teamInvite.InvitedUser.Id,
-                    Email = teamInvite.InvitedUser.Email,
-                    Username = teamInvite.InvitedUser.Username,
-                    FirstName = teamInvite.InvitedUser.FirstName,
-                    LastName = teamInvite.InvitedUser.LastName
+                    Id = savedInvite.InvitedUser.Id,
+                    Email = savedInvite.InvitedUser.Email,
+                    Username = savedInvite.InvitedUser.Username,
+                    FirstName = savedInvite.InvitedUser.FirstName,
+                    LastName = savedInvite.InvitedUser.LastName
                 },
-                InvitingUser = teamInvite.InvitingUser == null ? null : new TeamInviteUserDTO
+                InvitingUser = savedInvite.InvitingUser == null ? null : new TeamInviteUserDTO
                 {
-                    Id = teamInvite.InvitingUser.Id,
-                    Email = teamInvite.InvitingUser.Email,
-                    Username = teamInvite.InvitingUser.Username,
-                    FirstName = teamInvite.InvitingUser.FirstName,
-                    LastName = teamInvite.InvitingUser.LastName
+                    Id = savedInvite.InvitingUser.Id,
+                    Email = savedInvite.InvitingUser.Email,
+                    Username = savedInvite.InvitingUser.Username,
+                    FirstName = savedInvite.InvitingUser.FirstName,
+                    LastName = savedInvite.InvitingUser.LastName
                 },
-                TeamRole = teamInvite.TeamRole.ToString(),
-                Status = teamInvite.Status.ToString(),
-                InviteDate = teamInvite.InviteDate,
-                ResponseDate = teamInvite.ResponseDate
+                TeamRole = savedInvite.TeamRole.ToString(),
+                Status = savedInvite.Status.ToString(),
+                InviteDate = savedInvite.InviteDate,
+                ResponseDate = savedInvite.ResponseDate
             };
             return ServiceResult<TeamInviteDTO>.Ok(teamInviteDTO);
         }
@@ -241,6 +250,7 @@ namespace TaskIt.Server.Services
 
             if (invite.Status != InviteStatus.Pending)
                 return ServiceResult<bool>.Fail("Invite is already responded to");
+
 
             invite.Status = newStatus;
             invite.ResponseDate = DateTime.UtcNow;
@@ -259,6 +269,7 @@ namespace TaskIt.Server.Services
                     return ServiceResult<bool>.Fail(result.ErrorMessage ?? "Failed to add user to team");
                 }
             }
+
 
             await _teamInvitesRepository.SaveChangesAsync();
 

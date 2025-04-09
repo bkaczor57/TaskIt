@@ -1,14 +1,15 @@
-﻿using TaskIt.Server.Core.Enums;
+﻿using System.Text.Json.Serialization;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.Requests
 {
     public class TeamInviteRequest
     {
-        public int Id { get; set; }
         public int TeamId { get; set; }
-        public int InvitedUserId { get; set; }
-        public int InvitingUserId { get; set; }
-        public UserTeamRole? TeamRole { get; set; } 
+        public required string InvitedUserEmail { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public UserTeamRole? TeamRole { get; set; }
 
     }
 }

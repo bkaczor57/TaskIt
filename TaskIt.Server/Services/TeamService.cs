@@ -34,9 +34,9 @@ namespace TaskIt.Server.Services
             await _userTeamService.AddUserToTeam(userTeamRequest);
 
 
-            var userDTO = TeamMapper.ToTeamDTO(team);
+            var teamDTO = TeamMapper.ToTeamDTO(team);
 
-            return ServiceResult<TeamDTO>.Ok(userDTO);
+            return ServiceResult<TeamDTO>.Ok(teamDTO);
         }
 
         public async Task<ServiceResult<TeamDTO>> GetTeamById(int teamId)

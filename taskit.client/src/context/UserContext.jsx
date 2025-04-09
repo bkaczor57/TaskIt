@@ -1,7 +1,8 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import { getCurrentUser } from "../services/UserService";
 
 const UserContext = createContext();
+
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -15,6 +16,8 @@ export const UserProvider = ({ children }) => {
       setIsUserLoading(false);
       return;
     }
+
+    
 
     const storedUserRaw = localStorage.getItem("user");
     if (storedUserRaw) {
@@ -42,6 +45,8 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  
+
   useEffect(() => {
     loadUser();
 
@@ -66,11 +71,21 @@ export const UserProvider = ({ children }) => {
         userError,
         clearUser,
         setUser,
+        loadUser
       }}
     >
       {children}
     </UserContext.Provider>
   );
 };
+
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+};
+
 
 export default UserContext;

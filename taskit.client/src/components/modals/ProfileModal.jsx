@@ -3,6 +3,7 @@ import UserContext from "../../context/UserContext";
 import AuthContext from "../../context/AuthContext";
 import { updateCurrentUser } from "../../services/UserService";
 import { PasswordChangeModal } from "./PasswordChangeModal";
+import UserTeamContext from "../../context/UserTeamContext";
 import "./Modal.css";
 
 export const ProfileModal = ({ onClose }) => {
@@ -16,6 +17,8 @@ export const ProfileModal = ({ onClose }) => {
   const [localError, setLocalError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const { loadUser } = useContext(UserContext);
+  const { fetchUserTeams } = useContext(UserTeamContext);
 
   const validate = () => {
     const newErrors = {};
@@ -41,8 +44,11 @@ export const ProfileModal = ({ onClose }) => {
 
     try {
       const updatedUser = await updateCurrentUser(formData);
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      // setUser(updatedUser);
+      // localStorage.setItem("user", JSON.stringify(updatedUser));
+      await loadUser();           // <--- Fetchuj nowego usera
+      await fetchUserTeams();     // <--- Fetchuj grupy jeszcze raz
+      window.dispatchEvent(new Event("userUpdated"));  // <--- Wyślij event do całej aplikacji
       setSuccessMessage("Profil został zaktualizowany pomyślnie!");
     } catch (err) {
       setLocalError(err.message);

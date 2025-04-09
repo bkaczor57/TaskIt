@@ -57,16 +57,16 @@ function Navbar() {
 
     useEffect(() => {
         const handleResize = () => {
-          if (window.innerWidth < 768) {
-            setActiveDropdown(null);
-          }
+            if (window.innerWidth < 768) {
+                setActiveDropdown(null);
+            }
         };
-      
+
         window.addEventListener("resize", handleResize);
         return () => {
-          window.removeEventListener("resize", handleResize);
+            window.removeEventListener("resize", handleResize);
         };
-      }, []);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -88,17 +88,27 @@ function Navbar() {
     return (
         <>
             <nav className="navbar">
-                <div className="navbar-left">
-                    <span className="logo" onClick={goToDashboard}>TaskIt</span>
-                    <button className="burger-button" onClick={() => {
-                        window.dispatchEvent(new Event("toggleSidebar"));
-                    }}>
-                        ☰
-                    </button>
+                <div
+                    className="navbar-left"
+                    onClick={goToDashboard}
+                >
+                    <img
+                        src="/logo.png"
+                        alt="Task It Logo"
+                        className="navbar-logo"
+                    />
+                    <span className="navbar-title">Task It</span>
                 </div>
 
+                <button
+                    className="burger-button"
+                    onClick={() => window.dispatchEvent(new Event("toggleSidebar"))}
+                >
+                    ☰
+                </button>
+
                 <div className="navbar-right">
-                    <div className="navbar-notif-wrapper"  ref={notifRef}>
+                    <div className="navbar-notif-wrapper" ref={notifRef}>
                         <div className="navbar-icon" onClick={() => toggleDropdown('notif')}>&#128276;</div>
                         {unreadCount > 0 && <div className="notif-badge">{unreadCount}</div>}
                         {activeDropdown === 'notif' && (

@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import TeamContext from '../../context/TeamContext';
 import './Modal.css';
 
-const CreateTeamModal = ({ onClose }) => {
+const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
   const {
     createTeam,
     createTeamResult,
@@ -17,21 +17,22 @@ const CreateTeamModal = ({ onClose }) => {
     description: ''
   });
 
-  const handleClose = () => {
-    setErrors({});
-    setLocalError('');
+  const handleClose = async () => {
     clearApiError();
     onClose();
+
+    if (createTeamResult) { 
+      await fetchUserTeams();   
+      navigate(`/groups/${createTeamResult.id}`); 
+    }
   };
 
   const validate = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = 'Nazwa jest wymagana.';
     else if (formData.name.length >= 50) newErrors.name = 'Nazwa może mieć maksymalnie 50 znaków.';
-
     if (formData.description.length >= 500)
       newErrors.description = 'Opis może mieć maksymalnie 500 znaków.';
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -54,8 +55,9 @@ const CreateTeamModal = ({ onClose }) => {
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={handleClose}>✕</button>
           <h2>Grupa została utworzona</h2>
-          <p>Grupa <strong>{createTeamResult}</strong> została dodana poprawnie.</p>
-          <button className="btn-green" onClick={handleClose}>Zamknij</button>
+          <p>Grupa <strong>{createTeamResult.name}</strong> została dodana poprawnie.</p>
+
+          <button className="btn-green" onClick={handleClose}>Przejdź do grupy</button>
         </div>
       </div>
     );
@@ -93,5 +95,4 @@ const CreateTeamModal = ({ onClose }) => {
     </div>
   );
 };
-
 export default CreateTeamModal;

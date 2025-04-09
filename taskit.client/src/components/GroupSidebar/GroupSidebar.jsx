@@ -3,7 +3,9 @@ import './GroupSidebar.css';
 import UserContext from '../../context/UserContext';
 import UserTeamContext from '../../context/UserTeamContext';
 import TeamContext from '../../context/TeamContext';
-import { FaUsers, FaSignOutAlt, FaTrash, FaTimes, FaPencilAlt, FaInfoCircle } from 'react-icons/fa';
+import { FaUsers, FaSignOutAlt, FaTrash, FaTimes, FaPencilAlt, FaInfoCircle, FaUserPlus } from 'react-icons/fa';
+import InviteModal from '../modals/InviteModal';
+import UserInfoModal from '../modals/UserInfoModal';
 
 const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDeleteGroup, onGroupUpdated }) => {
   const [showUsers, setShowUsers] = useState(false);
@@ -11,6 +13,9 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedName, setEditedName] = useState(group.name);
   const [editedDescription, setEditedDescription] = useState(group.description || '');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const { setCurrentTeam } = useContext(TeamContext);
 
   const { teamUsers, fetchTeamUsers, updateUserRole } = useContext(UserTeamContext);
   const { user } = useContext(UserContext);
@@ -18,6 +23,8 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
 
   const isOwner = user?.id === group.ownerId;
   const isAdmin = teamUsers.find(u => u.id === user?.id)?.role === 'Admin';
+  const isManager = teamUsers.find(u => u.id === user?.id)?.role === 'Manager';
+  const canInviteUsers = isOwner || isAdmin || isManager;
 
   useEffect(() => {
     if (group) {
@@ -48,19 +55,20 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
     }
   };
 
-  const renderRoleSelect = (teamUser) => (
-    (isAdmin || isOwner) && teamUser.id !== group.ownerId && (
-      <select
-        className="role-select"
-        value={teamUser.role}
-        onChange={(e) => handleRoleChange(teamUser.id, e.target.value)}
-      >
-        <option value="Member">Member</option>
-        <option value="Manager">Manager</option>
-        <option value="Admin">Admin</option>
-      </select>
-    )
-  );
+  useEffect(() => {
+    const handleUserUpdated = () => {
+      if (group?.id) {
+        fetchTeamUsers(group.id);  // <--- odśwież użytkowników w grupie
+      }
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdated);
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdated);
+    };
+  }, [group?.id, fetchTeamUsers]);
+
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -69,6 +77,11 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
     } catch (error) {
       console.error('Błąd podczas aktualizacji roli użytkownika:', error);
     }
+  };
+
+  const handleShowUserInfo = (user) => {
+    setCurrentTeam(group)
+    setSelectedUser(user);
   };
 
   return (
@@ -129,9 +142,20 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
         </div>
 
         <div className="users-section">
-          <button className="users-toggle" onClick={toggleUsers}>
-            <FaUsers /> Użytkownicy ({teamUsers.length})
-          </button>
+          <div className="users-header">
+            <button className="users-toggle" onClick={toggleUsers}>
+              <FaUsers /> Użytkownicy ({teamUsers.length})
+            </button>
+            {canInviteUsers && (
+              <button
+                className="invite-user-button"
+                onClick={() => setShowInviteModal(true)}
+                title="Zaproś użytkownika"
+              >
+                <FaUserPlus />
+              </button>
+            )}
+          </div>
           {showUsers && (
             <div className="users-list">
               {teamUsers.map(user => (
@@ -139,7 +163,9 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
                   key={user.id}
                   className="user-item"
                 >
-                  <div className={`user-role ${user.role.toLowerCase()}`}>{user.role[0]}</div>
+                  <div className={`user-role ${user.id === group.ownerId ? 'owner' : user.role.toLowerCase()}`}>
+                    {user.id === group.ownerId ? 'O' : user.role[0]}
+                  </div>
                   <div className="user-name" title={`${user.firstName} ${user.lastName}`}>
                     {user.firstName} {user.lastName}
                   </div>
@@ -151,7 +177,6 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
                   </button>
                 </div>
               ))}
-              
             </div>
           )}
         </div>
@@ -164,6 +189,22 @@ const GroupSidebar = ({ group, isMobile, isVisible, onClose, onLeaveGroup, onDel
           )}
         </div>
       </aside>
+
+      {showInviteModal && (
+        <InviteModal
+          onClose={() => setShowInviteModal(false)}
+          teamId={group.id}
+        />
+      )}
+
+      {selectedUser && (
+        <UserInfoModal
+          onClose={() => setSelectedUser(null)}
+          teamId={group.id}
+          userId={selectedUser.id}
+          onUserUpdated={() => fetchTeamUsers(group.id)}
+        />
+      )}
     </>
   );
 };

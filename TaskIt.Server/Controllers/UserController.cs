@@ -55,9 +55,7 @@ namespace TaskIt.Server.Controllers
             return NoContent();
         }
 
-
-        //Admin Only
-        [Authorize(Policy = "AdminOnly")]
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -83,6 +81,11 @@ namespace TaskIt.Server.Controllers
             if (!result.Success)
                 return NotFound(new { error = result.ErrorMessage });
             return Ok(result.Data);
+        }
+
+        private int GetUserId()
+        {
+            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         }
 
 

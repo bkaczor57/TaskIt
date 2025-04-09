@@ -1,5 +1,6 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useContext } from 'react';
 import TeamService from '../services/TeamService';
+import UserTeamContext from './UserTeamContext';
 
 const TeamContext = createContext();
 
@@ -7,11 +8,12 @@ export const TeamProvider = ({ children }) => {
   const [createTeamResult, setCreateTeamResult] = useState(null);
   const [apiError, setApiError] = useState(null);
   const [currentTeam, setCurrentTeam] = useState(null);
+  const { fetchUserTeams } = useContext(UserTeamContext);
 
   const createTeam = async (name, description) => {
     try {
       const team = await TeamService.createTeam(name, description);
-      setCreateTeamResult(team.name);
+      setCreateTeamResult(team);
       setApiError(null);
       return team;
     } catch (error) {
@@ -34,6 +36,7 @@ export const TeamProvider = ({ children }) => {
   const updateTeam = async (teamId, updatedData) => {
     try {
       const team = await TeamService.updateTeam(teamId, updatedData);
+      await fetchUserTeams(); 
       return team; 
     } catch (error) {
       setApiError(error.message);
@@ -44,6 +47,7 @@ export const TeamProvider = ({ children }) => {
   const deleteTeam = async (teamId) => {
     try {
       await TeamService.deleteTeam(teamId);
+      await fetchUserTeams(); 
     } catch (error) {
       setApiError(error.message);
       throw error;
@@ -83,6 +87,14 @@ export const TeamProvider = ({ children }) => {
       {children}
     </TeamContext.Provider>
   );
+};
+
+export const useTeam = () => {
+  const context = useContext(TeamContext);
+  if (!context) {
+    throw new Error("useTeam must be used within a TeamProvider");
+  }
+  return context;
 };
 
 export default TeamContext;

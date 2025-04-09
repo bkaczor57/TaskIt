@@ -38,7 +38,25 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
-        [HttpGet("teams")]
+        [HttpGet("team/{teamId}/user/{userId}")]
+        public async Task<IActionResult> GetUserInTeam(int teamId, int userId)
+        {
+            if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, Core.Enums.UserTeamRole.Member))
+            {
+                return Unauthorized(new { error = "You don't have permission to perform this action" });
+            }
+
+            var result = await _userTeamService.GetUserInTeam(teamId, userId);
+
+            if (!result.Success)
+                return BadRequest(new { error = result.ErrorMessage });
+
+
+
+            return Ok(result.Data);
+        }
+
+        [HttpGet("user/teams")]
         public async Task<IActionResult> GetUserTeams()
         {
             var result = await _userTeamService.GetTeamsByUserId(GetUserId());
@@ -50,7 +68,7 @@ namespace TaskIt.Server.Controllers
         }
 
 
-        [HttpGet("users/{teamId}")]
+        [HttpGet("team/{teamId}/users")]
         public async Task<IActionResult> GetAllUsers(int teamId)
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, Core.Enums.UserTeamRole.Member))
@@ -63,7 +81,7 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
-        [HttpGet("teams/{userId}")]
+        [HttpGet("user/{userId}/teams")]
         public async Task<IActionResult> GetAllTeams(int userId)
         {
             if (!await _serviceHelper.IsSelf(GetUserId(),userId)&&!await _serviceHelper.IsGlobalAdmin(GetUserId()))
@@ -76,7 +94,7 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
-        [HttpDelete("{teamId}/{userId}")]
+        [HttpDelete("team/{teamId}/user/{userId}")]
         public async Task<IActionResult> RemoveUserFromTeam(int teamId, int userId)
         {
 
@@ -94,9 +112,7 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
-
-        //Do zrobienia: Nie dopuścić możliwości do zmiany roli dla właściciela / zmiany roli osoby która zgłasza zapytanie
-        [HttpPut("{teamId}/{userId}")]
+        [HttpPut("team/{teamId}/user/{userId}")]
         public async Task<IActionResult> UpdateUserRoleInTeam(int teamId, int userId, [FromBody] UserTeamUpdateRequest userTeamUpdateRequest)
         {
             if(await _serviceHelper.IsOwner(userId, teamId))

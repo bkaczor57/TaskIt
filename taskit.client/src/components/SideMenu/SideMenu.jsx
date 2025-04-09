@@ -55,12 +55,12 @@ function SideMenu() {
   return (
     <>
       {isMobile && isOpen && (
-        <div 
+        <div
           className="side-menu-overlay visible"
           onClick={() => setIsOpen(false)}
         />
       )}
-      
+
       <aside className={`side-menu ${isMobile ? (isOpen ? 'mobile-visible' : '') : ''}`}>
         <nav>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
@@ -99,7 +99,11 @@ function SideMenu() {
       </aside>
 
       {isCreateTeamModalOpen && (
-        <CreateTeamModal onClose={() => setIsCreateTeamModalOpen(false)} />
+        <CreateTeamModal
+          onClose={() => setIsCreateTeamModalOpen(false)}
+          fetchUserTeams={fetchUserTeams}
+          navigate={navigate}
+        />
       )}
     </>
   );

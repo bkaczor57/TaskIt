@@ -104,9 +104,9 @@
 
 .group-description {
   padding-right: 0.5rem; 
-  word-wrap: break-word; /* starszy zapis */
-  overflow-wrap: break-word; /* nowszy, bardziej zalecany */
-  white-space: pre-wrap; /* jeśli chcesz zachować nowe linie */
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+  white-space: pre-wrap; 
 }
 
 
@@ -238,23 +238,23 @@
 }
 
 .user-role.member {
-  background-color: #007bff;
-  color: white;
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 
 .user-role.manager {
-  background-color: #28a745;
-  color: white;
+  background-color: #fff3e0; 
+  color: #f57c00;
 }
 
 .user-role.admin {
-  background-color: #ff8894;
-  color: #000;
+  background-color: #fce4ec; 
+  color: #c2185b;
 }
 
 .user-role.owner {
-  background-color:#ffc107 ;
-  color: white;
+  background-color: #e8f5e9; 
+  color: #2e7d32;
 }
 
 .group-user-info {
@@ -368,4 +368,34 @@
 
 .close-button:hover {
   color: #333;
+}
+
+.users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.invite-user-button {
+  background: none;
+  border: none;
+  color: #2a5298;
+  cursor: pointer;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.invite-user-button:hover {
+  background-color: rgba(42, 82, 152, 0.1);
+}
+
+.invite-user-button svg {
+  width: 16px;
+  height: 16px;
 }

@@ -28,6 +28,15 @@ export const UserTeamProvider = ({ children }) => {
     }
   }, []);
 
+  const getUserInTeam = useCallback(async (teamId, userId) => {
+    try {
+      return await UserTeamService.getUserInTeam(teamId, userId);
+    } catch (err) {
+      console.error("Błąd przy getUserInTeam:", err);
+      throw err;
+    }
+  }, []);
+
   const addUserToTeam = async (teamId, userId, role) => {
     try {
       return await UserTeamService.addUserToTeam({ teamId, userId, role });
@@ -62,6 +71,7 @@ export const UserTeamProvider = ({ children }) => {
         teamUsers,
         fetchUserTeams,
         fetchTeamUsers,
+        getUserInTeam,
         addUserToTeam,
         removeUserFromTeam,
         updateUserRole,
