@@ -95,6 +95,7 @@ export const AuthProvider = ({ children }) => {
   // Obsługa wylogowania - usuwanie wszystkiego z localStorage
   const logout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     setIsAuthenticated(false); 
     setAuthError(null);
     window.dispatchEvent(new Event("logout"));

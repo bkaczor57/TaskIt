@@ -2,10 +2,8 @@
 {
     public enum TasksStatus
     {
-        Open,
+        Pending,
         InProgress,
         Completed,
-        Closed,
-        Canceled
     }
 }

@@ -20,6 +20,31 @@ namespace TaskIt.Server.Repository
                 .ToListAsync();
         }
 
+        public async Task<(List<TeamInvites> Invites, int TotalCount)> getUserInvitesPaged(int userId, int pageNumber, int pageSize, string status)
+        {
+            var query = _context.TeamInvites
+                .Include(ti => ti.InvitingUser)
+                .Include(ti => ti.InvitedUser)
+                .Include(ti => ti.Team)
+                .Where(ti => ti.InvitedUserId == userId);
+
+            if (!string.Equals(status, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(ti => ti.Status.ToString() == status);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var invites = await query
+                .OrderByDescending(ti => ti.InviteDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (invites, totalCount);
+        }
+
+
         public async Task<TeamInvites?> getTeamInviteByTeamIdAndInvitedId(int teamId, int invitedUserId)
         {
             return await _context.TeamInvites
@@ -57,6 +82,10 @@ namespace TaskIt.Server.Repository
                 .Where(ti => ti.InvitedUserId == userId)
                 .ToListAsync();
         }
+
+
+
+
 
         public void AddInvitation(TeamInvites teamInvites)
         {

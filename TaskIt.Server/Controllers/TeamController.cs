@@ -89,7 +89,6 @@ namespace TaskIt.Server.Controllers
         }
 
 
- 
         private int GetUserId()
         {
             return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);

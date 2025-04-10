@@ -12,7 +12,7 @@ namespace TaskIt.Server.Core.Entities
         public Sections? Section { get; set; }
         public int AssignedUserId{ get; set; }
         public Users? AssignedUser { get; set; }
-        public TasksStatus Status { get; set; } = TasksStatus.Open;
+        public TasksStatus Status { get; set; } = TasksStatus.Pending;
         public TasksPriority Priority { get; set; } = TasksPriority.Medium;
         [Required, MaxLength(30)]
         public string? Title { get; set; } = "New Task";

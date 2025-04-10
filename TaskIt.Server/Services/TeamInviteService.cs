@@ -1,6 +1,7 @@
 ﻿using TaskIt.Server.Core.Entities;
 using TaskIt.Server.Core.Enums;
 using TaskIt.Server.DTOs;
+using TaskIt.Server.DTOs.TaskIt.Server.DTOs;
 using TaskIt.Server.Repository;
 using TaskIt.Server.Requests;
 
@@ -133,6 +134,52 @@ namespace TaskIt.Server.Services
                 })
                .ToList();
             return ServiceResult<List<TeamInviteDTO>>.Ok(TeamInviteDTO);
+        }
+
+        public async Task<ServiceResult<PagedResult<TeamInviteDTO>>> GetUserInvitesPaged(int userId, int pageNumber, int pageSize, string status)
+        {
+            var (invites, totalCount) = await _teamInvitesRepository.getUserInvitesPaged(userId, pageNumber, pageSize, status);
+
+            var inviteDtos = invites.Select(ti => new TeamInviteDTO
+            {
+                Id = ti.Id,
+                Team = ti.Team == null ? null : new TeamInviteTeamDTO
+                {
+                    Id = ti.Team.Id,
+                    Name = ti.Team.Name,
+                    Description = ti.Team.Description
+                },
+                InvitedUser = ti.InvitedUser == null ? null : new TeamInviteUserDTO
+                {
+                    Id = ti.InvitedUser.Id,
+                    Email = ti.InvitedUser.Email,
+                    Username = ti.InvitedUser.Username,
+                    FirstName = ti.InvitedUser.FirstName,
+                    LastName = ti.InvitedUser.LastName
+                },
+                InvitingUser = ti.InvitingUser == null ? null : new TeamInviteUserDTO
+                {
+                    Id = ti.InvitingUser.Id,
+                    Email = ti.InvitingUser.Email,
+                    Username = ti.InvitingUser.Username,
+                    FirstName = ti.InvitingUser.FirstName,
+                    LastName = ti.InvitingUser.LastName
+                },
+                TeamRole = ti.TeamRole.ToString(),
+                Status = ti.Status.ToString(),
+                InviteDate = ti.InviteDate,
+                ResponseDate = ti.ResponseDate
+            }).ToList();
+
+            var result = new PagedResult<TeamInviteDTO>
+            {
+                Items = inviteDtos,
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                CurrentPage = pageNumber
+            };
+
+            return ServiceResult<PagedResult<TeamInviteDTO>>.Ok(result);
         }
         public async Task<ServiceResult<List<TeamInviteDTO>>> GetTeamInvitesByTeamId(int teamId)
         {

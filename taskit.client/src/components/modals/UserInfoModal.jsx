@@ -3,6 +3,9 @@ import { useUserTeam } from '../../context/UserTeamContext';
 import { useUser } from '../../context/UserContext';
 import { useTeam } from '../../context/TeamContext';
 import './ModalCommon.css';
+import './UserInfoModal.css';
+import { FaTimes, FaUserAlt, FaEnvelope, FaIdCard, FaUserTag, FaUserCog, FaTrashAlt } from 'react-icons/fa';
+import { GrUserManager, GrUserPolice, GrUserWorker, GrUserAdmin } from 'react-icons/gr';
 
 export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -12,7 +15,6 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
   const { getUserInTeam, updateUserRole, removeUserFromTeam, teamUsers } = useUserTeam();
   const { user } = useUser();
   const { currentTeam } = useTeam();
-
 
   // czy wybrany użytkownik to właściciel?
   const isUserOwner = userId === currentTeam?.ownerId;
@@ -56,12 +58,29 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
   };
 
   const handleRemoveUser = async () => {
-    try {
-      await removeUserFromTeam(teamId, userId);
-      if (onUserUpdated) onUserUpdated();
-      onClose();
-    } catch (err) {
-      setError(err.message);
+    if (window.confirm(`Czy na pewno chcesz usunąć użytkownika ${userInfo.firstName} ${userInfo.lastName} z zespołu?`)) {
+      try {
+        await removeUserFromTeam(teamId, userId);
+        if (onUserUpdated) onUserUpdated();
+        onClose();
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+  };
+
+  const getRoleIcon = (role) => {
+    if (isUserOwner) return <GrUserAdmin />;
+    
+    switch (role?.toLowerCase()) {
+      case 'manager':
+        return <GrUserManager />;
+      case 'admin':
+        return <GrUserPolice />;
+      case 'member':
+        return <GrUserWorker />;
+      default:
+        return <GrUserWorker />;
     }
   };
 
@@ -79,9 +98,12 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <div className="user-info-modal-header">
+            <h2 className="user-info-modal-title">Błąd</h2>
+            <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
+          </div>
           <p className="error-message">{error}</p>
-          <button className="btn-green" onClick={onClose}>Zamknij</button>
+          <button className="btn btn-green" onClick={onClose}>Zamknij</button>
         </div>
       </div>
     );
@@ -94,29 +116,32 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>✕</button>
-        <h2>Informacje o użytkowniku</h2>
+        <div className="user-info-modal-header">
+          <h2 className="user-info-modal-title">Informacje o użytkowniku</h2>
+          <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
+        </div>
 
         <div className="user-info">
           <p>
-            <strong>Email:</strong>
+            <strong><FaEnvelope /> Email:</strong>
             <span>{userInfo.email}</span>
           </p>
           <p>
-            <strong>Nazwa użytkownika:</strong>
+            <strong><FaUserAlt /> Nazwa użytkownika:</strong>
             <span>{userInfo.username}</span>
           </p>
           <p>
-            <strong>Imię:</strong>
+            <strong><FaIdCard /> Imię:</strong>
             <span>{userInfo.firstName}</span>
           </p>
           <p>
-            <strong>Nazwisko:</strong>
+            <strong><FaIdCard /> Nazwisko:</strong>
             <span>{userInfo.lastName}</span>
           </p>
           <p>
-            <strong>Rola w grupie:</strong>
+            <strong><FaUserTag /> Rola w grupie:</strong>
             <span className={`user-role-badge ${isUserOwner ? 'owner' : userInfo.role.toLowerCase()}`}>
+              <span className="user-role-icon">{getRoleIcon(isUserOwner ? 'Owner' : userInfo.role)}</span>
               {isUserOwner ? 'Owner' : userInfo.role}
             </span>
           </p>
@@ -124,6 +149,7 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
 
         {canModifyUser && (
           <div className="user-actions">
+            <h4><FaUserCog /> Zarządzanie użytkownikiem</h4>
             <div className="role-change">
               <select
                 value={selectedRole}
@@ -134,7 +160,7 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
                 <option value="Admin">Admin</option>
               </select>
               <button
-                className="btn-green"
+                className="btn btn-green"
                 onClick={handleRoleChange}
                 disabled={selectedRole === userInfo.role}
               >
@@ -143,10 +169,10 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
             </div>
 
             <button
-              className="btn-danger"
+              className="btn btn-danger btn-full-width"
               onClick={handleRemoveUser}
             >
-              Usuń użytkownika
+              <FaTrashAlt /> Usuń użytkownika
             </button>
           </div>
         )}

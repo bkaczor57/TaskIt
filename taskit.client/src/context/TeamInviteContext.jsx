@@ -15,6 +15,12 @@ export const TeamInviteProvider = ({ children }) => {
   const [userRoles, setUserRoles] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalInvites, setTotalInvites] = useState(0);
+  const [invites, setInvites] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [loading, setLoading] = useState(false);
 
   const fetchUserRoles = useCallback(async () => {
     try {
@@ -39,66 +45,111 @@ export const TeamInviteProvider = ({ children }) => {
     }
   }, []);
 
-  const getUserInvites = useCallback(async () => {
+  const getUserInvites = useCallback(async (page = 1, pageSize = 5, status = "All") => {
+    setLoading(true);
     try {
-      const invites = await TeamInviteService.getUserInvites();
+      const response = await TeamInviteService.getUserInvites(page, pageSize, status);
       setError(null);
-      return invites;
+      setCurrentPage(page);
+      setTotalPages(response.totalPages || 1);
+      setTotalInvites(response.totalCount || 0);
+      setInvites(response.items || []);
+      setSelectedStatus(status);
+      return response.items || [];
     } catch (err) {
       setError(err.message);
       throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const getTeamInvites = useCallback(async (teamId) => {
+  const getTeamInvites = useCallback(async (teamId, page = 1, pageSize = 5, status = "All") => {
+    setLoading(true);
     try {
-      const invites = await TeamInviteService.getTeamInvites(teamId);
+      const response = await TeamInviteService.getTeamInvites(teamId, page, pageSize, status);
       setError(null);
-      return invites;
+      setCurrentPage(page);
+      setTotalPages(response.totalPages || 1);
+      setTotalInvites(response.totalItems || 0);
+      setInvites(response.items || []);
+      setSelectedStatus(status);
+      return response.items || [];
     } catch (err) {
       setError(err.message);
       throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getInviteById = useCallback(async (inviteId) => {
+    setLoading(true);
+    try {
+      const invite = await TeamInviteService.getInviteById(inviteId);
+      setError(null);
+      return invite;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   const acceptInvite = useCallback(async (inviteId) => {
+    setLoading(true);
     try {
       const result = await TeamInviteService.acceptInvite(inviteId);
       setSuccess('Zaproszenie zostało zaakceptowane');
       setError(null);
+      // Odśwież listę zaproszeń po akceptacji
+      getUserInvites(currentPage, 5, selectedStatus);
       return result;
     } catch (err) {
       setError(err.message);
       setSuccess(null);
       throw err;
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [currentPage, selectedStatus, getUserInvites]);
 
   const declineInvite = useCallback(async (inviteId) => {
+    setLoading(true);
     try {
       const result = await TeamInviteService.declineInvite(inviteId);
       setSuccess('Zaproszenie zostało odrzucone');
       setError(null);
+      // Odśwież listę zaproszeń po odrzuceniu
+      getUserInvites(currentPage, 5, selectedStatus);
       return result;
     } catch (err) {
       setError(err.message);
       setSuccess(null);
       throw err;
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [currentPage, selectedStatus, getUserInvites]);
 
   const deleteInvite = useCallback(async (inviteId) => {
+    setLoading(true);
     try {
       const result = await TeamInviteService.deleteInvite(inviteId);
       setSuccess('Zaproszenie zostało usunięte');
       setError(null);
+      // Odśwież listę zaproszeń po usunięciu
+      getUserInvites(currentPage, 5, selectedStatus);
       return result;
     } catch (err) {
       setError(err.message);
       setSuccess(null);
       throw err;
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [currentPage, selectedStatus, getUserInvites]);
 
   const clearMessages = useCallback(() => {
     setError(null);
@@ -109,14 +160,22 @@ export const TeamInviteProvider = ({ children }) => {
     userRoles,
     error,
     success,
+    totalPages,
+    currentPage,
+    totalInvites,
+    invites,
+    loading,
+    selectedStatus,
     fetchUserRoles,
     createInvite,
     getUserInvites,
     getTeamInvites,
+    getInviteById,
     acceptInvite,
     declineInvite,
     deleteInvite,
-    clearMessages
+    clearMessages,
+    setSelectedStatus
   };
 
   return (

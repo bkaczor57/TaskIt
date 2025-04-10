@@ -1,11 +1,11 @@
 ﻿using TaskIt.Server.DTOs;
+using TaskIt.Server.DTOs.TaskIt.Server.DTOs;
 using TaskIt.Server.Requests;
 
 namespace TaskIt.Server.Services
 {
     public interface ITeamService
     {
-
 
         Task<ServiceResult<TeamDTO>> CreateTeam(int ownerId, TeamCreateRequest request);
         Task<ServiceResult<TeamDTO>> GetTeamById(int teamId);

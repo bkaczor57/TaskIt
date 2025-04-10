@@ -15,9 +15,15 @@ export const TeamInviteService = {
     }
   },
 
-  getUserInvites: async () => {
+  getUserInvites: async (page = 1, pageSize = 5, status = "All") => {
     try {
-      const response = await api.get(`/TeamInvite/user`);
+      const response = await api.get(`/TeamInvite/user-paged`, { 
+        params: {
+          pageNumber: page,
+          pageSize: pageSize,
+          status: status
+        }
+      });
       return response.data;
     } catch (error) {
       const apiError = error.response?.data?.error;
@@ -25,13 +31,29 @@ export const TeamInviteService = {
     }
   },
 
-  getTeamInvites: async (teamId) => {
+  getTeamInvites: async (teamId, page = 1, pageSize = 5, status = "All") => {
     try {
-      const response = await api.get(`/TeamInvite/team/${teamId}`);
+      const response = await api.get(`/TeamInvite/team/${teamId}`, {
+        params: {
+          pageNumber: page,
+          pageSize: pageSize,
+          status: status
+        }
+      });
       return response.data;
     } catch (error) {
       const apiError = error.response?.data?.error;
       throw `Wystąpił błąd podczas pobierania zaproszeń grupy${apiError ? `: ${apiError}` : ''}`;
+    }
+  },
+
+  getInviteById: async (inviteId) => {
+    try {
+      const response = await api.get(`/TeamInvite/${inviteId}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error.response?.data?.error;
+      throw `Wystąpił błąd podczas pobierania zaproszenia${apiError ? `: ${apiError}` : ''}`;
     }
   },
 

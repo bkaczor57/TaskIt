@@ -52,6 +52,22 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("user-paged")]
+        public async Task<IActionResult> GetUserInvitesPaged([FromQuery] InviteQueryRequest request)
+        {
+            var result = await _teamInviteService.GetUserInvitesPaged(
+                GetUserId(),
+                request.PageNumber,
+                request.PageSize,
+                request.Status
+            );
+
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
         // Pobranie wszystkich zaproszeń dla konkretnego zespołu
         [HttpGet("team/{teamId}")]
         public async Task<IActionResult> GetTeamInvites(int teamId)

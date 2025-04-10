@@ -1,3 +1,4 @@
+/* === Navbar Main === */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -12,156 +13,123 @@
 
 .navbar-left {
   display: flex;
-  align-items: center; 
-  gap: 10px; 
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
 }
+
 .navbar-logo {
   height: 40px;
   width: auto;
-  display: block;
 }
 
 .navbar-title {
   font-weight: bold;
   font-size: 1.4rem;
-  display: flex;
-  align-items: center; 
 }
 
-.burger-button {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-  line-height: 1;
-}
-
-@media (max-width: 768px) {
-  @media (max-width: 768px) {
-    .navbar {
-      position: relative;
-    }
-
-    .navbar-left {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .logo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.3rem;
-      font-weight: bold;
-      z-index: 4;
-    }
-
-    .navbar-left {
-      flex: 1;
-    }
-
-    .navbar-right {
-      flex: 1;
-      justify-content: flex-end;
-    }
-  }
-}
-
-
+/* === Navbar Right Side === */
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* ========== Ikony i awatar ========== */
-
-.navbar-notif-wrapper {
+.navbar-item {
   position: relative;
   display: flex;
   align-items: center;
-  cursor: pointer;
+  justify-content: center;
 }
 
+/* === Icons and Avatar === */
+.navbar-icon, .navbar-avatar {
+  font-size: 1.6rem;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+}
 
 .navbar-icon {
-  font-size: 1.4rem;
-  cursor: pointer;
-  position: relative;
+  background-color: #fff8e1;
+  color: #ffbf00;
 }
 
 .navbar-avatar {
   background-color: #cce5ff;
   color: #004085;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  font-size: 1rem;
+  font-size: 1.2rem;
   user-select: none;
 }
 
-/* ========== Dropdowny ========== */
-
+/* === Dropdown Unified === */
 .dropdown {
   position: absolute;
-  top: 120%;
+  top: 100%;
   right: 0;
-  background-color: white;
+  margin-top: 1rem; /* <-- zmień z 0.5rem na 1rem */
+  background: #fff;
   padding: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  z-index: 4;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 250px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 5;
+}
+
+
+.dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .dropdown ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0.5rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .dropdown li {
-  padding: 6px 0;
-  border-bottom: 1px solid #eee;
+  padding: 0.5rem;
   font-size: 0.9rem;
+  color: #333;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-.dropdown li:last-child {
-  border-bottom: none;
+.dropdown li:hover {
+  background-color: #f1f5fe;
 }
 
-.dropdown strong {
-  display: block;
-  margin-bottom: 8px;
-}
-
+/* === Buttons in dropdown === */
 .form-buttons-column {
-  margin-top: 12px;
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-/* ========== Badge ========== */
+/* === Notification Badge === */
 .notif-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: 0;
+  right: 0;
+  transform: translate(10%, -10%);
   background-color: red;
   color: white;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
   height: 18px;
   width: 18px;
@@ -171,12 +139,16 @@
   border-radius: 50%;
 }
 
-/* ========== Przyciski w dropdownie ========== */
-.navbar-dropdown-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
+/* === Responsive for Mobile === */
+@media (max-width: 768px) {
+  .navbar-left {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 
-/* Zobacz profil – biały z niebieską ramką */
+  .navbar-right {
+    flex: 1;
+    justify-content: flex-end;
+  }
+}

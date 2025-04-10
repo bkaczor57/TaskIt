@@ -80,8 +80,6 @@ const GroupPage = () => {
     return <div className="loading">Ładowanie...</div>;
   }
 
-
-
   return (
     <div className={`group-page ${showGroupSidebar ? 'sidebar-open' : ''}`}>
       <GroupSidebar

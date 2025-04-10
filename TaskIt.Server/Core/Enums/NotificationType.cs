@@ -4,7 +4,6 @@
     {
         TeamInvite,
         TaskAssigned,
-        TaskStatusChanged,
         NewComment,
         General
     }

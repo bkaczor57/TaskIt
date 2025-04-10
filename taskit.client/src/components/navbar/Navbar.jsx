@@ -3,160 +3,125 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
 import UserContext from '../../context/UserContext';
 import { ProfileModal } from '../modals/ProfileModal';
+import { MdNotifications } from "react-icons/md";
 import './Navbar.css';
 
 function Navbar() {
-    const { logout } = useContext(AuthContext);
-    const { user, isUserLoading } = useContext(UserContext);
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-    const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
+  const { user, isUserLoading } = useContext(UserContext);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null); // 'profile' | 'notif' | null
+  const dropdownRef = useRef(null);
+  const notifRef = useRef(null);
+  const navigate = useNavigate();
 
+  const sampleNotifications = [
+    { id: 1, message: 'Nowe zadanie: Zaktualizować dokumentację' },
+    { id: 2, message: 'Zaproszenie do grupy: Zespół Frontend' },
+    { id: 3, message: 'Komentarz: "Super robota!"' }
+  ];
+  const [notifications, setNotifications] = useState(sampleNotifications);
 
-    const [activeDropdown, setActiveDropdown] = useState(null); // 'profile' | 'notif' | null
-    const dropdownRef = useRef(null);
-    const notifRef = useRef(null);
+  
 
-    const sampleNotifications = [
-        { id: 1, message: 'Nowe zadanie: Zaktualizować dokumentację', type: 'task' },
-        { id: 2, message: 'Zaproszenie do grupy: Zespół Frontend', type: 'invite' },
-        { id: 3, message: 'Komentarz: "Super robota!"', type: 'comment' }
-    ];
-    const [notifications, setNotifications] = useState(sampleNotifications);
+  const unreadCount = notifications.length;
 
-    if (isUserLoading) return null;
+  const toggleDropdown = (type) => {
+    if (window.innerWidth < 768) {
+      navigate(type === 'notif' ? '/notifications' : '/profile');
+      return;
+    }
+    setActiveDropdown(prev => (prev === type ? null : type));
+  };
 
-    const unreadCount = notifications.length;
+  const goToDashboard = () => {
+    navigate('/dashboard');
+  };
 
-    const toggleDropdown = (type) => {
-        if (window.innerWidth < 768) {
-            if (type === 'notif') {
-                navigate('/notifications');
-            } else if (type === 'profile') {
-                goToFullProfile();
-            }
-            return;
-        }
+  const goToFullProfile = () => {
+    setIsProfileModalOpen(true);
+    setActiveDropdown(null);
+  };
 
-        setActiveDropdown(prev => (prev === type ? null : type));
-    };
+  const getAvatarLetter = () => {
+    if (user?.firstName) return user.firstName[0].toUpperCase();
+    if (user?.username) return user.username[0].toUpperCase();
+    return '?';
+  };
 
-    const goToDashboard = () => {
-        navigate('/dashboard');
-    };
-
-    const goToFullProfile = () => {
-        setIsProfileModalOpen(true);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
         setActiveDropdown(null);
+      }
     };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    const getAvatarLetter = () => {
-        if (user?.firstName?.length > 0) return user.firstName[0].toUpperCase();
-        if (user?.username?.length > 0) return user.username[0].toUpperCase();
-        return '?';
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        activeDropdown &&
+        !dropdownRef.current?.contains(event.target) &&
+        !notifRef.current?.contains(event.target)
+      ) {
+        setActiveDropdown(null);
+      }
     };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeDropdown]);
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setActiveDropdown(null);
-            }
-        };
+  if (isUserLoading || !user) return null;
 
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
+  return (
+    <>
+      <nav className="navbar">
+        <div className="navbar-left" onClick={goToDashboard}>
+          <img src="/logo.png" alt="Task It Logo" className="navbar-logo" />
+          <span className="navbar-title">Task It</span>
+        </div>
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                activeDropdown &&
-                !dropdownRef.current?.contains(event.target) &&
-                !notifRef.current?.contains(event.target)
-            ) {
-                setActiveDropdown(null);
-            }
-        };
+        <div className="navbar-right">
+          {/* Notifications */}
+          <div className="navbar-item" ref={notifRef}>
+            <div className="navbar-icon" onClick={() => toggleDropdown('notif')}>
+              <MdNotifications />
+              {unreadCount > 0 && <div className="notif-badge">{unreadCount}</div>}
+            </div>
+            <div className={`dropdown ${activeDropdown === 'notif' ? 'show' : ''}`}>
+              <p><strong>Powiadomienia</strong></p>
+              <ul>
+                {notifications.map(n => (
+                  <li key={n.id}>{n.message}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [activeDropdown]);
+          {/* Profile */}
+          <div className="navbar-item" ref={dropdownRef}>
+            <div className="navbar-avatar" onClick={() => toggleDropdown('profile')}>
+              {getAvatarLetter()}
+            </div>
+            <div className={`dropdown ${activeDropdown === 'profile' ? 'show' : ''}`}>
+              <p>{user.firstName} {user.lastName}</p>
+              <p>{user.email}</p>
+              <div className="form-buttons-column">
+                <button className="btn-orange" onClick={goToFullProfile}>Zobacz profil</button>
+                <button className="btn-danger" onClick={logout}>Wyloguj się</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-    return (
-        <>
-            <nav className="navbar">
-                <div
-                    className="navbar-left"
-                    onClick={goToDashboard}
-                >
-                    <img
-                        src="/logo.png"
-                        alt="Task It Logo"
-                        className="navbar-logo"
-                    />
-                    <span className="navbar-title">Task It</span>
-                </div>
-
-                <button
-                    className="burger-button"
-                    onClick={() => window.dispatchEvent(new Event("toggleSidebar"))}
-                >
-                    ☰
-                </button>
-
-                <div className="navbar-right">
-                    <div className="navbar-notif-wrapper" ref={notifRef}>
-                        <div className="navbar-icon" onClick={() => toggleDropdown('notif')}>&#128276;</div>
-                        {unreadCount > 0 && <div className="notif-badge">{unreadCount}</div>}
-                        {activeDropdown === 'notif' && (
-                            <div className="dropdown">
-                                <p><strong>Powiadomienia</strong></p>
-                                <ul>
-                                    {notifications.map(n => (
-                                        <li key={n.id}>{n.message}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="navbar-profile" ref={dropdownRef}>
-                        <div className="navbar-avatar" onClick={() => toggleDropdown('profile')}>
-                            {getAvatarLetter()}
-                        </div>
-                        {activeDropdown === 'profile' && (
-                            <div className="dropdown" >
-                                <p>
-                                    <span className="tooltip left">
-                                        <span className="tooltip-text">{`${user.firstName} ${user.lastName}`}</span>
-                                        <span className="tooltip-bubble">{`${user.firstName} ${user.lastName}`}</span>
-                                    </span>
-                                </p>
-                                <p>
-                                    <span className="tooltip left">
-                                        <span className="tooltip-text">{user.email}</span>
-                                        <span className="tooltip-bubble">{user.email}</span>
-                                    </span>
-                                </p>
-
-                                <div className="form-buttons-column">
-                                    <button className="btn-orange btn-full-width" onClick={goToFullProfile}>Zobacz profil</button>
-                                    <button className="btn-danger btn-full-width" onClick={logout}>Wyloguj się</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </nav>
-
-            {isProfileModalOpen && (
-                <ProfileModal onClose={() => setIsProfileModalOpen(false)} />
-            )}
-        </>
-    );
+      {isProfileModalOpen && (
+        <ProfileModal onClose={() => setIsProfileModalOpen(false)} />
+      )}
+    </>
+  );
 }
 
 export default Navbar;

@@ -19,7 +19,7 @@ export const UserProvider = ({ children }) => {
 
     
 
-    const storedUserRaw = localStorage.getItem("user");
+    const storedUserRaw = sessionStorage.getItem("user");
     if (storedUserRaw) {
       try {
         const parsedUser = JSON.parse(storedUserRaw);
@@ -27,7 +27,7 @@ export const UserProvider = ({ children }) => {
         setIsUserLoading(false);
         return;
       } catch {
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
       }
     }
 
@@ -35,11 +35,11 @@ export const UserProvider = ({ children }) => {
     try {
       const fetchedUser = await getCurrentUser();
       setUser(fetchedUser);
-      localStorage.setItem("user", JSON.stringify(fetchedUser));
+      sessionStorage.setItem("user", JSON.stringify(fetchedUser));
     } catch (err) {
       console.error("Błąd pobierania usera z API:", err);
       setUser(null);
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
     } finally {
       setIsUserLoading(false);
     }
@@ -60,7 +60,7 @@ export const UserProvider = ({ children }) => {
 
   const clearUser = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
   };
 
   return (
