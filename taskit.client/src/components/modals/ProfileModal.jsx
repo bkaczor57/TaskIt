@@ -4,6 +4,7 @@ import AuthContext from "../../context/AuthContext";
 import { updateCurrentUser } from "../../services/UserService";
 import { PasswordChangeModal } from "./PasswordChangeModal";
 import UserTeamContext from "../../context/UserTeamContext";
+import { FaTimes } from "react-icons/fa";
 import "./Modal.css";
 
 export const ProfileModal = ({ onClose }) => {
@@ -58,7 +59,7 @@ export const ProfileModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>✕</button>
+      <button class="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Profil użytkownika</h2>
         <div className="user-info">
           <p>

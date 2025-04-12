@@ -1,0 +1,223 @@
+/* UserInviteModal.css */
+
+.invite-list-modal {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-height: 450px;
+  }
+  
+  .invites-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 0.5rem;
+  }
+  
+  .invites-modal-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .invite-list {
+    min-height: 310px;
+    overflow-y: auto;
+  }
+  
+  .invite-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.8rem;
+    margin: 0.5rem 0.8rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .invite-item:hover {
+    background-color: #e2e6ea;
+  }
+  
+  .invite-item-icon {
+    font-size: 1.8rem;
+    color: #385170;
+    margin-right: 1rem;
+  }
+  
+  .invite-item-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .invite-item-team {
+    flex: 1;
+    min-width: 0;
+    font-weight: 500;
+    overflow: hidden;
+    text-align:left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding:0.5rem;
+  }
+  
+  .invite-item-team[title] {
+    cursor: help;
+  }
+  
+  .invite-item-status {
+    padding:0.2rem;
+    font-size: 1rem;
+    font-weight: 550;
+    text-transform: capitalize;
+    width:8.5rem;
+    text-align:center;
+  }
+  
+  .status-pending {
+    color: #f57c00;
+  }
+  
+  .status-accepted {
+    color: #2e7d32;
+  }
+  
+  .status-declined {
+    color: #c2185b;
+  }
+  
+  /* Szczegóły zaproszenia */
+  .invite-details {
+    max-width: 500px;
+    width: 90%;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin: 0 auto;
+  }
+  
+  .invite-detail-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+  
+  .invite-detail-item {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    background-color:#f9fafb;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+  }
+  
+  .invite-detail-icon {
+    color: #385170;
+    font-size: 1.2rem;
+    padding:0 0.5rem;
+    margin: 0 0.2rem;
+  }
+  
+  .invite-detail-label {
+    font-weight: 500;
+    min-width:9rem;
+    text-align:left ;
+    padding: 0.2rem;
+    margin: 0.2rem;
+    font-weight: 550;
+  }
+  
+  .invite-detail-value {
+    color: #495057;
+    flex-grow:1;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding:0.5rem;
+    margin:0.5rem;
+  }
+  
+  .invite-actions {
+    border-top: 1px solid #eaeaea;
+    padding-top: 1rem;
+    margin-bottom:0.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .success-message,
+  .error-message {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .filter-btn {
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    padding: 0;
+    margin:0.2rem;
+    font-size: 0.9rem;
+    font-weight: 550;
+    cursor: pointer;
+    color: #385170;
+  }
+
+  .filter-btn:hover {
+    border-bottom:#385170 2px solid;
+    border-radius:0;
+  }
+  
+  .filter-btn.active {
+    color: #2e7d32;
+    border-bottom:#2e7d32 2px solid;
+    border-radius:0;
+  }
+
+  /* Styl paginacji */
+
+.pagination{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.pagination-btn {
+    border: 0;
+    background:none;
+    cursor: pointer;
+    font-size:1.2rem;
+    padding: 0.5rem;
+  }
+
+  .pagination-info{
+    padding:0 0.5rem;
+    font-size:1.2rem;
+    font-weight: 550;
+    align-items: center;
+  }
+  
+  
+  /* Przycisk Usuń zaproszenie */
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+

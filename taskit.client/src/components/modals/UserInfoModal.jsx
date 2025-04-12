@@ -118,25 +118,25 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
       <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
         <div className="user-info-modal-header">
           <h2 className="user-info-modal-title">Informacje o użytkowniku</h2>
-          <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
+          <button class="close-btn" onClick={onClose}><FaTimes /></button>
         </div>
 
         <div className="user-info">
           <p>
             <strong><FaEnvelope /> Email:</strong>
-            <span>{userInfo.email}</span>
+            <span title={userInfo.email}>{userInfo.email}</span>
           </p>
           <p>
             <strong><FaUserAlt /> Nazwa użytkownika:</strong>
-            <span>{userInfo.username}</span>
+            <span title={userInfo.username}>{userInfo.username}</span>
           </p>
           <p>
             <strong><FaIdCard /> Imię:</strong>
-            <span>{userInfo.firstName}</span>
+            <span title={userInfo.firstName}>{userInfo.firstName}</span>
           </p>
           <p>
             <strong><FaIdCard /> Nazwisko:</strong>
-            <span>{userInfo.lastName}</span>
+            <span title={userInfo.lastName}>{userInfo.lastName}</span>
           </p>
           <p>
             <strong><FaUserTag /> Rola w grupie:</strong>

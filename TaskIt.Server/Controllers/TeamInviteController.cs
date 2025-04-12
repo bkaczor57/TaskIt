@@ -146,7 +146,7 @@ namespace TaskIt.Server.Controllers
                 return NotFound(new { error = inviteResult.ErrorMessage });
 
 
-            if (!await _serviceHelper.CanPerformAction(GetUserId(), inviteResult.Data.Team.Id, UserTeamRole.Admin))
+            if (!await _serviceHelper.CanPerformAction(GetUserId(), inviteResult.Data.Team.Id, inviteResult.Data.InvitedUser.Id, UserTeamRole.Admin))
             {
                 return Unauthorized(new { error = "You don't have permission to delete this invite" });
             }

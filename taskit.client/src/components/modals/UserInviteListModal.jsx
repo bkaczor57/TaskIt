@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTeamInvite } from '../../context/TeamInviteContext';
 import UserInviteDetailsModal from './UserInviteDetailsModal';
-import './ModalCommon.css';
-import './UserInvitesModal.css';
-import { FaTimes, FaUsers, FaFilter } from 'react-icons/fa';
+import './UserInviteModal.css'; // Używamy nowego pliku CSS
+import { FaTimes, FaUsers, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const UserInviteListModal = ({ onClose }) => {
-  const { invites, loading, error, success, totalPages, currentPage, selectedStatus, getUserInvites, setSelectedStatus } = useTeamInvite();
+  const { invites, loading, error, success, clearMessages, totalPages, currentPage, selectedStatus, getUserInvites, setSelectedStatus } = useTeamInvite();
   const [selectedInvite, setSelectedInvite] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
@@ -23,14 +22,20 @@ const UserInviteListModal = ({ onClose }) => {
     setShowDetailsModal(false);
     setSelectedInvite(null);
   };
+
+  const handleClose =  () => {
+    clearMessages();
+    onClose();
+  }
+
   const truncateText = (text, maxLength = 20) => text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal invite-list-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         <div className="invites-modal-header">
           <h2 className="invites-modal-title">Zaproszenia do zespołów</h2>
-          <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
         </div>
 
         <div className="invite-filter">
@@ -58,7 +63,9 @@ const UserInviteListModal = ({ onClose }) => {
               <div key={invite.id} className="invite-item" onClick={() => handleInviteClick(invite)}>
                 <div className="invite-item-icon"><FaUsers /></div>
                 <div className="invite-item-content">
-                  <div className="invite-item-team">{truncateText(invite.team?.name || 'Nieznany zespół')}</div>
+                  <div className="invite-item-team" title={invite.team?.name || 'Nieznany zespół'}>
+                    {truncateText(invite.team?.name || 'Nieznany zespół')}
+                  </div>
                   <div className={`invite-item-status status-${invite.status?.toLowerCase()}`}>
                     {invite.status === 'Pending' ? 'Oczekujące' : invite.status === 'Accepted' ? 'Zaakceptowane' : invite.status === 'Declined' ? 'Odrzucone' : invite.status}
                   </div>
@@ -70,9 +77,21 @@ const UserInviteListModal = ({ onClose }) => {
 
         {totalPages > 1 && (
           <div className="pagination">
-            <button className="pagination-btn" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>&lt;</button>
+            <button 
+              className="pagination-btn" 
+              disabled={currentPage === 1} 
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              <FaChevronLeft />
+            </button>
             <span className="pagination-info">Strona {currentPage} z {totalPages}</span>
-            <button className="pagination-btn" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>&gt;</button>
+            <button 
+              className="pagination-btn" 
+              disabled={currentPage === totalPages} 
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              <FaChevronRight />
+            </button>
           </div>
         )}
 

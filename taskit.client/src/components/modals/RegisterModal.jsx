@@ -22,8 +22,8 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
   const handleClose = () => {
     setErrors({});
     setLocalError("");
-    clearAuthError(); // wyczyść globalny błąd
-    onClose();        // zamyka modal z zewnątrz
+    clearAuthError(); 
+    onClose();      
   };
 
 

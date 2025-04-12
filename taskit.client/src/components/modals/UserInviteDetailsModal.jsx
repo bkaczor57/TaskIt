@@ -1,13 +1,11 @@
-// UserInviteDetailsModal.jsx
 import React, { useState } from 'react';
 import { useTeamInvite } from '../../context/TeamInviteContext';
-import './ModalCommon.css';
-import './UserInvitesModal.css';
+import './UserInviteModal.css';
 import { FaTimes, FaUsers, FaUserTag, FaCalendarAlt, FaUserPlus, FaCheck, FaTimes as FaTimesCircle } from 'react-icons/fa';
 
 const UserInviteDetailsModal = ({ invite, onClose }) => {
   const [loading, setLoading] = useState(false);
-  const { acceptInvite, declineInvite, error, success } = useTeamInvite();
+  const { deleteInvite, acceptInvite, declineInvite, error, success, clearMessages } = useTeamInvite();
 
   const formatDate = (dateString) => {
     if (!dateString) return "Brak daty";
@@ -21,11 +19,12 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
     });
   };
 
+  
+
   const handleAccept = async () => {
     setLoading(true);
     try {
       await acceptInvite(invite.id);
-      setTimeout(() => onClose(), 2000);
     } catch (err) {
       console.error("Błąd akceptowania zaproszenia:", err);
     } finally {
@@ -37,7 +36,6 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
     setLoading(true);
     try {
       await declineInvite(invite.id);
-      setTimeout(() => onClose(), 2000);
     } catch (err) {
       console.error("Błąd odrzucania zaproszenia:", err);
     } finally {
@@ -56,12 +54,30 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
     return 'member';
   };
 
+
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await deleteInvite(invite.id);
+    } catch (err) {
+      console.error("Błąd usuwania zaproszenia:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+    clearMessages();
+  }
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal invite-details" onClick={(e) => e.stopPropagation()}>
         <div className="invites-modal-header">
           <h2 className="invites-modal-title">Szczegóły zaproszenia</h2>
-          <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
+          <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         </div>
 
         <div className="invite-details-content">
@@ -69,7 +85,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
             <div className="invite-detail-item">
               <span className="invite-detail-icon"><FaUsers /></span>
               <span className="invite-detail-label">Zespół:</span>
-              <span className="invite-detail-value">{invite.team?.name || "Nieznany zespół"}</span>
+              <span className="invite-detail-value" title={invite.team?.name}>{invite.team?.name || "Nieznany zespół"}</span>
             </div>
 
             <div className="invite-detail-item">
@@ -81,7 +97,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
             <div className="invite-detail-item">
               <span className="invite-detail-icon"><FaUserTag /></span>
               <span className="invite-detail-label">Rola w zespole:</span>
-              <span className={`invite-detail-value user-role-badge ${getRoleClass(invite.teamRole)}`}>{invite.teamRole || "Członek"}</span>
+              <span className={`invite-detail-value`}>{invite.teamRole || "Członek"}</span>
             </div>
 
             <div className="invite-detail-item">
@@ -109,6 +125,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
                 {invite.status === 'Pending' ? 'Oczekujące' : invite.status === 'Accepted' ? 'Zaakceptowane' : invite.status === 'Declined' ? 'Odrzucone' : invite.status}
               </span>
             </div>
+
           </div>
 
           {success && <div className="success-message">{success}</div>}
@@ -116,11 +133,21 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
 
           {invite.status === 'Pending' && (
             <div className="invite-actions">
-              <button className="btn btn-green" onClick={handleAccept} disabled={loading || isDisabled}><FaCheck /> Akceptuj</button>
-              <button className="btn btn-danger" onClick={handleDecline} disabled={loading || isDisabled}><FaTimesCircle /> Odrzuć</button>
+              <button className="btn btn-green" onClick={handleAccept} disabled={loading || isDisabled}>
+                <FaCheck /> Akceptuj
+              </button>
+              <button className="btn btn-danger" onClick={handleDecline} disabled={loading || isDisabled}>
+                <FaTimesCircle /> Odrzuć
+              </button>
             </div>
           )}
+                      <div className="user-actions">
+              <button className="btn-danger" onClick={handleDelete} disabled={loading}>
+                🗑️ Usuń zaproszenie
+              </button>
+            </div>
         </div>
+        
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import TeamContext from '../../context/TeamContext';
 import './Modal.css';
+import './ModalCommon.css'
+import {FaTimes} from 'react-icons/fa';
 
 const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
   const {
@@ -53,7 +55,7 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
     return (
       <div className="modal-overlay" onClick={handleClose}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
-          <button className="close-btn" onClick={handleClose}>✕</button>
+          <button className="close-btn" onClick={handleClose}><FaTimes/></button>
           <h2>Grupa została utworzona</h2>
           <p>Grupa <strong>{createTeamResult.name}</strong> została dodana poprawnie.</p>
 
@@ -66,7 +68,7 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={handleClose}>✕</button>
+      <button className="close-btn" onClick={handleClose}><FaTimes/></button>
         <h2>Utwórz nowy zespół</h2>
         <form onSubmit={handleCreateTeam}>
           <input
