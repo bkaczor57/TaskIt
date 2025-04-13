@@ -56,6 +56,7 @@ builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 builder.Services.AddScoped<IUserTeamRepository, UserTeamRepository>();
 builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<ITeamInvitesRepository, TeamInvitesRepository>();
+builder.Services.AddScoped<ITaskRepository, TasksRepository>();
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IUserTeamService, UserTeamService>();
 builder.Services.AddScoped<ITeamInviteService, TeamInviteService>();
 builder.Services.AddScoped<ISectionService, SectionService>();
 builder.Services.AddScoped<IServiceHelper, ServiceHelper>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

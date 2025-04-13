@@ -2,20 +2,31 @@
 
 namespace TaskIt.Server.DTOs
 {
+
+
     public class TaskDTO
     {
-        public required int Id { get; set; }
-        public required int SectionId { get; set; }
-        public required int TeamId { get; set; }
-        public required int AssignedUserId { get; set; }
-
-        public TasksStatus TaskStatus { get; set; }
-        public TasksPriority TaskPriority { get; set; }
-        public string? Title { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; } = default!;
         public string? Description { get; set; }
+
+        public TasksStatus Status { get; set; }
+        public TasksPriority Priority { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime? DueDate { get; set; }
-        public DateTime? CompletedAt { get; set; }
 
+        // Przesyłanie SectionId, opcjonalnie SectionName
+        public int SectionId { get; set; }
+        public string? SectionName { get; set; }
+
+        // Opcjonalne Przesyłanie TeamId i TeamName
+        public int? TeamId { get; set; }
+        public string? TeamName { get; set; }
+
+        // Przesyłanie Assigned UserId oraz opcjonalnie AssignedUserName
+        public int AssignedUserId { get; set; }
+        public string? AssignedUserName { get; set; }
     }
+
 }
