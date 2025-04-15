@@ -85,6 +85,63 @@
   z-index: 5;
 }
 
+/* Profile name components */
+.profile-name {
+  margin-bottom: 0.5rem;
+  max-height: 2.4em; /* Maksymalnie dwie linijki */
+  overflow: hidden;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.profile-name .firstname,
+.profile-name .lastname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Jednoliniowe wyświetlanie imienia i nazwiska */
+.profile-name .single-line {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dwuliniowe wyświetlanie imienia i nazwiska */
+.profile-name .two-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name .two-lines .firstname,
+.profile-name .two-lines .lastname {
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+}
+
+/* Jeśli imię i nazwisko mieszczą się w jednej linijce, wyświetl je obok siebie */
+@media (min-width: 320px) {
+  .profile-name .firstname,
+  .profile-name .lastname {
+    max-width: 100%;
+  }
+}
+
+.dropdown p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* <-- maksymalnie 2 linijki */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-width: 100%;
+  font-size: 1.2rem;
+}
 
 .dropdown.show {
   opacity: 1;

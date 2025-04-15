@@ -1,13 +1,14 @@
  import React, { useState, useEffect } from 'react';
  import { useTeamInvite } from '../../context/TeamInviteContext';
  import './ModalCommon.css';
+ import { FaTimes } from 'react-icons/fa';
  
  export const GroupInviteModal = ({ onClose, teamId }) => {
    const [email, setEmail] = useState('');
    const [selectedRole, setSelectedRole] = useState('');
    const [localError, setLocalError] = useState(null); 
    const { userRoles, error, success, fetchUserRoles, createInvite, clearMessages } = useTeamInvite();
- 
+  
    useEffect(() => {
      fetchUserRoles();
    }, [fetchUserRoles]);
@@ -34,7 +35,7 @@
    return (
      <div className="modal-overlay" onClick={handleClose}>
        <div className="modal" onClick={(e) => e.stopPropagation()}>
-         <button className="close-btn" onClick={handleClose}>✕</button>
+         <button className="close-btn" onClick={onClose}><FaTimes /></button>
          <h2>Zaproś użytkownika do grupy</h2>
  
          <form onSubmit={handleSubmit}>

@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import "./Modal.css";
 import { RegisterSuccessModal } from "./RegisterSuccessModal";
 import AuthContext from "../../context/AuthContext";
+import { FaTimes } from "react-icons/fa";
 
 export const RegisterModal = ({ onClose, onOpenLogin }) => {
   const { register, authError, registerResult,clearAuthError } = useContext(AuthContext);
@@ -80,7 +81,7 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={handleClose}>✕</button>
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Rejestracja</h2>
         <form onSubmit={handleRegister}>
           <input

@@ -1,14 +1,15 @@
-﻿using TaskIt.Server.Core.Enums;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Text.Json.Serialization;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.Requests
 {
     public class TasksUserQueryRequest
     {
-        public int AssignedUserId { get; set; }
         public bool Ascending { get; set; } = true;
 
         // domyślne filtrowanie po dacie utworzenia
-        public string? OrderBy { get; set; } = "createdat";
+        public TaskOrderBy? OrderBy { get; set; } = TaskOrderBy.CreatedAt;
 
         // Opcjonalne filtrowanie po Statusie i Priorytecie
         public TasksStatus? Status { get; set; }
@@ -20,7 +21,7 @@ namespace TaskIt.Server.Requests
         public string? SearchTerm { get; set; }
 
         // Opcjonalna paginacja
-        public int? PageNumber { get; set; } = 0;
-        public int? PageSize { get; set; } = 0;
+        public int? PageNumber { get; set; }
+        public int? PageSize { get; set; }
     }
 }

@@ -14,6 +14,6 @@ namespace TaskIt.Server.Services
 
         Task<ServiceResult<UserDTO>> UpdateUser(int userId, UserUpdateRequest updateRequest);
         Task<ServiceResult<bool>> DeleteUser(int userId);
-
+        Task GetUserById(int? assignedUserId);
     }
 }

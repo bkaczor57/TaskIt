@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import "./Modal.css";
-
+import { FaTimes } from "react-icons/fa";
 export const LoginModal = ({ onClose }) => {
   const { login, authError } = useContext(AuthContext);
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export const LoginModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>✕</button>
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Logowanie</h2>
         <form onSubmit={handleLogin}>
           <input
@@ -43,7 +43,7 @@ export const LoginModal = ({ onClose }) => {
             required
           />
           <div className="form-buttons">
-          <button class="btn-green" type="submit">Zaloguj się</button>
+          <button className="btn-green" type="submit">Zaloguj się</button>
           </div>
         </form>
         {(authError || localError) && (

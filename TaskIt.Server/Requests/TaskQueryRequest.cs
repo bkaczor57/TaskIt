@@ -7,7 +7,7 @@ namespace TaskIt.Server.Requests
         public bool Ascending { get; set; } = true;
 
         // domyślne filtrowanie po dacie utworzenia
-        public string? OrderBy { get; set; } = "createdat";
+        public TaskOrderBy? OrderBy { get; set; } = TaskOrderBy.CreatedAt;
     
         public int? AssignedUserId { get; set; }
         public int? SectionId { get; set; }

@@ -15,9 +15,9 @@ namespace TaskIt.Server.Core.Entities
         public TasksStatus Status { get; set; } = TasksStatus.Pending;
         public TasksPriority Priority { get; set; } = TasksPriority.Medium;
         [Required, MaxLength(30)]
-        public string? Title { get; set; } = "New Task";
-        [Required,MaxLength(300)]
-        public string? Description { get; set; }
+        public string Title { get; set; } = "New Task";
+        [Required, MaxLength(300)]
+        public string Description { get; set; } = "Description";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? DueDate { get; set; }
         public DateTime? CompletedAt { get; set; }

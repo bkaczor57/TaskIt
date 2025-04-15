@@ -16,6 +16,7 @@ public class UserTeamRepository : IUserTeamRepository
     {
         return await _context.UsersTeams
             .Include(ut => ut.User)
+            .OrderBy(ut => ut.Team.CreatedAt)
             .FirstOrDefaultAsync(ut => ut.TeamId == teamId && ut.UserId == userId);
     }
 
@@ -40,6 +41,7 @@ public class UserTeamRepository : IUserTeamRepository
         return await _context.UsersTeams
             .Include(ut => ut.Team)
             .Where(ut => ut.UserId == userId)
+            .OrderBy(ut => ut.Team.CreatedAt)
             .ToListAsync();
     }
 

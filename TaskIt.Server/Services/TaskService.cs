@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using TaskIt.Server.Core.Entities;
 using TaskIt.Server.Core.Enums;
 using TaskIt.Server.DTOs;
@@ -9,15 +10,22 @@ using TaskIt.Server.Services;
 public class TaskService : ITaskService
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly ISectionService _sectionService;
+    private readonly IUserService _userService;
+    private readonly IUserTeamService _userTeamService;
+    private readonly IServiceHelper _serviceHelper;
 
-    public TaskService(ITaskRepository taskRepository)
+    public TaskService(ITaskRepository taskRepository, ISectionService sectionService, IUserService userService, IUserTeamService userTeamService, IServiceHelper serviceHelper)
     {
         _taskRepository = taskRepository;
+        _sectionService = sectionService;
+        _userService = userService;
+        _userTeamService = userTeamService;
+        _serviceHelper = serviceHelper;
     }
 
-    public async Task<TaskDTO?> GetTaskByIdAsync(int taskId, bool includeTeam)
+    public async Task<ServiceResult<TaskDTO>> GetTaskByIdAsync(int taskId, bool includeTeam)
     {
-        // todo: ServiceResult, zwracanie błędów i komunikatów
         // pobieranie taska z repozytorium, opcjonalnie z wczytaniem zespołu
         var taskEntity = await _taskRepository.GetByIdAsync(
             taskId,
@@ -26,15 +34,16 @@ public class TaskService : ITaskService
         includeTeam: includeTeam
         );
 
-        if (taskEntity == null) return null;
+        if (taskEntity == null)
+            return ServiceResult<TaskDTO>.Fail("Team not found");
 
         // Mapowanie DTO
-        return MapToDto(taskEntity);
+        return ServiceResult<TaskDTO>.Ok(MapToDto(taskEntity));
     }
 
-    public async Task<(List<TaskDTO> Tasks, int TotalCount)> GetTasksFilteredAsync(TasksQueryRequest request)
+    public async Task<ServiceResult<PagedResult<TaskDTO>>> GetTasksFilteredAsync(TasksQueryRequest request)
     {
-        // Todo: ServiceResult, zwracanie błędów i komunikatów
+       
         // Lazy loading
         var query = _taskRepository.GetAllQueryable();
 
@@ -93,7 +102,6 @@ public class TaskService : ITaskService
         // Sortowanie - wybór konkretnej kolumny do sortowania oraz kierunku sortowania
         query = SortTasks(query, request.OrderBy, request.Ascending);
 
-
         // pobór danych przed paginacją - może być wykorzystywany nawet bez paginacji w celu określenia ilości tasków w teamie 
         // bez konieczności wykonywania metody CountTasksByAssignedUserAsync
         // - przydatne ponieważ nie musimy wykonywać dwóch zapytań do bazy we frontendzie
@@ -108,21 +116,31 @@ public class TaskService : ITaskService
                          .Take(request.PageSize.Value);
         }
 
+
         // Pobranie danych i zmapowanie na DTO
         var tasks = await query.ToListAsync();
         var taskDtos = tasks.Select(MapToDto).ToList();
 
-        return (taskDtos, totalCount);
+        var pagedResult = new PagedResult<TaskDTO>
+        {
+            Items = taskDtos,
+            TotalItems = totalCount,
+            TotalPages = request.PageSize.HasValue && request.PageSize.Value > 0
+               ? (int)Math.Ceiling(totalCount / (double)request.PageSize.Value)
+               : 1,
+            CurrentPage = request.PageNumber ?? 1
+        };
+        return ServiceResult<PagedResult<TaskDTO>>.Ok(pagedResult);
     }
 
-    public async Task<(List<TaskDTO> Tasks, int TotalCount)> GetUserTasksWithSearchAsync(TasksUserQueryRequest request)
+    public async Task<ServiceResult<PagedResult<TaskDTO>>> GetUserTasksWithSearchAsync(int userId, TasksUserQueryRequest request)
     {
         // W tym miejscu chcemy juz pobierać również teamy - user musi wiedzieć do jakiego zespołu należy dane zadanie
         var query = _taskRepository.GetAllQueryable()
             .Include(t => t.Section)
             .ThenInclude(s => s.Team)
             .Include(t => t.AssignedUser)
-            .Where(t => t.AssignedUserId == request.AssignedUserId);
+            .Where(t => t.AssignedUserId == userId);
 
         // Filtrowanie
         if (request.Status.HasValue)
@@ -164,12 +182,24 @@ public class TaskService : ITaskService
                          .Take(request.PageSize.Value);
         }
 
+
+
         var tasks = await query.ToListAsync();
         var dtos = tasks.Select(MapToDto).ToList();
-        return (dtos, totalCount);
+
+        var pagedResult = new PagedResult<TaskDTO>
+        {
+            Items = dtos,
+            TotalItems = totalCount,
+            TotalPages = request.PageSize.HasValue && request.PageSize.Value > 0
+                ? (int)Math.Ceiling(totalCount / (double)request.PageSize.Value)
+                : 1, 
+            CurrentPage = request.PageNumber ?? 1
+        };
+        return ServiceResult<PagedResult<TaskDTO>>.Ok(pagedResult);
     }
 
-    public async Task<int> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null)
+    public async Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null)
     {
         // Przykład: 
         // a) Pobrać bazowe IQueryable
@@ -186,29 +216,61 @@ public class TaskService : ITaskService
             query = query.Where(t => t.Priority == priority.Value);
         }
 
-        return await query.CountAsync();
+        var count = await query.CountAsync();
+
+        return ServiceResult<int>.Ok(count);
     }
 
     // --- Tworzenie, edycja, usuwanie ---
 
-    public async Task<TaskDTO> CreateTaskAsync(CreateTaskRequest createRequest)
+    public async Task<ServiceResult<TaskDTO>> CreateTaskAsync(int teamId, int sectionId, TaskCreateRequest createRequest)
     {
+        if (createRequest.AssignedUserId == null)
+            return ServiceResult<TaskDTO>.Fail("AssignedUserId is required.");
 
-        // todo:
-        // ServiceResult, zwracanie błędów i komunikatów
-        // Logika biznesowa: np. weryfikacja czy Section istnieje, user istnieje itd.
-        // (Dostęp do innego repo lub serwisu)
+        int assignedUserId = createRequest.AssignedUserId.Value;
+
+        // Sprawdź czy sekcja istnieje
+        var section = await _sectionService.GetSectionById(sectionId);
+        if (!section.Success || section.Data == null)
+        {
+            return ServiceResult<TaskDTO>.Fail("Section not found.");
+        }
+
+        if(section.Data.TeamId != teamId)
+        {
+            return ServiceResult<TaskDTO>.Fail("Section is not in the team.");
+        }
+
+        // Sprawdź czy sekcja nalezy do Teamu
+
+        // Sprawdź czy user istnieje
+        var user = await _userService.GetUserById(assignedUserId);
+        if (!user.Success || user.Data == null)
+        {
+            return ServiceResult<TaskDTO>.Fail("User not found.");
+        }
+        // Sprawdź czy przydzielony user należy do zespołu
+        var userTeam = await _userTeamService.IsUserInTeam(section.Data.TeamId, assignedUserId);
+        if (!userTeam.Success || !userTeam.Data)
+        {
+            return ServiceResult<TaskDTO>.Fail("User is not in the team.");
+        }
+
+        if(createRequest.DueDate != null)
+            if (createRequest.DueDate < DateTime.UtcNow)
+                return ServiceResult<TaskDTO>.Fail("Due date must be in the future.");
+
 
         // Tworzymy nową encję:
         var taskEntity = new Tasks
         {
-            SectionId = createRequest.SectionId,
-            AssignedUserId = createRequest.AssignedUserId,
+            SectionId = sectionId,
+            AssignedUserId = assignedUserId,
             Title = createRequest.Title,
             Description = createRequest.Description,
-            Status = createRequest.Status,
             Priority = createRequest.Priority,
-            DueDate = createRequest.DueDate,
+            DueDate = createRequest.DueDate ?? null,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -217,32 +279,60 @@ public class TaskService : ITaskService
         await _taskRepository.SaveChangesAsync();
 
         // Zwracamy DTO
-        return MapToDto(taskEntity);
+        return ServiceResult<TaskDTO>.Ok(MapToDto(taskEntity));
     }
 
-    public async Task<TaskDTO?> UpdateTaskAsync(int taskId, UpdateTaskRequest updateRequest)
+    public async Task<ServiceResult<TaskDTO>> UpdateTaskAsync(int taskId, int userId, TaskUpdateRequest updateRequest)
     {
-        // todo: ServiceResult, zwracanie błędów i komunikatów 
 
         // Znajdź istniejący task
         var existingTask = await _taskRepository.GetByIdAsync(
             taskId,
-            includeSection: false,
+            includeSection: true,
             includeAssignedUser: false,
             includeTeam: false
         );
 
         if (existingTask == null)
         {
-            return null; 
+            return ServiceResult<TaskDTO>.Fail("Task not found"); 
         }
-        
-        if(updateRequest.SectionId != null)
+
+        // Sprawdź czy użytkownik może edytować taska
+        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId, UserTeamRole.Manager))
         {
+            return ServiceResult<TaskDTO>.Fail("You don't have permission to edit this task");
+        }
+
+        if (updateRequest.SectionId != null)
+        {
+            // Sprawdź czy sekcja istnieje
+            var section = await _sectionService.GetSectionById(updateRequest.SectionId.Value);
+            if (!section.Success || section.Data == null)
+            {
+                return ServiceResult<TaskDTO>.Fail("Section not found");
+            }
+            // Sprawdź czy sekcja należy do zespołu
+            if (section.Data.TeamId != existingTask.Section.TeamId)
+            {
+                return ServiceResult<TaskDTO>.Fail("Section is not in the team");
+            }
             existingTask.SectionId = updateRequest.SectionId.Value;
         }
         if (updateRequest.AssignedUserId != null)
         {
+            // Sprawdź czy użytkownik istnieje
+            var user = await _userService.GetUserById(updateRequest.AssignedUserId.Value);
+            if (user == null)
+            {
+                return ServiceResult<TaskDTO>.Fail("User not found");
+            }
+            // Sprawdź czy użytkownik należy do zespołu
+            var userTeam = await _userTeamService.IsUserInTeam(existingTask.Section.TeamId, updateRequest.AssignedUserId.Value);
+            if (!userTeam.Success || !userTeam.Data)
+            {
+                return ServiceResult<TaskDTO>.Fail("User is not in the team");
+            }
             existingTask.AssignedUserId = updateRequest.AssignedUserId.Value;
         }
         if (updateRequest.Title != null)
@@ -263,18 +353,23 @@ public class TaskService : ITaskService
         }
         if (updateRequest.DueDate != null)
         {
+            // Sprawdź czy data jest w przyszłości
+            if (updateRequest.DueDate.Value < DateTime.UtcNow)
+            {
+                return ServiceResult<TaskDTO>.Fail("Due date must be in the future");
+            }
             existingTask.DueDate = updateRequest.DueDate.Value;
         }
 
         _taskRepository.UpdateTask(existingTask);
         await _taskRepository.SaveChangesAsync();
 
-        return MapToDto(existingTask);
+        return ServiceResult<TaskDTO>.Ok(MapToDto(existingTask));
     }
 
-    public async Task<bool> DeleteTaskAsync(int taskId)
+    public async Task<ServiceResult<bool>> DeleteTaskAsync(int taskId, int userId)
     {
-        // todo: ServiceResult, zwracanie błędów i komunikatów
+
         var existingTask = await _taskRepository.GetByIdAsync(
             taskId,
             includeSection: false,
@@ -284,47 +379,42 @@ public class TaskService : ITaskService
 
         if (existingTask == null)
         {
-            return false;
+            return ServiceResult<bool>.Fail("Task Not Found");
         }
+
+        // Sprawdź czy użytkownik może usunąć taska
+        if(!await _serviceHelper.CanPerformAction(userId, taskId, existingTask.AssignedUserId, UserTeamRole.Manager))
+        {
+            return ServiceResult<bool>.Fail("You don't have permission to delete this task");
+        }
+
+
 
         _taskRepository.DeleteTask(existingTask);
         await _taskRepository.SaveChangesAsync();
 
-        return true;
+        return ServiceResult<bool>.Ok(true);
     }
 
     // --- Funkcje pomocnicze ---
 
-    private IQueryable<Tasks> SortTasks(IQueryable<Tasks> query, string? orderBy, bool ascending)
+    private IQueryable<Tasks> SortTasks(IQueryable<Tasks> query, TaskOrderBy? orderBy, bool ascending)
     {
-        if (string.IsNullOrEmpty(orderBy))
-        {
-            // Domyślne
-            return ascending
-                ? query.OrderBy(t => t.CreatedAt)
-                : query.OrderByDescending(t => t.CreatedAt);
-        }
 
-        switch (orderBy.ToLower())
+        switch (orderBy)
         {
-            case "createdat":
+            case TaskOrderBy.CreatedAt:
                 return ascending
                     ? query.OrderBy(t => t.CreatedAt)
                     : query.OrderByDescending(t => t.CreatedAt);
-            case "duedate":
+            case TaskOrderBy.DueDate:
                 return ascending
                     ? query.OrderBy(t => t.DueDate)
                     : query.OrderByDescending(t => t.DueDate);
-            case "priority":
+            case TaskOrderBy.Priority:
                 return ascending
                     ? query.OrderBy(t => t.Priority)
                     : query.OrderByDescending(t => t.Priority);
-            case "teamname":
-                // UWAGA: musimy mieć włączone .Include(t => t.Section.Team) wcześniej,
-                // w przeciwnym razie Team będzie null i EF nie posortuje.
-                return ascending
-                    ? query.OrderBy(t => t.Section.Team.Name)
-                    : query.OrderByDescending(t => t.Section.Team.Name);
             default:
                 return ascending
                     ? query.OrderBy(t => t.CreatedAt)
@@ -350,6 +440,7 @@ public class TaskService : ITaskService
             SectionName = entity.Section?.Title,
             TeamId = entity.Section?.TeamId,
             TeamName = entity.Section?.Team?.Name,
+            AssignedUserName = entity.AssignedUser?.Username
 
         };
     }

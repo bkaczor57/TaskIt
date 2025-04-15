@@ -45,11 +45,13 @@ export const ProfileModal = ({ onClose }) => {
 
     try {
       const updatedUser = await updateCurrentUser(formData);
-      // setUser(updatedUser);
-      // localStorage.setItem("user", JSON.stringify(updatedUser));
-      await loadUser();           // <--- Fetchuj nowego usera
-      await fetchUserTeams();     // <--- Fetchuj grupy jeszcze raz
-      window.dispatchEvent(new Event("userUpdated"));  // <--- Wyślij event do całej aplikacji
+
+      
+      await loadUser();          
+      setUser(updatedUser);
+      sessionStorage.setItem('user', JSON.stringify(updatedUser));
+      await fetchUserTeams(); 
+      window.dispatchEvent(new Event("userUpdated"));
       setSuccessMessage("Profil został zaktualizowany pomyślnie!");
     } catch (err) {
       setLocalError(err.message);
@@ -59,7 +61,7 @@ export const ProfileModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <button class="close-btn" onClick={onClose}><FaTimes /></button>
+      <button className="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Profil użytkownika</h2>
         <div className="user-info">
           <p>

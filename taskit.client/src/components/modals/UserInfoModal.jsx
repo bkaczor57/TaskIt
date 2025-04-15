@@ -118,7 +118,7 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
       <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
         <div className="user-info-modal-header">
           <h2 className="user-info-modal-title">Informacje o użytkowniku</h2>
-          <button class="close-btn" onClick={onClose}><FaTimes /></button>
+          <button className="close-btn" onClick={onClose}><FaTimes /></button>
         </div>
 
         <div className="user-info">

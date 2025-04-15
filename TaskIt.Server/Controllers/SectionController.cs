@@ -54,6 +54,8 @@ namespace TaskIt.Server.Controllers
                 return NotFound(new { error = result.ErrorMessage });
             return Ok(result.Data);
         }
+
+
         [HttpDelete("{sectionId}")]
         public async Task<IActionResult> DeleteSection(int teamId, int sectionId)
         {

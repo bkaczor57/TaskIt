@@ -6,13 +6,13 @@ namespace TaskIt.Server.Services
 {
     public interface ITaskService
     {
-        Task<TaskDTO?> GetTaskByIdAsync(int taskId, bool includeTeam);
-        Task<(List<TaskDTO> Tasks, int TotalCount)> GetTasksFilteredAsync(TasksQueryRequest request);
-        Task<(List<TaskDTO> Tasks, int TotalCount)> GetUserTasksWithSearchAsync(TasksUserQueryRequest request);
-        Task<int> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null);
-        Task<TaskDTO> CreateTaskAsync(CreateTaskRequest request);
-        Task<TaskDTO> UpdateTaskAsync(int taskId, UpdateTaskRequest request);
-        Task<bool> DeleteTaskAsync(int taskId);
+        Task<ServiceResult<TaskDTO>> GetTaskByIdAsync(int taskId, bool includeTeam);
+        Task<ServiceResult<PagedResult<TaskDTO>>> GetTasksFilteredAsync(TasksQueryRequest request);
+        Task<ServiceResult<PagedResult<TaskDTO>>> GetUserTasksWithSearchAsync(int userId, TasksUserQueryRequest request);
+        Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null);
+        Task<ServiceResult<TaskDTO>> CreateTaskAsync(int teamId, int sectionId,TaskCreateRequest request);
+        Task<ServiceResult<TaskDTO>> UpdateTaskAsync(int taskId, int userId, TaskUpdateRequest request);
+        Task<ServiceResult<bool>> DeleteTaskAsync(int taskId, int userId);
 
     }
 }

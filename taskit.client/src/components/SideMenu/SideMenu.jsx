@@ -127,7 +127,7 @@ function SideMenu() {
                 {userTeams.map(group => (
                   <li key={group.id} onClick={() => handleNavigate(`/groups/${group.id}`)}>
                     <span className="menu-icon"><MdGroup /></span>
-                    <span className="item-text">{group.name}</span>
+                    <span className="item-text" title={group.name}>{group.name}</span>
                   </li>
                 ))}
                 <li className="action-item" onClick={() => setIsCreateTeamModalOpen(true)}>

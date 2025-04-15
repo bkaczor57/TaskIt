@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import "./Modal.css";
+import { FaTimes } from "react-icons/fa";
 
 export const PasswordChangeModal = ({ onClose }) => {
   const { changeUserPassword } = useContext(AuthContext);
@@ -49,7 +50,7 @@ export const PasswordChangeModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>✕</button>
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Zmiana hasła</h2>
 
         <form onSubmit={handleSubmit}>

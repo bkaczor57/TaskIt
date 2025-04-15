@@ -1,15 +1,18 @@
-﻿using TaskIt.Server.Core.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.Requests
 {
     public class TaskCreateRequest
     {
-        public int AssignedUserId { get; set; }
-        public TasksStatus TaskStatus { get; set; }
-        public TasksPriority TaskPriority { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-        public DateTime? DueDate { get; set; }
+        public int? AssignedUserId { get; set; }
 
+        [Required, MaxLength(30)]
+        public required string Title { get; set; }
+
+        [Required, MaxLength(300)]
+        public required string Description { get; set; }
+        public TasksPriority Priority { get; set; } = TasksPriority.Medium;
+        public DateTime? DueDate { get; set; }
     }
 }

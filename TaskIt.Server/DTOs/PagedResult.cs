@@ -1,5 +1,4 @@
-﻿namespace TaskIt.Server.DTOs
-{
+﻿
     namespace TaskIt.Server.DTOs
     {
         public class PagedResult<T>
@@ -10,4 +9,4 @@
             public int CurrentPage { get; set; }
         }
     }
-}
+

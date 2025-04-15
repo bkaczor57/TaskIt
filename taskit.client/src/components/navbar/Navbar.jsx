@@ -22,7 +22,35 @@ function Navbar() {
   ];
   const [notifications, setNotifications] = useState(sampleNotifications);
 
-  
+  const formatName = (firstName, lastName) => {
+    const maxLineLength = 22; // Maksymalna długość linii
+    
+    // Sprawdź czy imię i nazwisko mieszczą się w jednej linii
+    if ((firstName.length + lastName.length + 1) <= maxLineLength) {
+      return { firstName, lastName, singleLine: true };
+    }
+    
+    // Sprawdź czy imię jest za długie
+    if (firstName.length > maxLineLength) {
+      return { 
+        firstName: firstName.substring(0, maxLineLength - 3) + '...', 
+        lastName, 
+        singleLine: false 
+      };
+    }
+    
+    // Sprawdź czy nazwisko jest za długie
+    if (lastName.length > maxLineLength) {
+      return { 
+        firstName, 
+        lastName: lastName.substring(0, maxLineLength - 3) + '...', 
+        singleLine: false 
+      };
+    }
+    
+    // Przypadek gdy imię i nazwisko osobno mieszczą się w liniach
+    return { firstName, lastName, singleLine: false };
+  };
 
   const unreadCount = notifications.length;
 
@@ -106,8 +134,23 @@ function Navbar() {
               {getAvatarLetter()}
             </div>
             <div className={`dropdown ${activeDropdown === 'profile' ? 'show' : ''}`}>
-              <p>{user.firstName} {user.lastName}</p>
-              <p>{user.email}</p>
+              <div className="profile-name">
+                {(() => {
+                  const { firstName, lastName, singleLine } = formatName(user.firstName, user.lastName);
+                  return singleLine ? (
+                    <div className="single-line">
+                      <span className="firstname" title={user.firstName}>{firstName}</span>
+                      <span className="lastname" title={user.lastName}>{lastName}</span>
+                    </div>
+                  ) : (
+                    <div className="two-lines">
+                      <span className="firstname" title={user.firstName}>{firstName}</span>
+                      <span className="lastname" title={user.lastName}>{lastName}</span>
+                    </div>
+                  );
+                })()}
+              </div>
+              <p title={user.email}>{user.email}</p>
               <div className="form-buttons-column">
                 <button className="btn-orange" onClick={goToFullProfile}>Zobacz profil</button>
                 <button className="btn-danger" onClick={logout}>Wyloguj się</button>
