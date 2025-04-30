@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TaskIt.Server.Core.Entities;
-using TaskIt.Server.DTOs;
 using TaskIt.Server.Requests;
 using TaskIt.Server.Services;
 
@@ -23,8 +21,7 @@ namespace TaskIt.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUser()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var result = await _userService.GetUserById(userId);
+            var result = await _userService.GetUserById(GetUserId());
 
             if (!result.Success)
                 return NotFound(new { error = result.ErrorMessage });
@@ -34,8 +31,7 @@ namespace TaskIt.Server.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateUser([FromBody] UserUpdateRequest updateRequest)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var result = await _userService.UpdateUser(userId, updateRequest);
+            var result = await _userService.UpdateUser(GetUserId(), updateRequest);
 
             if (!result.Success)
                 return NotFound(new { error = result.ErrorMessage });
@@ -46,8 +42,7 @@ namespace TaskIt.Server.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteUser()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var result = await _userService.DeleteUser(userId);
+            var result = await _userService.DeleteUser(GetUserId());
 
             if (!result.Success)
                 return NotFound(new { error = result.ErrorMessage });

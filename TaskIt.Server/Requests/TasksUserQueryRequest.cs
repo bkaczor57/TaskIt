@@ -9,10 +9,14 @@ namespace TaskIt.Server.Requests
         public bool Ascending { get; set; } = true;
 
         // domyślne filtrowanie po dacie utworzenia
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TaskOrderBy? OrderBy { get; set; } = TaskOrderBy.CreatedAt;
 
         // Opcjonalne filtrowanie po Statusie i Priorytecie
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksStatus? Status { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksPriority? Priority { get; set; }
 
         // Filtrowanie po wielu teamach - możliwe do wykorzystania w przypadku gdzie użytkownik zechce wyświetlić zadania z konkretnych teamów.

@@ -77,21 +77,28 @@ public class TaskService : ITaskService
         {
             query = query.Where(t => t.Priority == request.Priority.Value);
         }
-        if (request.DueBefore.HasValue)
+        if (request.DueBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
         {
-            query = query.Where(t => t.DueDate <= request.DueBefore.Value);
+            var dueBeforeUtc = AdjustToUtc(request.DueBefore, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.DueDate <= dueBeforeUtc.Value);
         }
-        if (request.DueAfter.HasValue)
+
+        if (request.DueAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
         {
-            query = query.Where(t => t.DueDate >= request.DueAfter.Value);
+            var dueAfterUtc = AdjustToUtc(request.DueAfter, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.DueDate >= dueAfterUtc.Value);
         }
-        if (request.CreatedBefore.HasValue)
+
+        if (request.CreatedBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
         {
-            query = query.Where(t => t.CreatedAt <= request.CreatedBefore.Value);
+            var createdBeforeUtc = AdjustToUtc(request.CreatedBefore, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.CreatedAt <= createdBeforeUtc.Value);
         }
-        if (request.CreatedAfter.HasValue)
+
+        if (request.CreatedAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
         {
-            query = query.Where(t => t.CreatedAt >= request.CreatedAfter.Value);
+            var createdAfterUtc = AdjustToUtc(request.CreatedAfter, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.CreatedAt >= createdAfterUtc.Value);
         }
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
@@ -230,6 +237,11 @@ public class TaskService : ITaskService
 
         int assignedUserId = createRequest.AssignedUserId.Value;
 
+        if (!Enum.IsDefined(typeof(TasksPriority), createRequest.Priority))
+        {
+            return ServiceResult<TaskDTO>.Fail("Invalid priority specified.");
+        }
+
         // Sprawdź czy sekcja istnieje
         var section = await _sectionService.GetSectionById(sectionId);
         if (!section.Success || section.Data == null)
@@ -292,6 +304,15 @@ public class TaskService : ITaskService
             includeAssignedUser: false,
             includeTeam: false
         );
+        if (updateRequest.Priority.HasValue && !Enum.IsDefined(typeof(TasksPriority), updateRequest.Priority.Value))
+        {
+            return ServiceResult<TaskDTO>.Fail("Invalid priority specified.");
+        }
+
+        if (updateRequest.Status.HasValue && !Enum.IsDefined(typeof(TasksStatus), updateRequest.Status.Value))
+        {
+            return ServiceResult<TaskDTO>.Fail("Invalid status specified.");
+        }
 
         if (existingTask == null)
         {
@@ -354,9 +375,9 @@ public class TaskService : ITaskService
         if (updateRequest.DueDate != null)
         {
             // Sprawdź czy data jest w przyszłości
-            if (updateRequest.DueDate.Value < DateTime.UtcNow)
+            if (updateRequest.DueDate.Value.Date < DateTime.UtcNow.Date)
             {
-                return ServiceResult<TaskDTO>.Fail("Due date must be in the future");
+                return ServiceResult<TaskDTO>.Fail("Due date must be today or in the future");
             }
             existingTask.DueDate = updateRequest.DueDate.Value;
         }
@@ -444,5 +465,13 @@ public class TaskService : ITaskService
 
         };
     }
-    
+
+    private DateTime? AdjustToUtc(DateTime? localDate, int? offsetInMinutes)
+    {
+        if (localDate == null || offsetInMinutes == null)
+            return localDate;
+
+        return localDate.Value.AddMinutes(-offsetInMinutes.Value);
+    }
+
 }

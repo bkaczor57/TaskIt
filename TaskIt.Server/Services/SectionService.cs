@@ -28,7 +28,7 @@ namespace TaskIt.Server.Services
 
             var sectionDTO = new SectionDTO
             {
-                SectionId = section.Id,
+                Id = section.Id,
                 Title = section.Title,
                 TeamId = section.TeamId
             };
@@ -45,7 +45,7 @@ namespace TaskIt.Server.Services
             }
             var sectionDTO = new SectionDTO
             {
-                SectionId = section.Id,
+                Id = section.Id,
                 Title = section.Title,
                 TeamId = section.TeamId
             };
@@ -57,7 +57,7 @@ namespace TaskIt.Server.Services
             var sections = await _sectionRepository.GetSectionsByTeamId(teamId);
             var sectionDTOs = sections.Select(s => new SectionDTO
             {
-                SectionId = s.Id,
+                Id = s.Id,
                 Title = s.Title,
                 TeamId = s.TeamId
             }).ToList();
@@ -79,7 +79,7 @@ namespace TaskIt.Server.Services
 
             var sectionDTO = new SectionDTO
             {
-                SectionId = section.Id,
+                Id = section.Id,
                 Title = section.Title,
                 TeamId = section.TeamId
             };

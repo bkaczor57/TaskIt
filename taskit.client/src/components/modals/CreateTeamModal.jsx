@@ -25,7 +25,7 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
 
     if (createTeamResult) { 
       await fetchUserTeams();   
-      navigate(`/groups/${createTeamResult.id}`); 
+      navigate(`/teams/${createTeamResult.id}`); 
     }
   };
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTeamInvite } from '../../context/TeamInviteContext';
 import UserInviteDetailsModal from './UserInviteDetailsModal';
-import './UserInviteModal.css'; // Używamy nowego pliku CSS
+import './UserInviteModal.css'; 
 import { FaTimes, FaUsers, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const UserInviteListModal = ({ onClose }) => {

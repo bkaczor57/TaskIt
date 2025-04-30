@@ -81,7 +81,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
         </div>
 
         <div className="invite-details-content">
-          <div className="invite-detail-group">
+          <div className="invite-detail-team">
             <div className="invite-detail-item">
               <span className="invite-detail-icon"><FaUsers /></span>
               <span className="invite-detail-label">Zespół:</span>

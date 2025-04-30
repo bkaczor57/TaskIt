@@ -33,7 +33,7 @@ namespace TaskIt.Server.Controllers
         [HttpGet("taskStatus")]
         public IActionResult GetTaskStatus()
         {
-            var statuses = Enum.GetNames(typeof(TaskStatus)).ToList();
+            var statuses = Enum.GetNames(typeof(TasksStatus)).ToList();
             return Ok(statuses);
         }
 
@@ -51,5 +51,11 @@ namespace TaskIt.Server.Controllers
             return Ok(types);
         }
 
+        [HttpGet("taskOrderBy")]
+        public IActionResult GetTaskOrderBy()
+        {
+            var order = Enum.GetNames(typeof(TaskOrderBy)).ToList();
+            return Ok(order);
+        }
     }
 }

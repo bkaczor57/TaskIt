@@ -7,7 +7,7 @@ using TaskIt.Server.Services;
 
 namespace TaskIt.Server.Controllers
 {
-    [Route("api/Team/{teamId}/sections")]
+    [Route("api/Team/{teamId}/section")]
     [ApiController]
     public class SectionController : ControllerBase
     {

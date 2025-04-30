@@ -4,7 +4,7 @@ import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import ProtectedLayout from './layouts/ProtectedLayout';
 import LandingPage from './pages/LandingPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import GroupPage from './pages/GroupPage.jsx';
+import TeamPageWrapper from './pages/TeamPageWrapper.jsx';
 import './styles/GlobalStyles.css';
 import './App.css';
 
@@ -20,10 +20,8 @@ function App() {
                     <ProtectedRoute>
                         <ProtectedLayout/>
                     </ProtectedRoute>}>
-                        
                         <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/groups/:groupId" element={<GroupPage />} />
-                    
+                        <Route path="/teams/:teamId" element={<TeamPageWrapper />} />
                 </Route>
             </Routes>
         </div>

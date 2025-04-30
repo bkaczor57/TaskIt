@@ -63,7 +63,7 @@ namespace TaskIt.Server.Controllers
         /// <param name="teamId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpGet("Team/{teamId}/Tasks")]
+        [HttpGet("Team/{teamId}/task")]
         public async Task<IActionResult> GetTasksByTeamId(int teamId, [FromQuery] TasksQueryRequest request)
         {
            if(!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
@@ -84,7 +84,7 @@ namespace TaskIt.Server.Controllers
         /// <param name="sectionId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpGet("Team/{teamId}/Section/{sectionId}")]
+        [HttpGet("Team/{teamId}/section/{sectionId}/task")]
         public async Task<IActionResult> GetTasksBySectionId(int teamId, int sectionId, [FromQuery] TasksQueryRequest request)
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
@@ -112,7 +112,7 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
-        [HttpPost("Team/{teamId}/Section/{sectionId}/Task")]
+        [HttpPost("Team/{teamId}/section/{sectionId}/task")]
         public async Task<IActionResult> CreateTask(int teamId, int sectionId, [FromBody] TaskCreateRequest request)
         {
 

@@ -11,9 +11,7 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<UserDTO>> GetUserByUsername(string username);
         Task<ServiceResult<UserRole>> GetUserRole(int userId);
         Task<ServiceResult<List<UserDTO>>> GetUsers();
-
         Task<ServiceResult<UserDTO>> UpdateUser(int userId, UserUpdateRequest updateRequest);
         Task<ServiceResult<bool>> DeleteUser(int userId);
-        Task GetUserById(int? assignedUserId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using TaskIt.Server.Core.Enums;
+﻿using System.Text.Json.Serialization;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.Requests
 {
@@ -7,13 +8,17 @@ namespace TaskIt.Server.Requests
         public bool Ascending { get; set; } = true;
 
         // domyślne filtrowanie po dacie utworzenia
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TaskOrderBy? OrderBy { get; set; } = TaskOrderBy.CreatedAt;
     
         public int? AssignedUserId { get; set; }
         public int? SectionId { get; set; }
         public int? TeamId { get; set; }
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksStatus? Status { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksPriority? Priority { get; set; }
 
         public DateTime? DueBefore { get; set; }
@@ -30,5 +35,7 @@ namespace TaskIt.Server.Requests
 
         // Czy dołączyć Team - W przypadku potrzeby pobrania TeamId i TeamName
         public bool IncludeTeam { get; set; } = false;
+
+        public int? TimeZoneOffsetInMinutes { get; set; }
     }
 }

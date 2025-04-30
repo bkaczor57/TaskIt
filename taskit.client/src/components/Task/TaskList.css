@@ -1,0 +1,96 @@
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .task-card {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+  
+  .task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .priority-tag {
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    color: white;
+  }
+  
+  .priority-tag.low {
+    background-color: #4caf50;
+  }
+  
+  .priority-tag.medium {
+    background-color: #ffa726;
+  }
+  
+  .priority-tag.high {
+    background-color: #ef5350;
+  }
+  
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  
+  .status-dot.pending {
+    background-color: #42a5f5;
+  }
+  
+  .status-dot.inprogress {
+    background-color: #ffb300;
+  }
+  
+  .status-dot.completed {
+    background-color: #66bb6a;
+  }
+  
+  .status-dot.cancelled {
+    background-color: #bdbdbd;
+  }
+  
+  .task-title {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .task-description {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  .task-date,
+  .task-due {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.2rem;
+  }
+  
+  .task-avatar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    background-color: #1976d2;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  

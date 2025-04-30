@@ -1,4 +1,4 @@
-.group-sidebar {
+.team-sidebar {
   position: fixed;
   right: 0;
   top: 60px;
@@ -16,24 +16,24 @@
 }
 
 @media (min-width: 769px) {
-  .group-sidebar {
+  .team-sidebar {
     z-index: 2;
   }
 
-  .group-page.sidebar-open {
+  .team-page.sidebar-open {
     margin-right: 260px;
     transition: margin-right 0.3s ease-in-out;
   }
 }
 
 @media (max-width: 768px) {
-  .group-sidebar {
+  .team-sidebar {
     z-index: 2;
     width:80%;
     max-width: 260px;
   }
 
-  .group-sidebar-overlay {
+  .team-sidebar-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -44,42 +44,42 @@
     z-index: 1;
   }
 
-  .group-sidebar-overlay.visible {
+  .team-sidebar-overlay.visible {
     display: block;
   }
 
-  .group-page.sidebar-open {
+  .team-page.sidebar-open {
     margin-right: 0;
   }
 }
 
-.group-sidebar.visible {
+.team-sidebar.visible {
   transform: translateX(0);
 }
 
-.group-sidebar.hidden {
+.team-sidebar.hidden {
   transform: translateX(100%);
 }
 
 
-.group-sidebar.desktop {
+.team-sidebar.desktop {
   width: 260px;
 }
 
-.group-info {
+.team-info {
   padding: 0.5rem;
   background-color: #f8f9fa;
   border-radius: 8px;
 }
 
-.group-info-header {
+.team-info-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding:0.5rem 0;
 }
 
-.group-title-container {
+.team-title-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -87,7 +87,7 @@
   overflow: hidden;
 }
 
-.group-title {
+.team-title {
   flex: 1;
   font-size: 1.2rem;
   font-weight: 600;
@@ -113,7 +113,7 @@
   color: #0056b3;
 }
 
-.group-title-edit {
+.team-title-edit {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #ddd;
@@ -122,14 +122,14 @@
   margin-bottom: 0.5rem;
 }
 
-.group-description-header {
+.team-description-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
 }
 
-.group-description {
+.team-description {
   padding-right: 0.5rem; 
   word-wrap: break-word; 
   overflow-wrap: break-word; 
@@ -139,7 +139,7 @@
 }
 
 
-.group-description-box {
+.team-description-box {
   background-color: white;
   padding: 0.4rem;
   border-radius: 6px;
@@ -147,14 +147,14 @@
   margin-top: 0.5rem;
 }
 
-.group-description {
+.team-description {
   color: #666;
   font-size: 0.9rem;
   margin: 0;
   white-space: pre-wrap;
 }
 
-.group-description-edit {
+.team-description-edit {
   width: 100%;
   min-height: 80px;
   padding: 0.5rem;
@@ -301,7 +301,7 @@
   color: #f57c00;
 }
 
-.group-user-info {
+.team-user-info {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -361,7 +361,7 @@
   cursor: pointer;
 }
 
-.group-actions {
+.team-actions {
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid #eee;
@@ -370,8 +370,8 @@
   gap: 0.5rem;
 }
 
-.leave-group,
-.delete-group {
+.leave-team,
+.delete-team {
   width: 100%;
   padding: 0.75rem;
   display: flex;
@@ -385,22 +385,22 @@
   transition: all 0.2s;
 }
 
-.leave-group {
+.leave-team {
   background-color: #f8f9fa;
   color: #666;
   border: 1px solid #ddd;
 }
 
-.delete-group {
+.delete-team {
   background-color: #dc3545;
   color: white;
 }
 
-.leave-group:hover {
+.leave-team:hover {
   background-color: #e9ecef;
 }
 
-.delete-group:hover {
+.delete-team:hover {
   background-color: #c82333;
 }
 

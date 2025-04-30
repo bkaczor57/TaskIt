@@ -1,0 +1,91 @@
+.section {
+  flex: 0 0 calc(33.333% - 1rem);
+  min-width: 300px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.section-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2a5298;
+}
+
+.add-task-btn {
+  background: none;
+  border: none;
+  color: #2a5298;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.add-task-btn:hover {
+  background-color: rgba(42, 82, 152, 0.1);
+}
+
+.section-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: white;
+  border-radius: 0 0 8px 8px;
+}
+
+.section-content.scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: #2a5298 #f8f9fa;
+}
+
+.section-content.scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.section-content.scrollable::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.section-content.scrollable::-webkit-scrollbar-thumb {
+  background-color: #2a5298;
+  border-radius: 4px;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 100%;
+}
+
+.task-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e9ecef;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+  

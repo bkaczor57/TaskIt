@@ -5,7 +5,7 @@ import CreateTeamModal from '../modals/CreateTeamModal';
 import UserInviteListModal from '../modals/UserInviteListModal';
 import UserTeamContext from '../../context/UserTeamContext';
 import { RxHamburgerMenu } from "react-icons/rx";
-import { FaTasks, FaUsers, FaArrowRight, FaArrowDown } from 'react-icons/fa';
+import { FaTasks, FaUsers, FaArrowRight, FaArrowDown, FaBorderAll } from 'react-icons/fa';
 import { MdOutlineTaskAlt, MdOutlineTask, MdTask, MdGroup, MdGroupAdd, MdOutlineGroupAdd, MdSpaceDashboard, MdNotifications, MdMail } from "react-icons/md";
 
 function SideMenu() {
@@ -13,7 +13,7 @@ function SideMenu() {
   const { userTeams, fetchUserTeams } = useContext(UserTeamContext);
 
   const [tasksOpen, setTasksOpen] = useState(false);
-  const [groupsOpen, setGroupsOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 768);
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
@@ -40,10 +40,10 @@ function SideMenu() {
   }, []);
 
   useEffect(() => {
-    if (groupsOpen && userTeams.length === 0) {
+    if (teamsOpen && userTeams.length === 0) {
       fetchUserTeams();
     }
-  }, [groupsOpen, userTeams, fetchUserTeams]);
+  }, [teamsOpen, userTeams, fetchUserTeams]);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -83,7 +83,12 @@ function SideMenu() {
                 Zadania
                 <span className="arrow">{tasksOpen ? <FaArrowDown /> : <FaArrowRight />}</span>
               </button>
+
               <ul className={`submenu ${tasksOpen ? 'expand' : 'collapse'}`}>
+              <li onClick={() => handleNavigate('/tasks')}>
+                  <span className="menu-icon"><FaBorderAll /></span>
+                  <span className="item-text">Wszystkie</span>
+                </li>
                 <li onClick={() => handleNavigate('/tasks/completed')}>
                   <span className="menu-icon"><MdOutlineTaskAlt /></span>
                   <span className="item-text">Ukończone</span>
@@ -113,28 +118,28 @@ function SideMenu() {
             </li>
 
             <li>
-              <button className="menu-item" onClick={() => setGroupsOpen(!groupsOpen)}>
+              <button className="menu-item" onClick={() => setTeamsOpen(!teamsOpen)}>
                 <span className="menu-icon"><FaUsers /></span>
                 Grupy
-                <span className="arrow">{groupsOpen ? <FaArrowDown /> : <FaArrowRight />}</span>
+                <span className="arrow">{teamsOpen ? <FaArrowDown /> : <FaArrowRight />}</span>
               </button>
-              <ul className={`submenu ${groupsOpen ? 'expand' : 'collapse'}`}>
+              <ul className={`submenu ${teamsOpen ? 'expand' : 'collapse'}`}>
                 {userTeams.length === 0 && (
                   <li className="no-teams">
                     <span className="item-text">Brak zespołów</span>
                   </li>
                 )}
-                {userTeams.map(group => (
-                  <li key={group.id} onClick={() => handleNavigate(`/groups/${group.id}`)}>
+                {userTeams.map(team => (
+                  <li key={team.id} onClick={() => handleNavigate(`/teams/${team.id}`)}>
                     <span className="menu-icon"><MdGroup /></span>
-                    <span className="item-text" title={group.name}>{group.name}</span>
+                    <span className="item-text" title={team.name}>{team.name}</span>
                   </li>
                 ))}
                 <li className="action-item" onClick={() => setIsCreateTeamModalOpen(true)}>
                   <span className="menu-icon join"><MdGroupAdd /></span>
                   <span className="item-text">Utwórz grupę</span>
                 </li>
-                <li className="action-item" onClick={() => handleNavigate('/groups/join')}>
+                <li className="action-item" onClick={() => handleNavigate('/teams/join')}>
                   <span className="menu-icon join"><MdOutlineGroupAdd /></span>
                   <span className="item-text">Dołącz do grupy</span>
                 </li>

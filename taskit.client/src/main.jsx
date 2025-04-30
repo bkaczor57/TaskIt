@@ -6,23 +6,28 @@ import { UserProvider } from './context/UserContext.jsx';
 import { TeamProvider } from './context/TeamContext.jsx';
 import { UserTeamProvider } from './context/UserTeamContext.jsx';
 import { TeamInviteProvider } from './context/TeamInviteContext.jsx';
+import { EnumProvider } from './context/EnumContext.jsx';
 import App from './App.jsx';
 import './index.css';
 
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <AuthProvider>
-            <UserProvider>
-                <UserTeamProvider>
+    <AuthProvider>
+        <UserProvider>
+            <UserTeamProvider>
+                <TeamInviteProvider>
                     <TeamProvider>
-                        <TeamInviteProvider>
+
+                        <EnumProvider>
                             <BrowserRouter>
                                 <App />
                             </BrowserRouter>
-                        </TeamInviteProvider>
+                        </EnumProvider>
+
                     </TeamProvider>
-                </UserTeamProvider>
-            </UserProvider>
-        </AuthProvider>
-    </React.StrictMode>
+                </TeamInviteProvider>
+            </UserTeamProvider>
+        </UserProvider>
+    </AuthProvider>
 );

@@ -3,7 +3,7 @@
  import './ModalCommon.css';
  import { FaTimes } from 'react-icons/fa';
  
- export const GroupInviteModal = ({ onClose, teamId }) => {
+ export const TeamInviteModal = ({ onClose, teamId }) => {
    const [email, setEmail] = useState('');
    const [selectedRole, setSelectedRole] = useState('');
    const [localError, setLocalError] = useState(null); 
@@ -79,4 +79,4 @@
    );
  };
  
- export default GroupInviteModal;
+ export default TeamInviteModal;

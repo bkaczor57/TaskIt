@@ -1,4 +1,5 @@
-﻿using TaskIt.Server.Core.Enums;
+﻿using System.Text.Json.Serialization;
+using TaskIt.Server.Core.Enums;
 
 namespace TaskIt.Server.DTOs
 {
@@ -10,7 +11,10 @@ namespace TaskIt.Server.DTOs
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksStatus Status { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksPriority Priority { get; set; }
 
         public DateTime CreatedAt { get; set; }
