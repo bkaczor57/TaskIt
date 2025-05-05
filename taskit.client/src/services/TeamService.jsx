@@ -1,58 +1,54 @@
 import api from './Api';
+import { parseApiError } from '../utils/parseApiError'; 
 
-const handleError = (error, context) => {
-  if (error.response?.data?.error) {
-    throw new Error(error.response.data.error);
-  } else {
-    throw new Error(`Wystąpił błąd podczas ${context}. Spróbuj ponownie.`);
-  }
-};
 
 const TeamService = {
   async createTeam(name, description) {
     try {
-      const res = await api.post("/Team", { name, description });
-      return res.data;
-    } catch (error) {
-      handleError(error, "tworzenia zespołu");
+      const { data } = await api.post('/Team', { name, description });
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'tworzenia zespołu');
     }
   },
 
   async getTeamById(teamId) {
     try {
-      const res = await api.get(`/Team/${teamId}`);
-      return res.data;
-    } catch (error) {
-      handleError(error, "pobierania danych zespołu");
+      const { data } = await api.get(`/Team/${teamId}`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania danych zespołu');
     }
   },
 
-  async updateTeam(teamId, updatedData) {
+  async updateTeam(teamId, payload) {
     try {
-      const res = await api.put(`/Team/${teamId}`, updatedData);
-      return res.data;
-    } catch (error) {
-      handleError(error, "aktualizacji zespołu");
+      const { data } = await api.put(`/Team/${teamId}`, payload);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'aktualizacji zespołu');
     }
   },
 
   async deleteTeam(teamId) {
     try {
-      const res = await api.delete(`/Team/${teamId}`);
-      return res.data;
-    } catch (error) {
-      handleError(error, "usuwania zespołu");
+      const { data } = await api.delete(`/Team/${teamId}`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'usuwania zespołu');
     }
   },
 
   async changeTeamOwner(teamId, newOwnerId) {
     try {
-      const res = await api.put(`/Team/${teamId}/change-owner`, { newOwnerId });
-      return res.data;
-    } catch (error) {
-      handleError(error, "zmiany właściciela zespołu");
+      const { data } = await api.put(`/Team/${teamId}/change-owner`, {
+        newOwnerId,
+      });
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'zmiany właściciela zespołu');
     }
-  }
+  },
 };
 
 export default TeamService;

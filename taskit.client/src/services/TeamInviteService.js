@@ -1,99 +1,85 @@
 import api from './Api';
+import { parseApiError } from '../utils/parseApiError'; 
+
 
 export const TeamInviteService = {
-  createInvite: async (teamId, email, role) => {
+  async createInvite(teamId, email, role) {
     try {
-      const response = await api.post(`/TeamInvite`, {
+      const { data } = await api.post('/TeamInvite', {
         teamId,
         invitedUserEmail: email,
-        teamRole: role
+        teamRole: role,
       });
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas wysyłania zaproszenia${apiError ? `: ${apiError}` : ''}`;
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'tworzenia');
     }
   },
 
-  getUserInvites: async (page = 1, pageSize = 5, status = "All") => {
+  async getUserInvites(page = 1, pageSize = 5, status = 'All') {
     try {
-      const response = await api.get(`/TeamInvite/user-paged`, { 
-        params: {
-          pageNumber: page,
-          pageSize: pageSize,
-          status: status
-        }
+      const { data } = await api.get('/TeamInvite/user-paged', {
+        params: { pageNumber: page, pageSize, status },
       });
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas pobierania zaproszeń${apiError ? `: ${apiError}` : ''}`;
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania');
     }
   },
 
-  getTeamInvites: async (teamId, page = 1, pageSize = 5, status = "All") => {
+  async getTeamInvites(teamId, page = 1, pageSize = 5, status = 'All') {
     try {
-      const response = await api.get(`/TeamInvite/team/${teamId}`, {
-        params: {
-          pageNumber: page,
-          pageSize: pageSize,
-          status: status
-        }
+      const { data } = await api.get(`/TeamInvite/team/${teamId}`, {
+        params: { pageNumber: page, pageSize, status },
       });
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas pobierania zaproszeń grupy${apiError ? `: ${apiError}` : ''}`;
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania');
     }
   },
 
-  getInviteById: async (inviteId) => {
+  async getInviteById(inviteId) {
     try {
-      const response = await api.get(`/TeamInvite/${inviteId}`);
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas pobierania zaproszenia${apiError ? `: ${apiError}` : ''}`;
+      const { data } = await api.get(`/TeamInvite/${inviteId}`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania');
     }
   },
 
-  acceptInvite: async (inviteId) => {
+  async acceptInvite(inviteId) {
     try {
-      const response = await api.put(`/TeamInvite/${inviteId}/accept`);
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas akceptowania zaproszenia${apiError ? `: ${apiError}` : ''}`;
+      const { data } = await api.put(`/TeamInvite/${inviteId}/accept`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'akceptacji');
     }
   },
 
-  declineInvite: async (inviteId) => {
+  async declineInvite(inviteId) {
     try {
-      const response = await api.put(`/TeamInvite/${inviteId}/decline`);
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas odrzucania zaproszenia${apiError ? `: ${apiError}` : ''}`;
+      const { data } = await api.put(`/TeamInvite/${inviteId}/decline`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'odrzucenia');
     }
   },
 
-  deleteInvite: async (inviteId) => {
+  async deleteInvite(inviteId) {
     try {
-      const response = await api.delete(`/TeamInvite/${inviteId}`);
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas usuwania zaproszenia${apiError ? `: ${apiError}` : ''}`;
+      const { data } = await api.delete(`/TeamInvite/${inviteId}`);
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'usuwania');
     }
   },
 
-  getUserTeamRoles: async () => {
+  async getUserTeamRoles() {
     try {
-      const response = await api.get(`/Enums/userTeamRoles`);
-      return response.data;
-    } catch (error) {
-      const apiError = error.response?.data?.error;
-      throw `Wystąpił błąd podczas pobierania ról użytkownika${apiError ? `: ${apiError}` : ''}`;
+      const { data } = await api.get('/Enums/userTeamRoles');
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania');
     }
-  }
+  },
 };

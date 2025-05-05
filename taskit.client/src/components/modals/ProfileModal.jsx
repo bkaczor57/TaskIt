@@ -25,12 +25,12 @@ export const ProfileModal = ({ onClose }) => {
     const newErrors = {};
 
     if (!formData.firstName) newErrors.firstName = "Imię jest wymagane.";
-    else if (formData.firstName.length < 2 || formData.firstName.length > 30)
-      newErrors.firstName = "Imię musi mieć od 2 do 30 znaków.";
+    else if (formData.firstName.length < 2 || formData.firstName.length > 20)
+      newErrors.firstName = "Imię musi mieć od 2 do 20 znaków.";
 
     if (!formData.lastName) newErrors.lastName = "Nazwisko jest wymagane.";
-    else if (formData.lastName.length < 2 || formData.lastName.length > 30)
-      newErrors.lastName = "Nazwisko musi mieć od 2 do 30 znaków.";
+    else if (formData.lastName.length < 2 || formData.lastName.length > 20)
+      newErrors.lastName = "Nazwisko musi mieć od 2 do 20 znaków.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

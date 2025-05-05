@@ -76,7 +76,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal invite-details" onClick={(e) => e.stopPropagation()}>
         <div className="invites-modal-header">
-          <h2 className="invites-modal-title">Szczegóły zaproszenia</h2>
+          <span className="invites-modal-title">Szczegóły zaproszenia</span>
           <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         </div>
 

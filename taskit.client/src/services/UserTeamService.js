@@ -1,61 +1,73 @@
 import api from './Api';
+import { emitError } from '../context/ErrorProvider';
 
-const UserTeamService = {
-  getUserInTeam: async (teamId, userId) => {
-    try {
-      const response = await api.get(`/UserTeam/team/${teamId}/user/${userId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.error || 'Wystąpił błąd podczas pobierania informacji o użytkowniku';
-    }
-  },
-
-  removeUserFromTeam: async (teamId, userId) => {
-    try {
-      const response = await api.delete(`/UserTeam/team/${teamId}/user/${userId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.error || 'Wystąpił błąd podczas usuwania użytkownika z grupy';
-    }
-  },
-  
-  updateUserRole: async (teamId, userId, newRole) => {
-    try {
-      const response = await api.put(`/UserTeam/team/${teamId}/user/${userId}`, { role: newRole });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.error || 'Wystąpił błąd podczas aktualizacji roli użytkownika';
-    }
-  },
-  
-  getUserTeams: async () => {
-    try {
-      const response = await api.get('/UserTeam/user/teams');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.error || 'Wystąpił błąd podczas pobierania grup użytkownika';
-    }
-  },
-  
-  getUsersByTeamId: async (teamId) => {
-    try {
-      const response = await api.get(`/UserTeam/team/${teamId}/users`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.error || 'Wystąpił błąd podczas pobierania użytkowników grupy';
-    }
-  },
-
-  getTeamsByUserId: async (userId) => {
-    try {
-      const response = await api.get(`/UserTeam/user/${userId}/teams`);
-      return response.data;
-    } catch (error){
-      throw error.response?.data?.error || 'Wystąpił błąd podczas pobierania grup użytkownika';
-    }
-    
-  }
-
+const handleError = (error, ctx) => {
+  const msg =
+    error.response?.data?.error ??
+    `Wystąpił błąd podczas ${ctx}. Spróbuj ponownie.`;
+  emitError(msg);
+  throw new Error(msg);
 };
 
-export default UserTeamService; 
+const UserTeamService = {
+  async getUserInTeam(teamId, userId) {
+    try {
+      const { data } = await api.get(`/UserTeam/team/${teamId}/user/${userId}`);
+      return data;
+    } catch (e) {
+      handleError(e, 'pobierania informacji o użytkowniku');
+    }
+  },
+
+  async removeUserFromTeam(teamId, userId) {
+    try {
+      const { data } = await api.delete(
+        `/UserTeam/team/${teamId}/user/${userId}`,
+      );
+      return data;
+    } catch (e) {
+      handleError(e, 'usuwania użytkownika z grupy');
+    }
+  },
+
+  async updateUserRole(teamId, userId, role) {
+    try {
+      const { data } = await api.put(
+        `/UserTeam/team/${teamId}/user/${userId}`,
+        { role },
+      );
+      return data;
+    } catch (e) {
+      handleError(e, 'aktualizacji roli użytkownika');
+    }
+  },
+
+  async getUserTeams() {
+    try {
+      const { data } = await api.get('/UserTeam/user/teams');
+      return data;
+    } catch (e) {
+      handleError(e, 'pobierania grup użytkownika');
+    }
+  },
+
+  async getUsersByTeamId(teamId) {
+    try {
+      const { data } = await api.get(`/UserTeam/team/${teamId}/users`);
+      return data;
+    } catch (e) {
+      handleError(e, 'pobierania użytkowników grupy');
+    }
+  },
+
+  async getTeamsByUserId(userId) {
+    try {
+      const { data } = await api.get(`/UserTeam/user/${userId}/teams`);
+      return data;
+    } catch (e) {
+      handleError(e, 'pobierania grup użytkownika');
+    }
+  },
+};
+
+export default UserTeamService;
