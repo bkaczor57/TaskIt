@@ -1,23 +1,43 @@
-import React from 'react';
+import React , {useState} from 'react';
 import './TaskCard.css';
+import TaskModal from '../modals/TaskModal';
+
+
 
 const TaskCard = ({ task }) => {
-  const formatDate = (iso) => new Date(iso).toLocaleDateString();
-  const formatDateTime = (iso) => new Date(iso).toLocaleString([], {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const [showModal, setShowModal] = useState(false);
+  const formatDate = (iso) => {
+    if (!iso) return 'brak daty';
+    try {
+      return new Date(iso).toLocaleDateString();
+    } catch {
+      return 'błędna data';
+    }
+  };
+
+  const getPriorityClass = () => {
+    if (typeof task.priority === 'string') return task.priority.toLowerCase();
+    return 'unknown';
+  };
+
+  const getPriorityLabel = () => {
+    if (typeof task.priority === 'string') return task.priority.toUpperCase();
+    return 'BRAK';
+  };
+
+  const getStatusDotClass = () => {
+    if (typeof task.status === 'string') return task.status.toLowerCase();
+    return 'unknown';
+  };
 
   return (
-    <div className="task-card-modern">
+    <>
+    <div className="task-card-modern" onClick={() => setShowModal(true)}>
       <div className="task-card-header">
-        <span className={`priority-badge ${task.priority.toLowerCase()}`}>
-          {task.priority.toUpperCase()}
+        <span className={`priority-badge ${getPriorityClass()}`}>
+          {getPriorityLabel()}
         </span>
-        {task.assignedUserName && (
+        {typeof task.assignedUserName === 'string' && task.assignedUserName.length > 0 && (
           <div className="user-avatar">
             {task.assignedUserName[0].toUpperCase()}
           </div>
@@ -25,21 +45,25 @@ const TaskCard = ({ task }) => {
       </div>
 
       <div className="task-title-row">
-        <span className={`status-dot ${task.status.toLowerCase()}`}></span>
-        <h3>{task.title}</h3>
+        <span className={`status-dot ${getStatusDotClass()}`}></span>
+        <h3>{task.title || 'Bez tytułu'}</h3>
       </div>
 
       <div className="task-meta">
         <small>Utworzono: {formatDate(task.createdAt)}</small>
-        {task.dueDate && <small>Do: {formatDateTime(task.dueDate)}</small>}
+        <small>Do: {formatDate(task.dueDate)}</small>
       </div>
 
-      {task.description && (
+      {typeof task.description === 'string' && task.description.length > 0 && (
         <p className="task-description">
           {task.description}
         </p>
       )}
     </div>
+    {showModal && (
+      <TaskModal task={task} onClose={() => setShowModal(false)} />
+    )}
+    </>
   );
 };
 
