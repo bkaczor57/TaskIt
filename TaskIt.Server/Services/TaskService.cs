@@ -469,9 +469,11 @@ public class TaskService : ITaskService
     private DateTime? AdjustToUtc(DateTime? localDate, int? offsetInMinutes)
     {
         if (localDate == null || offsetInMinutes == null)
-            return localDate;
+            return null;
 
-        return localDate.Value.AddMinutes(-offsetInMinutes.Value);
+        var unspecified = DateTime.SpecifyKind(localDate.Value, DateTimeKind.Unspecified);
+        var utc = DateTime.SpecifyKind(unspecified.AddMinutes(-offsetInMinutes.Value), DateTimeKind.Utc);
+        return utc;
     }
 
 }

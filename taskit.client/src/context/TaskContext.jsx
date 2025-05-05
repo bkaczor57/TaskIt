@@ -9,6 +9,7 @@ import TaskService from '../services/TaskService';
 
 const TaskContext = createContext();
 
+
 export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children }) => {
   /* -------------------------  LOCAL STATE  ------------------------- */
   const [tasks,       setTasks]       = useState([]);
@@ -85,11 +86,17 @@ export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children 
     return newTask;
   };
 
+  const getTask = async (id) => {
+    const task = await TaskService.getTask(id);
+    return task;
+  };
+
   const updateTask = async (id, data) => {
     const updated = await TaskService.update(id, data);
     setTasks(prev => prev.map(t => (t.id === id ? updated : t)));
     return updated;
   };
+
 
   const deleteTask = async (id) => {
     await TaskService.remove(id);
@@ -108,6 +115,7 @@ export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children 
       createTask,
       updateTask,
       deleteTask,
+      getTask
     }}>
       {children}
     </TaskContext.Provider>
