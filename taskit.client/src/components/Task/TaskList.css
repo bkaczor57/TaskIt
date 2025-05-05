@@ -1,7 +1,7 @@
 .task-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 10px;
   }
   
   .task-card {
@@ -92,5 +92,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .task-list-loading,
+  .task-list-error,
+  .task-list-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+  
+  .task-list-error {
+    color: #c62828;
+    background-color: #ffebee;
+  }
+  
+  .task-list-empty {
+    color: #666;
+    background-color: #f5f5f5;
   }
   

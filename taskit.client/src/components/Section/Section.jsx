@@ -23,33 +23,32 @@ const Section = ({ section, teamId }) => {
   };
 
   return (
-
-      <div className="section">
-        <div className="section-header">
-          <h3>{section.title}</h3>
-          <button
-            className="add-task-btn"
-            onClick={() => setShowCreateTaskModal(true)}
-          >
-            <FaPlus />
-          </button>
-        </div>
-
-        <div 
-          className={`section-content ${isScrolling ? 'scrollable' : ''}`}
-          onScroll={handleScroll}
+    <div className="section">
+      <div className="section-header">
+        <h3>{section.title}</h3>
+        <button
+          className="add-task-btn"
+          onClick={() => setShowCreateTaskModal(true)}
         >
-          <TaskList />
-        </div>
-
-        {showCreateTaskModal && (
-          <CreateTaskModal
-            onClose={() => setShowCreateTaskModal(false)}
-            assignedUsers={teamUsers}
-            canAssign={canAssign}
-          />
-        )}
+          <FaPlus />
+        </button>
       </div>
+
+      <div 
+        className={`section-content ${isScrolling ? 'scrollable' : ''}`}
+        onScroll={handleScroll}
+      >
+        <TaskList />
+      </div>
+
+      {showCreateTaskModal && (
+        <CreateTaskModal
+          onClose={() => setShowCreateTaskModal(false)}
+          assignedUsers={teamUsers}
+          canAssign={canAssign}
+        />
+      )}
+    </div>
   );
 };
 

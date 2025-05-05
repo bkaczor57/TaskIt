@@ -97,7 +97,7 @@ const TeamSidebar = ({ team, isMobile, isVisible, onClose, onLeaveTeam, onDelete
               <div className="edit-section">
                 <input
                   type="text"
-                  className="team-title-edit"
+                  className="team-sidebar-title-edit"
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
                 />
@@ -107,8 +107,8 @@ const TeamSidebar = ({ team, isMobile, isVisible, onClose, onLeaveTeam, onDelete
                 </div>
               </div>
             ) : (
-              <div className="team-title-container">
-                <h3 className="team-title" title={team.name}>{team.name}</h3>
+              <div className="team-sidebar-title-container">
+                <h3 className="team-sidebar-title" title={team.name}>{team.name}</h3>
                 {isOwner && (
                   <button className="edit-button" onClick={() => setIsEditingName(true)}>
                     <FaPencilAlt />

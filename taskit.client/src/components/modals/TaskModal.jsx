@@ -52,6 +52,7 @@ const TaskModal = ({ task, onClose }) => {
             value={formData.title}
             onChange={handleChange}
             required
+            className="task-modal-title"
           />
         ) : (
           task.title
@@ -64,6 +65,7 @@ const TaskModal = ({ task, onClose }) => {
               name="description"
               value={formData.description}
               onChange={handleChange}
+              className="task-modal-description"
             />
           ) : (
             <p>{task.description}</p>
@@ -73,7 +75,7 @@ const TaskModal = ({ task, onClose }) => {
         <div className="task-field">
           <label>Status:</label>
           {isPrivileged ? (
-            <select name="status" value={formData.status} onChange={handleChange}>
+            <select name="status" value={formData.status} onChange={handleChange} className="task-modal-select">
               {taskStatuses.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -86,7 +88,7 @@ const TaskModal = ({ task, onClose }) => {
         <div className="task-field">
           <label>Priorytet:</label>
           {isPrivileged ? (
-            <select name="priority" value={formData.priority} onChange={handleChange}>
+            <select name="priority" value={formData.priority} onChange={handleChange} className="task-modal-select">
               {taskPriorities.map(p => (
                 <option key={p} value={p}>{p}</option>
               ))}
@@ -104,6 +106,7 @@ const TaskModal = ({ task, onClose }) => {
               name="dueDate"
               value={formData.dueDate?.substring(0, 10) || ''}
               onChange={handleChange}
+              className="task-modal-input"
             />
           ) : (
             <span>{task.dueDate?.substring(0, 10) || 'brak'}</span>
@@ -117,8 +120,8 @@ const TaskModal = ({ task, onClose }) => {
 
         {isPrivileged && (
           <div className="modal-buttons">
-            <button onClick={handleSave}>Zapisz zmiany</button>
-            <button onClick={onClose}>Anuluj</button>
+            <button className="btn-primary" onClick={handleSave}>Zapisz zmiany</button>
+            <button className="btn-secondary" onClick={onClose}>Anuluj</button>
           </div>
         )}
       </div>

@@ -6,9 +6,9 @@ import './TaskList.css';
 const TaskList = () => {
   const { tasks, loading, error } = useTasks();
 
-  if (loading) return <div className="task-loading">Ładowanie zadań...</div>;
-  if (error) return <div className="task-error">{error}</div>;
-  if (!tasks.length) return <div className="task-empty">Brak zadań w tej sekcji.</div>;
+  if (loading) return <div className="task-list-loading">Ładowanie zadań...</div>;
+  if (error) return <div className="task-list-error">{error}</div>;
+  if (!tasks.length) return <div className="task-list-empty">Brak zadań w tej sekcji.</div>;
 
   return (
     <div className="task-list">

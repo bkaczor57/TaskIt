@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
 import TeamContext from '../../context/TeamContext';
 import './Modal.css';
-import './ModalCommon.css'
-import {FaTimes} from 'react-icons/fa';
+import './ModalCommon.css';
+import { FaTimes } from 'react-icons/fa';
 
 const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
   const {
@@ -59,7 +59,7 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
           <h2>Grupa została utworzona</h2>
           <p>Grupa <strong>{createTeamResult.name}</strong> została dodana poprawnie.</p>
 
-          <button className="btn-green" onClick={handleClose}>Przejdź do grupy</button>
+          <button className="btn-primary" onClick={handleClose}>Przejdź do grupy</button>
         </div>
       </div>
     );
@@ -68,26 +68,32 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <button className="close-btn" onClick={handleClose}><FaTimes/></button>
+        <button className="close-btn" onClick={handleClose}><FaTimes/></button>
         <h2>Utwórz nowy zespół</h2>
         <form onSubmit={handleCreateTeam}>
-          <input
-            type="text"
-            placeholder="Nazwa zespołu"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-          {errors.name && <p className="error-message">{errors.name}</p>}
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Nazwa zespołu"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className={errors.name ? 'error' : ''}
+            />
+            {errors.name && <p className="error-message">{errors.name}</p>}
+          </div>
 
-          <textarea
-            placeholder="Opis (opcjonalnie)"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
-          {errors.description && <p className="error-message">{errors.description}</p>}
+          <div className="form-group">
+            <textarea
+              placeholder="Opis (opcjonalnie)"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className={errors.description ? 'error' : ''}
+            />
+            {errors.description && <p className="error-message">{errors.description}</p>}
+          </div>
 
           <div className="form-buttons">
-            <button className="btn-green" type="submit">Utwórz</button>
+            <button className="btn-primary" type="submit">Utwórz</button>
           </div>
         </form>
         {(apiError || localError) && (
@@ -97,4 +103,5 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
     </div>
   );
 };
+
 export default CreateTeamModal;

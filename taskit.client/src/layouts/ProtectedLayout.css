@@ -1,36 +1,36 @@
+/** ProtectedLayout.css **/
 .layout-root {
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-  
-.layout-body {
-  display: flex;
-  flex-grow: 1;
-  height: 100%;
   overflow: hidden;
 }
-  
-  .layout-sidebar {
-    width: 240px;
-    background-color: #f8f8f8;
-    border-right: 1px solid #ddd;
-    padding: 1rem;
-    box-sizing: border-box;
-  }
-  
-  .layout-main {
-    flex-grow: 1;
-    padding: 0rem;
-    overflow-y: auto;
-    background-color: #f3f3f3;
-  }
 
-  @media (min-width: 769px) {
-    .layout-body.sidebar-open .layout-main {
-      margin-left: 260px; /* Taka sama szerokość jak side-menu */
-      transition: margin-left 0.3s ease-in-out;
-    }
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-sidebar {
+  width: 240px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #ddd;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.layout-main {
+  flex: 1;
+  overflow-y: auto;
+  height: calc(100vh - 60px); /* 60px to wysokość Navbaru */
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 769px) {
+  .layout-body.sidebar-open .layout-main {
+    margin-left: 260px;
+    transition: margin-left 0.3s ease-in-out;
   }
-  
-  
+}
