@@ -21,9 +21,6 @@ namespace TaskIt.Server.Core.Entities
         public int? TaskId { get; set; }
         public Tasks? Task { get; set; }
 
-        public int? CommentId { get; set; }
-        public Comments? Comment { get; set; }
-
         public int? TeamId { get; set; }
         public Teams? Team { get; set; }
         

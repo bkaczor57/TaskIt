@@ -11,6 +11,29 @@ namespace TaskIt.Server.Repository
         {
             _context = context;
         }
+        public async Task<int> GetNextPositionForTeam(int teamId)
+        {
+            var max = await _context.Sections
+                         .Where(s => s.TeamId == teamId)
+                         .MaxAsync(s => (int?)s.Position) ?? 0;
+            return max + 1;
+        }
+
+
+        public async Task<List<Sections>> GetSectionsAfterPosition(int teamId, int position)
+        {
+            return await _context.Sections
+                .Where(s => s.TeamId == teamId && s.Position > position)
+                .ToListAsync();
+        }
+
+        public async Task<List<Sections>> GetSectionsByTeamIdOrdered(int teamId)
+        {
+            return await _context.Sections
+                        .Where(s => s.TeamId == teamId)
+                        .OrderBy(s => s.Position)
+                        .ToListAsync();
+        }
         public async Task<Sections?> GetSectionById(int sectionId)
         {
             return await _context.Sections.FirstOrDefaultAsync(s => s.Id == sectionId);
@@ -37,5 +60,8 @@ namespace TaskIt.Server.Repository
         {
             return await _context.SaveChangesAsync();
         }
+
+
+
     }
 }

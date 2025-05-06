@@ -8,7 +8,7 @@ namespace TaskIt.Server.Requests
     {
         public int? AssignedUserId { get; set; }
 
-        [Required, MaxLength(30)]
+        [Required, MaxLength(20)]
         public required string Title { get; set; }
 
         [Required, MaxLength(300)]

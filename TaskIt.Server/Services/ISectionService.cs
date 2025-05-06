@@ -10,5 +10,7 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<List<SectionDTO>>> GetSectionsByTeamId(int teamId);
         Task<ServiceResult<SectionDTO>> UpdateSection(int sectionId, SectionCreateRequest request);
         Task<ServiceResult<bool>> DeleteSection(int sectionId);
+
+        Task<ServiceResult<bool>> MoveSection(int teamId, int sectionId, int newPosition);
     }
 }

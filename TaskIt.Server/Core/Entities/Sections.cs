@@ -9,8 +9,9 @@ namespace TaskIt.Server.Core.Entities
         //Foreign Key
         public int TeamId { get; set; }
         public Teams? Team { get; set; }
-        [Required, MaxLength(30)]
+        [Required, MaxLength(20)]
         public required string Title { get; set; }
+        public int Position { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Tasks>? Tasks { get; set; }

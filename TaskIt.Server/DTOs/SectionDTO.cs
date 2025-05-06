@@ -5,5 +5,6 @@
         public int Id { get; set; }
         public required string Title { get; set; }
         public int TeamId { get; set; }
+        public int? Position { get; set; }
     }
 }

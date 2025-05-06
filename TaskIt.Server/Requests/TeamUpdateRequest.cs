@@ -4,8 +4,10 @@ namespace TaskIt.Server.Requests
 {
     public class TeamUpdateRequest
     {
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string? Name { get; set; }
+
+        [MaxLength(300)]
         public string? Description { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskIt.Server.Data;
@@ -11,9 +12,11 @@ using TaskIt.Server.Data;
 namespace TaskIt.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505211141_UpdateMinMaxLenghts")]
+    partial class UpdateMinMaxLenghts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", null, t =>
+                    b.ToTable("Notifications", t =>
                         {
                             t.HasCheckConstraint("CK_Notifications_OnlyOneReference", "\r\n                    (\"TaskId\" IS NOT NULL AND \"CommentId\" IS NULL AND \"TeamId\" IS NULL) OR\r\n                    (\"TaskId\" IS NULL AND \"CommentId\" IS NOT NULL AND \"TeamId\" IS NULL) OR\r\n                    (\"TaskId\" IS NULL AND \"CommentId\" IS NULL AND \"TeamId\" IS NOT NULL)\r\n                    ");
                         });
@@ -89,9 +92,6 @@ namespace TaskIt.Server.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
@@ -104,7 +104,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Sections", (string)null);
+                    b.ToTable("Sections");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Tasks", b =>
@@ -154,7 +154,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("Tasks", (string)null);
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.TeamInvites", b =>
@@ -195,7 +195,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamInvites", null, t =>
+                    b.ToTable("TeamInvites", t =>
                         {
                             t.HasCheckConstraint("CK_TeamInvites_InvitingNotSelf", "\"InvitedUserId\" <> \"InvitingUserId\"");
                         });
@@ -228,7 +228,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Users", b =>
@@ -278,7 +278,7 @@ namespace TaskIt.Server.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.UsersTeams", b =>
@@ -306,7 +306,7 @@ namespace TaskIt.Server.Migrations
                     b.HasIndex("UserId", "TeamId")
                         .IsUnique();
 
-                    b.ToTable("UsersTeams", (string)null);
+                    b.ToTable("UsersTeams");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Notifications", b =>

@@ -6,8 +6,10 @@ namespace TaskIt.Server.Core.Entities
     {
         [Key]
         public int Id { get; set; }
-        [Required, MaxLength(50)]
+        [Required, MaxLength(20)]
         public required string Name { get; set; }
+
+        [MaxLength(300)]
         public string ?Description { get; set; }
         public int OwnerId { get; set; }
         public Users? Owner { get; set; }

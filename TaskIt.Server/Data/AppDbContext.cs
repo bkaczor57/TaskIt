@@ -14,7 +14,6 @@ namespace TaskIt.Server.Data
         public DbSet<TeamInvites> TeamInvites { get; set; }
         public DbSet<Tasks> Tasks { get; set; }
         public DbSet<Sections> Sections { get; set; }
-        public DbSet<Comments> Comments { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
 
 
@@ -102,7 +101,6 @@ namespace TaskIt.Server.Data
             //Indeksowanie po TeamId
             modelBuilder.Entity<Sections>()
                 .HasIndex(s => s.TeamId);
-
             //Tabela Tasks 
             //Relacje 
             //Relacja User -> Tasks, ustawianie na null w razie usunięcia użytkownika
@@ -128,20 +126,7 @@ namespace TaskIt.Server.Data
             modelBuilder.Entity<Tasks>()
                 .HasIndex(t => t.SectionId);
 
-            //Tabela Comments
-            //Relacje
-            //Relacja User -> Comments, ustawianie na null w razie usunięcia użytkownika
-            modelBuilder.Entity<Comments>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
-            //Relacja Task -> Comments, kaskadowe usuwanie
-            modelBuilder.Entity<Comments>()
-                .HasOne(c => c.Task)
-                .WithMany(t => t.Comments)
-                .HasForeignKey(c => c.TaskId)
-                .OnDelete(DeleteBehavior.Cascade);
+
 
             // Tabela Notifications
             // Relacja: Powiadomienie -> Użytkownik (KAŻDE powiadomienie musi mieć odbiorcę)
@@ -155,12 +140,6 @@ namespace TaskIt.Server.Data
                 .HasOne(n => n.Task)
                 .WithMany()
                 .HasForeignKey(n => n.TaskId)
-                .OnDelete(DeleteBehavior.Cascade);
-            // Relacja: Powiadomienie -> Comment (opcjonalne)
-            modelBuilder.Entity<Notifications>()
-                .HasOne(n => n.Comment)
-                .WithMany()
-                .HasForeignKey(n => n.CommentId)
                 .OnDelete(DeleteBehavior.Cascade);
             // Relacja: Powiadomienie -> Team (opcjonalne)
             modelBuilder.Entity<Notifications>()

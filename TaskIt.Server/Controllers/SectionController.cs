@@ -78,6 +78,19 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpPost("{sectionId}/move")]
+        public async Task<IActionResult> MoveSection(int teamId, int sectionId, [FromBody] SectionMoveRequest req)
+        {
+            if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Admin))
+                return Unauthorized(new { error = "You don't have permission" });
+
+            var result = await _sectionService.MoveSection(teamId, sectionId, req.NewPosition);
+            if (!result.Success)
+                return BadRequest(new { error = result.ErrorMessage });
+
+            return Ok();
+        }
+
         private int GetUserId()
         {
             return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
