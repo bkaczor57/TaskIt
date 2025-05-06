@@ -6,8 +6,8 @@ import TeamContext from '../context/TeamContext';
 import SectionModal from '../components/modals/SectionModal';
 import Section from '../components/Section/Section';
 import UserTeamContext from '../context/UserTeamContext';
+import UserContext from "../context/UserContext";
 import { useSections } from '../context/SectionContext';
-import { useTasks } from '../context/TaskContext';
 import { useEnums } from '../context/EnumContext';
 import { TaskProvider } from '../context/TaskContext';
 import FilterPanel from '../components/FilteredPanel/TeamFilteredPanel';
@@ -27,13 +27,14 @@ const TeamPage = () => {
     Ascending: true
   });
 
+
+  const { user } = useContext(UserContext);
   const { taskStatuses, taskPriorities, taskOrderBy } = useEnums();
   const { teamId } = useParams();
   const navigate = useNavigate();
   const { getTeamById, deleteTeam } = useContext(TeamContext);
-  const { teamUsers } = useContext(UserTeamContext);
+  const { teamUsers, removeUserFromTeam, fetchUserTeams} = useContext(UserTeamContext);
   const { sections, createSection } = useSections();
-
   const [team, setTeam] = useState(null);
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -68,9 +69,22 @@ const TeamPage = () => {
     if (window.confirm('Czy na pewno chcesz usunąć tę grupę?')) {
       try {
         await deleteTeam(parseInt(teamId));
+        await fetchUserTeams();
         navigate('/dashboard');
       } catch (error) {
         console.error('Błąd podczas usuwania grupy:', error);
+      }
+    }
+  };
+
+  const handleLeaveTeam = async() => {
+    if (window.confirm('Czy na pewno chcesz opuścić grupę? ')) {
+      try {
+        await removeUserFromTeam(parseInt(teamId), user.id);
+        await fetchUserTeams();
+        navigate('/dashboard');
+      } catch (error) {
+        console.error('Błąd podczas wychodzenia z grupy', error);
       }
     }
   };
@@ -96,7 +110,7 @@ const TeamPage = () => {
         isVisible={showTeamSidebar}
         onClose={() => setShowTeamSidebar(false)}
         onDeleteTeam={handleDeleteTeam}
-        onLeaveTeam={() => navigate('/dashboard')}
+        onLeaveTeam={handleLeaveTeam}
         onTeamUpdated={fetchTeam}
       />
 

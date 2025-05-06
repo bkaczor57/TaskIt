@@ -1,67 +1,64 @@
+/* === TaskModal.css (używa konwencji FilteredPanel) ================= */
+
+/* overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.35);
+  /* ciemność 0.35 jak w filter-overlay */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 200;
+  /* spójne z panelami filtrów */
+  padding: 1.5rem;
+  /* dodajemy odstęp przy małych ekranach */
+  overflow: hidden;
+  /* brak scrolla na overlayu */
 }
 
+/* główny panel */
 .task-modal {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
+  background: #fff;
   width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 400px;
+  /* jak filter-panel */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
+  max-height: 80vh;
+  /* własny scroll */
+  overflow-y: auto;
 }
 
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  padding: 5px;
-  line-height: 1;
-}
 
+/* nagłówek */
 .task-modal h2 {
-  margin: 0 0 20px 0;
-  font-size: 20px;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
   color: #333;
 }
 
+/* pole tytułu */
 .task-modal-title {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 1.25rem;
 }
 
+/* pola formularza */
 .task-field {
-  margin-bottom: 20px;
+  margin-bottom: 0.5rem;
 }
 
 .task-label-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
-}
-
-.task-label-row span {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
+  margin-bottom: 0.25rem;
 }
 
 .edit-toggle-btn {
@@ -71,65 +68,125 @@
   font-size: 16px;
   cursor: pointer;
   padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
 }
 
 .edit-toggle-btn:hover {
   color: #0d47a1;
 }
 
-.task-modal-description {
+.task-modal-description,
+.task-modal-input,
+.task-modal-select {
   width: 100%;
-  min-height: 100px;
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 14px;
+}
+
+/* opis – minimum 100 px */
+.task-modal-description {
+  min-height: 100px;
   resize: vertical;
 }
 
-.task-modal-select,
-.task-modal-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.modal-buttons {
+/* przyciski akcji */
+.task-modal-buttons {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: space-between;
+  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
-.btn-primary,
-.btn-secondary {
-  padding: 8px 16px;
-  border: none;
+.task-modal-buttons button {
+  padding: 0.5rem 1rem;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  font-weight: 550;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;           
+  line-height: 1.2;              
 }
 
-.btn-primary {
-  background-color: #1976d2;
+/* === PRZYCISKI === */
+
+/* Primary – Zapisz zmiany */
+.task-modal-btn-success {
+  background-color: #4caf50;
   color: white;
+  border: 1px solid #4caf50;
+  min-width: 140px;               /* większy */
+}
+.task-modal-btn-success:hover {
+  background-color: #388e3c;
+  border-color: #388e3c;
 }
 
-.btn-secondary {
+/* Secondary – Usuń */
+.task-modal-btn-danger {
+  background-color: #f8d7da;
+  color: #c62828;
+  border: 1px solid #c62828;
+  min-width: 90px;
+}
+.task-modal-btn-danger:hover {
+  background-color: #f1b0b7;
+}
+
+/* Secondary – Anuluj */
+.task-modal-btn-cancel {
   background-color: #f5f5f5;
-  color: #666;
+  color: #c62828;
+  border: 1px solid #c62828;
+  min-width: 90px;
+}
+.task-modal-btn-cancel:hover {
+  background-color: #fceaea;
 }
 
-.btn-primary:hover {
-  background-color: #1565c0;
+
+/* --- Mobile ≤ 480 px --- */
+@media (max-width: 480px) {
+  .task-modal {
+    padding: 1.5rem 1.5rem;
+    width: 100%;
+    border-radius: 0;
+    max-height: 90vh;
+  }
+
+  .task-modal-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
 }
 
-.btn-secondary:hover {
-  background-color: #e0e0e0;
+/* === Checkbox stylizowany z ikoną === */
+.due-date-toggle {
+  margin-bottom: 1rem;
+}
+
+.checkbox-label {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  gap: 0.5rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #1976d2; /* niebieski znacznik (wspierany w większości przeglądarek) */
+  cursor: pointer;
+}
+
+.checkbox-label .calendar-icon {
+  font-size: 18px;
+  color: #1976d2;
 }

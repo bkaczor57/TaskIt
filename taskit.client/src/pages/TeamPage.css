@@ -71,26 +71,6 @@
   opacity: 0.9;
 }
 
-
-.btn-primary, .btn-secondary {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.btn-primary {
-  background-color: #1976d2;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #f5f5f5;
-  color: #666;
-}
-
 .sections-container {
   flex: 1;
   overflow-x: auto;
@@ -120,7 +100,7 @@
   cursor: pointer;
   color: #666;
   transition: all 0.2s;
-  min-width: 300px;
+  min-width: 380px;
   height: auto;
   flex-shrink: 0;
 }

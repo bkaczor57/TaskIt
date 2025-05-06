@@ -2,13 +2,21 @@ import { emitError } from '../context/ErrorProvider';
 
 /**
  * Zwraca czytelną wiadomość na podstawie odpowiedzi API
- * i (nieobowiązkowo) kontekstu operacji.
+ * (ProblemDetails, { error }, itp.) i – o ile trzeba – pokazuje toast.
  *
- *  • Obsługuje ProblemDetails z `errors = { Field: [...] }`
- *  • Obsługuje własne `{ error: "..." }`
- *  • Falling‑back: error.message lub generyczny tekst
+ * • 404 traktujemy jako „cichy” błąd – nie wyświetlamy toasta
+ * • Zwraca Error (można dalej throw‑ować lub zignorować)
  */
 export const parseApiError = (err, context = '') => {
+  const status = err?.response?.status;
+
+  /* === 404 → bez toasta === */
+  if (status === 404) {
+    // tu możesz dodać console.debug, jeśli chcesz
+    return new Error('Not found (404) – toast pominięty');
+  }
+
+  /* ---------- poprzednia logika ---------- */
   let msg;
 
   // custom { error: "..." }
@@ -18,17 +26,13 @@ export const parseApiError = (err, context = '') => {
   // ASP.NET Validation ProblemDetails
   } else if (err.response?.data?.errors) {
     const dict = err.response.data.errors;
-    // scalamy wszystkie tablice message'ów w jedno zdanie
     msg = Object.values(dict).flat().join(' • ');
   }
 
-  // Fallback na komunikat Error lub generyczny
+  // Fallback
   msg ??= err.message ?? 'Nieoczekiwany błąd';
-
   if (context) msg = `Błąd podczas ${context}: ${msg}`;
 
-  // globalny toast
-  emitError(msg);
-
-  return new Error(msg);      // pozwala throw‑ować dalej
+  emitError(msg);          // 🔔 toast (dla wszystkiego poza 404)
+  return new Error(msg);
 };

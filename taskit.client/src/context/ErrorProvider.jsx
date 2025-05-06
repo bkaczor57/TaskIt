@@ -18,7 +18,8 @@ export const ErrorProvider = ({ children }) => {
   const [queue, setQueue] = useState([]); // [{ id, text }]
 
   const showError = useCallback((text) => {
-    setQueue((prev) => [...prev, { id: Date.now(), text }]);
+    if (!text) return;                 // <-- ignoruj puste
+    setQueue(prev => [...prev, { id: Date.now(), text }]);
   }, []);
 
   // expose to non‑React modules

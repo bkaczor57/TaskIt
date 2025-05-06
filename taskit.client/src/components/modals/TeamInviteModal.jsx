@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTeamInvite } from '../../context/TeamInviteContext';
-import './ModalCommon.css';
+import './Modal.css';
 import { FaTimes } from 'react-icons/fa';
 
 export const TeamInviteModal = ({ onClose, teamId }) => {

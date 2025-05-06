@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import TeamContext from '../../context/TeamContext';
 import './Modal.css';
-import './ModalCommon.css';
 import { FaTimes } from 'react-icons/fa';
 
 const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
@@ -57,7 +56,7 @@ const CreateTeamModal = ({ onClose, fetchUserTeams, navigate }) => {
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={handleClose}><FaTimes/></button>
           <h2>Grupa została utworzona</h2>
-          <p>Grupa <strong>{createTeamResult.name}</strong> została dodana poprawnie.</p>
+          <span className="group-created-desc">Grupa <strong>{createTeamResult.name}</strong> została dodana poprawnie.</span>
 
           <button className="btn-primary" onClick={handleClose}>Przejdź do grupy</button>
         </div>

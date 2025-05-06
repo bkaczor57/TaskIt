@@ -1,10 +1,11 @@
 import React from 'react';
 import './TeamFilteredPanel.css';
-
+import {  FaTimes  } from 'react-icons/fa';
 const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, teamUsers, taskStatuses, taskPriorities, taskOrderBy }) => {
   return (
     <div className="filter-overlay">
       <div className="filter-panel">
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
         <h2>Filtruj zadania</h2>
 
         <div className="filter-grid">

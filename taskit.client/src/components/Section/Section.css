@@ -19,6 +19,7 @@
   border-bottom: 1px solid #eee;
 }
 .section-title {
+  padding: 0 0.5rem;
   font-size: 16px;
   font-weight: bold;
   margin: 0;
@@ -54,7 +55,7 @@
 .edit-confirm {
   background-color: #d4edda;
   color: #155724;
-  border: none;
+  border: 1px solid #155724;
   padding: 6px;
   border-radius: 4px;
   cursor: pointer;
@@ -63,7 +64,16 @@
 .edit-cancel {
   background-color: #f8d7da;
   color: #721c24;
-  border: none;
+  border: 1px solid #721c24;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-delete {
+  background-color: #721c24;
+  color: #f8d7da;
+  border: 1px solid black;
   padding: 6px;
   border-radius: 4px;
   cursor: pointer;
@@ -79,6 +89,7 @@
   background: none;
   border: none;
   color: #1976d2;
+  border: 1px solid #1976d2;
   cursor: pointer;
   padding: 8px;
   border-radius: 4px;
@@ -106,7 +117,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-height: 0; /* <- pozwala scrollować jeśli jest overflow */
+  min-height: 0; 
 }
 
 /* Scrollbar */
@@ -128,17 +139,4 @@
   background: #999;
 }
 
-.task-card {
-  background: white;
-  padding: 1rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #e9ecef;
-}
 
-.task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-}

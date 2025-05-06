@@ -4,13 +4,13 @@ import { useTasks } from '../../context/TaskContext';
 import UserContext from '../../context/UserContext';
 import UserTeamContext from '../../context/UserTeamContext';
 import { useEnums } from '../../context/EnumContext';
-import { FaPencilAlt } from 'react-icons/fa';
+import { FaPencilAlt, FaTimes, FaTrash } from 'react-icons/fa';
 
 const TaskModal = ({ task, onClose }) => {
   const { user } = useContext(UserContext);
   const { teamUsers } = useContext(UserTeamContext);
   const { taskStatuses, taskPriorities } = useEnums();
-  const { getTask, updateTask } = useTasks();
+  const { getTask, updateTask, deleteTask } = useTasks();
 
   const [formData, setFormData] = useState(null);
   const [enabledFields, setEnabledFields] = useState({});
@@ -37,6 +37,18 @@ const TaskModal = ({ task, onClose }) => {
 
   const handleToggleField = (name) => {
     setEnabledFields(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm('Czy na pewno chcesz usunąć to zadanie?');
+    if (!confirmed) return;
+
+    try {
+      await deleteTask(task.id);
+      onClose();
+    } catch (err) {
+      console.error('Błąd przy usuwaniu zadania:', err);
+    }
   };
 
   const formatDueDate = (dateStr) => {
@@ -119,7 +131,7 @@ const TaskModal = ({ task, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content task-modal">
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
 
         {renderEditableField("Tytuł", "title",
           <input
@@ -197,9 +209,19 @@ const TaskModal = ({ task, onClose }) => {
         )}
 
         {isPrivileged && (
-          <div className="modal-buttons">
-            <button className="btn-primary" onClick={handleSave}>Zapisz zmiany</button>
-            <button className="btn-secondary" onClick={onClose}>Anuluj</button>
+          <div className="task-modal-buttons">
+                        <button className="task-modal-btn-success" onClick={handleSave}>
+              Zapisz zmiany
+            </button>
+            <button className="task-modal-btn-cancel" onClick={onClose}>
+              Anuluj
+            </button>
+            <button className="task-modal-btn-danger" onClick={handleDelete}>
+              <FaTrash style={{marginRight:6}}/> Usuń
+            </button>
+
+
+
           </div>
         )}
       </div>

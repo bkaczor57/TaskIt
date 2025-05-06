@@ -6,7 +6,6 @@ const UserTeamContext = createContext();
 
 export const UserTeamProvider = ({ children }) => {
   const { user } = useContext(UserContext);
-
   const [userTeams, setUserTeams] = useState([]);
   const [teamUsers, setTeamUsers] = useState([]);
 
@@ -46,15 +45,21 @@ export const UserTeamProvider = ({ children }) => {
     }
   };
 
-  const removeUserFromTeam = async (teamId, userId) => {
-    try {
-      return await UserTeamService.removeUserFromTeam(teamId, userId);
-    } catch (err) {
+// context/UserTeamContext.jsx
+const removeUserFromTeam = async (teamId, userId) => {
+  try {
+    await UserTeamService.removeUserFromTeam(teamId, userId);
+  } catch (err) {
+    // API rzuci 404, gdy membership już nie istnieje – dla UI to też "sukces"
+    if (err.response?.status !== 404) {
       console.error("Błąd przy removeUserFromTeam:", err);
-      throw err;
+      throw err;           // inny błąd = pokaż użytkownikowi
     }
-  };
-
+  } finally {
+    // ⬇️  ZAWSZE aktualizuj lokalny stan – również gdy była 404‑ka
+    setUserTeams(prev => prev.filter(t => t.id !== teamId));
+  }
+};
   const updateUserRole = async (teamId, userId, newRole) => {
     try {
       return await UserTeamService.updateUserRole(teamId, userId, newRole);

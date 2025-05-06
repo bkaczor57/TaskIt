@@ -404,18 +404,6 @@
   background-color: #c82333;
 }
 
-.close-button {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #666;
-}
-
-.close-button:hover {
-  color: #333;
-}
 
 .users-header {
   display: flex;

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { FaPlus, FaPencilAlt, FaCheck, FaTimes } from 'react-icons/fa';
-import { TaskProvider } from '../../context/TaskContext';
+import { FaPlus, FaPencilAlt, FaCheck, FaTimes, FaTrashAlt } from 'react-icons/fa';
 import TaskList from '../Task/TaskList';
 import CreateTaskModal from '../modals/CreateTaskModal';
 import { useUser } from '../../context/UserContext';
@@ -14,13 +13,13 @@ const Section = ({ section, teamId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(section.title);
   const [newTitle, setNewTitle] = useState(section.title);
-  const { updateSection } = useSections();
+  const { updateSection, deleteSection } = useSections();
 
   const { user } = useUser();
   const { teamUsers } = useUserTeam();
 
   const currentUser = teamUsers.find(u => u.id === user?.id);
-  const canAssign = currentUser?.role === 'Admin' || currentUser?.role === 'Manager';
+  const canAssign = currentUser?.role === 'Admin';
   const canEditTitle = canAssign;
 
   const handleScroll = (e) => {
@@ -48,6 +47,16 @@ const Section = ({ section, teamId }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Czy na pewno chcesz usunąć tę sekcję?')) return;
+  
+    try {
+      await deleteSection(section.id);
+    } catch (err) {
+      console.error('Błąd podczas usuwania sekcji:', err);
+    }
+  };
+
   return (
     <div className="section">
       <div className="section-header">
@@ -64,6 +73,9 @@ const Section = ({ section, teamId }) => {
               </button>
               <button onClick={handleCancelEdit} className="edit-cancel">
                 <FaTimes />
+              </button>
+              <button onClick={handleDelete} className="edit-delete">
+              <FaTrashAlt />
               </button>
             </div>
           </>

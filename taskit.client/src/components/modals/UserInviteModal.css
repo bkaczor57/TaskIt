@@ -29,6 +29,7 @@
     margin: 0.5rem 0.8rem;
     background-color: #f8f9fa;
     border-radius: 8px;
+    border: solid 1px #385170;;
     cursor: pointer;
     transition: background-color 0.2s ease;
   }
@@ -138,19 +139,14 @@
     margin:0.5rem;
   }
   
-  .invite-actions {
-    border-top: 1px solid #eaeaea;
-    padding-top: 1rem;
-    margin-bottom:0.5rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-  }
   
   .success-message,
   .error-message {
     margin-top: 1rem;
     text-align: center;
+  }
+  .filter-buttons {
+    margin: 0.5rem 0;
   }
   
   .filter-btn {

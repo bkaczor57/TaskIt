@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUserTeam } from '../../context/UserTeamContext';
 import { useUser } from '../../context/UserContext';
 import { useTeam } from '../../context/TeamContext';
-import './ModalCommon.css';
+import './Modal.css';
 import './UserInfoModal.css';
 import { FaTimes, FaUserAlt, FaEnvelope, FaIdCard, FaUserTag, FaUserCog, FaTrashAlt } from 'react-icons/fa';
 import { GrUserManager, GrUserPolice, GrUserWorker, GrUserAdmin } from 'react-icons/gr';
@@ -99,7 +99,7 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
           <div className="user-info-modal-header">
-            <h2 className="user-info-modal-title">Błąd</h2>
+            <span className="user-info-modal-title">Błąd</span>
             <button className="close-modal-button" onClick={onClose}><FaTimes /></button>
           </div>
           <p className="error-message">{error}</p>
@@ -117,7 +117,7 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
         <div className="user-info-modal-header">
-          <h2 className="user-info-modal-title">Informacje o użytkowniku</h2>
+          <span className="user-info-modal-title">Informacje o użytkowniku</span>
           <button className="close-btn" onClick={onClose}><FaTimes /></button>
         </div>
 

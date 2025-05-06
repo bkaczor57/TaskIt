@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './SideMenu.css';
 import CreateTeamModal from '../modals/CreateTeamModal';
 import UserInviteListModal from '../modals/UserInviteListModal';
@@ -11,7 +11,7 @@ import { MdOutlineTaskAlt, MdOutlineTask, MdTask, MdGroup, MdGroupAdd, MdOutline
 function SideMenu() {
   const navigate = useNavigate();
   const { userTeams, fetchUserTeams } = useContext(UserTeamContext);
-
+  const location = useLocation();
   const [tasksOpen, setTasksOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -31,6 +31,10 @@ function SideMenu() {
   }, []);
 
   useEffect(() => {
+    fetchUserTeams();
+  }, [fetchUserTeams, location.pathname]);
+
+  useEffect(() => {
     const toggleHandler = () => {
       setIsOpen(prev => !prev);
     };
@@ -40,10 +44,8 @@ function SideMenu() {
   }, []);
 
   useEffect(() => {
-    if (teamsOpen && userTeams.length === 0) {
-      fetchUserTeams();
-    }
-  }, [teamsOpen, userTeams, fetchUserTeams]);
+    if (teamsOpen) fetchUserTeams();
+  }, [teamsOpen, fetchUserTeams]);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -124,25 +126,26 @@ function SideMenu() {
                 <span className="arrow">{teamsOpen ? <FaArrowDown /> : <FaArrowRight />}</span>
               </button>
               <ul className={`submenu ${teamsOpen ? 'expand' : 'collapse'}`}>
-                {userTeams.length === 0 && (
+                {userTeams && userTeams.length === 0 ? (
                   <li className="no-teams">
                     <span className="item-text">Brak zespołów</span>
                   </li>
+                ) : (
+                  userTeams && userTeams.map(team => (
+                    <li key={team.id} onClick={() => handleNavigate(`/teams/${team.id}`)}>
+                      <span className="menu-icon"><MdGroup /></span>
+                      <span className="item-text" title={team.name}>{team.name}</span>
+                    </li>
+                  ))
                 )}
-                {userTeams.map(team => (
-                  <li key={team.id} onClick={() => handleNavigate(`/teams/${team.id}`)}>
-                    <span className="menu-icon"><MdGroup /></span>
-                    <span className="item-text" title={team.name}>{team.name}</span>
-                  </li>
-                ))}
                 <li className="action-item" onClick={() => setIsCreateTeamModalOpen(true)}>
                   <span className="menu-icon join"><MdGroupAdd /></span>
                   <span className="item-text">Utwórz grupę</span>
                 </li>
-                <li className="action-item" onClick={() => handleNavigate('/teams/join')}>
+                {/* <li className="action-item" onClick={() => handleNavigate('/teams/join')}>
                   <span className="menu-icon join"><MdOutlineGroupAdd /></span>
                   <span className="item-text">Dołącz do grupy</span>
-                </li>
+                </li> */}
               </ul>
             </li>
           </ul>

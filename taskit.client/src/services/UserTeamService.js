@@ -15,7 +15,7 @@ const UserTeamService = {
       const { data } = await api.get(`/UserTeam/team/${teamId}/user/${userId}`);
       return data;
     } catch (e) {
-      handleError(e, 'pobierania informacji o użytkowniku');
+      handleError(e, 'pobierania informacji o użytkowniku');
     }
   },
 
@@ -26,7 +26,7 @@ const UserTeamService = {
       );
       return data;
     } catch (e) {
-      handleError(e, 'usuwania użytkownika z grupy');
+      handleError(e, 'usuwania użytkownika z grupy');
     }
   },
 
@@ -46,8 +46,14 @@ const UserTeamService = {
     try {
       const { data } = await api.get('/UserTeam/user/teams');
       return data;
-    } catch (e) {
-      handleError(e, 'pobierania grup użytkownika');
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Handle the case where no teams are found by returning an empty array
+        return [];
+      } else {
+        // Handle other errors
+        handleError(error, 'pobierania grup użytkownika');
+      }
     }
   },
 
@@ -65,7 +71,9 @@ const UserTeamService = {
       const { data } = await api.get(`/UserTeam/user/${userId}/teams`);
       return data;
     } catch (e) {
-      handleError(e, 'pobierania grup użytkownika');
+      // You might want to handle this error as well, depending on your application's needs
+      console.error("Error fetching teams by user ID:", e);
+      return []; // Or throw an error if necessary
     }
   },
 };

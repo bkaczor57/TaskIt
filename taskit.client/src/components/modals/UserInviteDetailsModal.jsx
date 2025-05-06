@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState , useContext} from 'react';
 import { useTeamInvite } from '../../context/TeamInviteContext';
+import UserTeamContext from '../../context/UserTeamContext';
 import './UserInviteModal.css';
-import { FaTimes, FaUsers, FaUserTag, FaCalendarAlt, FaUserPlus, FaCheck, FaTimes as FaTimesCircle } from 'react-icons/fa';
+import { FaTrash, FaTimes, FaUsers, FaUserTag, FaCalendarAlt, FaUserPlus, FaCheck, FaTimes as FaTimesCircle } from 'react-icons/fa';
 
 const UserInviteDetailsModal = ({ invite, onClose }) => {
   const [loading, setLoading] = useState(false);
+  const { fetchUserTeams } = useContext(UserTeamContext);
   const { deleteInvite, acceptInvite, declineInvite, error, success, clearMessages } = useTeamInvite();
 
   const formatDate = (dateString) => {
@@ -25,6 +27,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
     setLoading(true);
     try {
       await acceptInvite(invite.id);
+      await fetchUserTeams();
     } catch (err) {
       console.error("Błąd akceptowania zaproszenia:", err);
     } finally {
@@ -132,7 +135,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
           {error && <div className="error-message">{error}</div>}
 
           {invite.status === 'Pending' && (
-            <div className="invite-actions">
+            <div className="form-buttons">
               <button className="btn btn-green" onClick={handleAccept} disabled={loading || isDisabled}>
                 <FaCheck /> Akceptuj
               </button>
@@ -143,7 +146,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
           )}
                       <div className="user-actions">
               <button className="btn-danger" onClick={handleDelete} disabled={loading}>
-                🗑️ Usuń zaproszenie
+                <FaTrash/> Usuń zaproszenie
               </button>
             </div>
         </div>

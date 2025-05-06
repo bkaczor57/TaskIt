@@ -3,7 +3,7 @@ import './TeamSidebar.css';
 import UserContext from '../../context/UserContext';
 import UserTeamContext from '../../context/UserTeamContext';
 import TeamContext from '../../context/TeamContext';
-import { FaUsers, FaSignOutAlt, FaTrash, FaTimes, FaPencilAlt, FaInfoCircle, FaUserPlus } from 'react-icons/fa';
+import { FaUsers, FaSignOutAlt, FaTrash, FaTimes, FaPencilAlt, FaUserPlus } from 'react-icons/fa';
 import { GrUserManager, GrUserPolice, GrUserWorker, GrUserAdmin } from 'react-icons/gr';
 import { MdInfoOutline } from "react-icons/md";
 import TeamInviteModal from '../modals/TeamInviteModal';
@@ -89,7 +89,7 @@ const TeamSidebar = ({ team, isMobile, isVisible, onClose, onLeaveTeam, onDelete
       {isMobile && isVisible && <div className="team-sidebar-overlay visible" onClick={onClose} />}
 
       <aside className={`team-sidebar ${isMobile ? 'mobile' : 'desktop'} ${isVisible ? 'visible' : 'hidden'}`}>
-        <button className="close-button" onClick={onClose}><FaTimes /></button>
+        <button className="close-btn" onClick={onClose}><FaTimes /></button>
 
         <div className="team-info">
           <div className="team-info-header">

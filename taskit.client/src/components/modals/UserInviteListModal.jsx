@@ -35,7 +35,7 @@ const UserInviteListModal = ({ onClose }) => {
       <div className="modal invite-list-modal" onClick={(e) => e.stopPropagation()}>
         <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         <div className="invites-modal-header">
-          <h2 className="invites-modal-title">Zaproszenia do zespołów</h2>
+          <span className="invites-modal-title">Zaproszenia do zespołów</span>
         </div>
 
         <div className="invite-filter">
