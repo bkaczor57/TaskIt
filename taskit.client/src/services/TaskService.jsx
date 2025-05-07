@@ -22,9 +22,12 @@ const TaskService = {
     }
   },
 
-  async listTeamTasks(teamId) {
+  async listTeamTasks(teamId,filters) {
     try {
-      const { data } = await api.get(`/Team/${teamId}/task`);
+      const { data } = await api.get(
+        `/Team/${teamId}/task`,
+      { params: filters },
+    );
       return data;
     } catch (e) {
       throw parseApiError(e, 'pobierania zadań zespołu');

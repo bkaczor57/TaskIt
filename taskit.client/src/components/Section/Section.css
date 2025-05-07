@@ -6,7 +6,7 @@
   margin: 0 8px;
   min-width: 380px;
   max-width: 380px;
-  height: calc(100vh - 180px);
+  height: auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;

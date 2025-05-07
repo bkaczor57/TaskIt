@@ -138,7 +138,7 @@ const Section = memo(({ section, teamId, isDragOverlay = false }) => {
         className={`section-content ${isScrolling ? 'scrollable' : ''}`}
         onScroll={handleScroll}
       >
-        <TaskList />
+        <TaskList sectionId={section.id} />
       </div>
 
       {showCreateTaskModal &&

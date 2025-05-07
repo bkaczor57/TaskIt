@@ -9,7 +9,7 @@ import UserTeamContext from '../context/UserTeamContext';
 import UserContext from "../context/UserContext";
 import { useSections } from '../context/SectionContext';
 import { useEnums } from '../context/EnumContext';
-import { TaskProvider } from '../context/TaskContext';
+import { useTasks } from '../context/TaskContext';
 import FilterPanel from '../components/FilteredPanel/TeamFilteredPanel';
 import './TeamPage.css';
 
@@ -29,20 +29,9 @@ import {
 import SectionService from '../services/SectionService'; // nowa metoda move
 
 
-const TeamPage = () => {
+const TeamPage = ({ filters, setFilters }) => {
   const [filterOpen, setFilterOpen] = useState(false);
-  const [draftFilters, setDraftFilters] = useState({
-    AssignedUserId: '',
-    Status: '',
-    Priority: '',
-    DueBefore: '',
-    DueAfter: '',
-    CreatedBefore: '',
-    CreatedAfter: '',
-    OrderBy: 'CreatedAt',
-    Ascending: true
-  });
-
+  const { updateTask } = useTasks();
   const { moveSectionLocal } = useSections();
   const { user } = useContext(UserContext);
   const { taskStatuses, taskPriorities, taskOrderBy } = useEnums();
@@ -89,9 +78,9 @@ const TeamPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
+  const [draftFilters, setDraftFilters] = useState(filters);
   const applyFilters = () => {
-    setAppliedFilters(draftFilters);
+    setFilters(draftFilters);   // this updates the filters in TaskProvider (via TeamPageWrapper)
     setFilterOpen(false);
   };
 
@@ -124,27 +113,14 @@ const TeamPage = () => {
       const newSection = await createSection(title);
       setNewSectionId(newSection.id);
       setShowSectionModal(false);
-      setTimeout(() => setNewSectionId(null), 300); // czas trwania animacji
+      setTimeout(() => setNewSectionId(null), 300); 
     } catch (err) {
       console.error('Błąd podczas tworzenia sekcji:', err);
     }
   };
 
-  const handleDelete = async (sectionId) => {
-    if (!window.confirm('Czy na pewno chcesz usunąć tę sekcję?')) return;
 
-    try {
-      setRemovingSectionId(sectionId);
-      setTimeout(async () => {
-        await deleteSection(sectionId);
-        setRemovingSectionId(null);
-      }, 300); // czas trwania animacji
-    } catch (err) {
-      console.error('Błąd podczas usuwania sekcji:', err);
-      setRemovingSectionId(null);
-    }
-  };
-
+  /* Section Drag */
   useEffect(() => setOrderedSections(sections), [sections]);
 
   const handleDragStart = useCallback(({ active }) => {
@@ -159,7 +135,7 @@ const TeamPage = () => {
     const oldIndex = orderedSections.findIndex((s) => s.id === active.id);
     const newIndex = orderedSections.findIndex((s) => s.id === over.id);
     const newOrder = arrayMove(orderedSections, oldIndex, newIndex);
-    
+
     try {
       await SectionService.move(team.id, Number(active.id), newIndex + 1);
       setOrderedSections(newOrder);
@@ -170,8 +146,17 @@ const TeamPage = () => {
     }
   }, [orderedSections, team?.id, moveSectionLocal]);
 
-  const activeSection = orderedSections.find((s) => s.id === activeSectionId);
+  /* Task Drag*/
+  const handleTaskDrop = ({ active, over }) => {
+    const taskId = active.id;
+    const newSectionId = over?.id;
+  
+    if (taskId && newSectionId) {
+      updateTask(taskId, { sectionId: newSectionId });
+    }
+  };
 
+  
   const currentUser = teamUsers?.find(u => u.id === user?.id);
   const isAdmin = currentUser?.role === 'Admin';
 
@@ -228,21 +213,14 @@ const TeamPage = () => {
             >
               <div className="sections-grid">
                 {sections.map(section => (
-                  <TaskProvider
+                  <Section
                     key={section.id}
+                    section={section}
                     teamId={team.id}
-                    sectionId={section.id}
-                    filters={appliedFilters}
-                  >
-                    <Section
-                      section={section}
-                      teamId={team.id}
-                      isAdmin={isAdmin}
-                      className={`${section.id === newSectionId ? 'new' : ''} ${
-                        section.id === removingSectionId ? 'removing' : ''
+                    isAdmin={isAdmin}
+                    className={`${section.id === newSectionId ? 'new' : ''} ${section.id === removingSectionId ? 'removing' : ''
                       }`}
-                    />
-                  </TaskProvider>
+                  />
                 ))}
 
                 {isAdmin && (
