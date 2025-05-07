@@ -57,10 +57,18 @@ const TeamPage = () => {
   const [showTeamSidebar, setShowTeamSidebar] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+        delay: 0,
+        tolerance: 5,
+      },
+    }),
   );
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [orderedSections, setOrderedSections] = useState(sections);
+  const [newSectionId, setNewSectionId] = useState(null);
+  const [removingSectionId, setRemovingSectionId] = useState(null);
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -113,19 +121,37 @@ const TeamPage = () => {
 
   const handleAddSection = async (title) => {
     try {
-      await createSection(title);
+      const newSection = await createSection(title);
+      setNewSectionId(newSection.id);
       setShowSectionModal(false);
+      setTimeout(() => setNewSectionId(null), 300); // czas trwania animacji
     } catch (err) {
       console.error('Błąd podczas tworzenia sekcji:', err);
     }
   };
 
+  const handleDelete = async (sectionId) => {
+    if (!window.confirm('Czy na pewno chcesz usunąć tę sekcję?')) return;
+
+    try {
+      setRemovingSectionId(sectionId);
+      setTimeout(async () => {
+        await deleteSection(sectionId);
+        setRemovingSectionId(null);
+      }, 300); // czas trwania animacji
+    } catch (err) {
+      console.error('Błąd podczas usuwania sekcji:', err);
+      setRemovingSectionId(null);
+    }
+  };
+
   useEffect(() => setOrderedSections(sections), [sections]);
 
-  const handleDragStart = ({ active }) => {
-    setActiveSectionId((active.id));
-  };
-  const handleDragEnd = async ({ active, over }) => {
+  const handleDragStart = useCallback(({ active }) => {
+    setActiveSectionId(active.id);
+  }, []);
+
+  const handleDragEnd = useCallback(async ({ active, over }) => {
     setActiveSectionId(null);
 
     if (!over || active.id === over.id) return;
@@ -133,21 +159,18 @@ const TeamPage = () => {
     const oldIndex = orderedSections.findIndex((s) => s.id === active.id);
     const newIndex = orderedSections.findIndex((s) => s.id === over.id);
     const newOrder = arrayMove(orderedSections, oldIndex, newIndex);
-    setOrderedSections(newOrder);
-    moveSectionLocal(active.id, newIndex); // <- kontekst też wie o zmianie
-
+    
     try {
       await SectionService.move(team.id, Number(active.id), newIndex + 1);
+      setOrderedSections(newOrder);
+      moveSectionLocal(active.id, newIndex);
     } catch (e) {
       console.error('Błąd aktualizacji pozycji sekcji:', e);
-      //Rollback
       setOrderedSections(orderedSections);
-      moveSectionLocal(active.id, oldIndex);
     }
-  };
+  }, [orderedSections, team?.id, moveSectionLocal]);
+
   const activeSection = orderedSections.find((s) => s.id === activeSectionId);
-
-
 
   const currentUser = teamUsers?.find(u => u.id === user?.id);
   const isAdmin = currentUser?.role === 'Admin';
@@ -201,7 +224,8 @@ const TeamPage = () => {
           >
             <SortableContext
               items={orderedSections.map((s) => s.id)}
-              strategy={horizontalListSortingStrategy}>
+              strategy={horizontalListSortingStrategy}
+            >
               <div className="sections-grid">
                 {sections.map(section => (
                   <TaskProvider
@@ -214,6 +238,9 @@ const TeamPage = () => {
                       section={section}
                       teamId={team.id}
                       isAdmin={isAdmin}
+                      className={`${section.id === newSectionId ? 'new' : ''} ${
+                        section.id === removingSectionId ? 'removing' : ''
+                      }`}
                     />
                   </TaskProvider>
                 ))}
@@ -225,23 +252,6 @@ const TeamPage = () => {
                 )}
               </div>
             </SortableContext>
-            <DragOverlay dropAnimation={null}>
-              {activeSection && (
-                <TaskProvider
-                  key={`overlay-${activeSection.id}`}
-                  teamId={team.id}
-                  sectionId={activeSection.id}
-                  filters={appliedFilters}
-                >
-                  <Section
-                    section={activeSection}
-                    teamId={team.id}
-                    isAdmin={isAdmin}
-                    isDragOverlay
-                  />
-                </TaskProvider>
-              )}
-            </DragOverlay>
           </DndContext>
         </div>
 

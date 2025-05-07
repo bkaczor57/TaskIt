@@ -1,116 +1,105 @@
 /** Section.css **/
 .section {
-  background-color: white;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 0 8px;
+  min-width: 380px;
+  max-width: 380px;
+  height: calc(100vh - 180px);
   display: flex;
   flex-direction: column;
-  min-width: 380px;
-  flex-shrink: 0;
-  height: 100%;
-  max-height: 100%;
+  overflow: hidden;
+  user-select: none;
+  animation: slideIn 0.3s ease-out;
 }
 
 .section-header {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+  gap: 8px;
 }
+
 .section-title {
-  padding: 0 0.5rem;
-  font-size: 16px;
-  font-weight: bold;
   margin: 0;
-  flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
 }
 
 .section-title-input {
-  flex-grow: 1;
-  font-size: 16px;
-  padding: 6px 8px;
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-right: 8px;
 }
 
 .section-edit-actions {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0rem 0.5rem;
+  gap: 4px;
 }
 
-.edit-toggle-btn {
-  background: none;
+.edit-toggle-btn,
+.edit-confirm,
+.edit-cancel,
+.edit-delete {
+  padding: 4px;
   border: none;
-  cursor: pointer;
+  background: none;
   color: #666;
-  padding: 4px 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.edit-toggle-btn:hover,
+.edit-confirm:hover,
+.edit-cancel:hover,
+.edit-delete:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .edit-confirm {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #155724;
-  padding: 6px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #28a745;
 }
 
 .edit-cancel {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #721c24;
-  padding: 6px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #dc3545;
 }
 
 .edit-delete {
-  background-color: #721c24;
-  color: #f8d7da;
-  border: 1px solid black;
-  padding: 6px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
+  color: #dc3545;
 }
 
 .add-task-btn {
-  background: none;
+  padding: 4px;
   border: none;
-  color: #1976d2;
-  border: 1px solid #1976d2;
+  background: none;
+  color: #666;
   cursor: pointer;
-  padding: 8px;
   border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .add-task-btn:hover {
-  background-color: rgba(25, 118, 210, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
 }
 
 .section-content {
   flex: 1;
   overflow-y: auto;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 0;
+  padding: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
 }
 
 .tasks-list {
@@ -126,42 +115,40 @@
 }
 
 .section-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: transparent;
 }
 
 .section-content::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background-color: #ddd;
   border-radius: 3px;
 }
 
-.section-content::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* ---------- Drag handle ---------- */
 .drag-handle {
-  background: none;
-  border: none;
   cursor: grab;
-  color: #666;
   padding: 4px;
-  display: none; /* domyślnie schowana */
+  border: none;
+  background: none;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-.section:hover .drag-handle {
-  display: block; /* pojawia się przy hover na sekcję */
+.drag-handle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.drag-handle.invisible {
-  visibility: hidden; /* znika w trakcie przeciągania */
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 /* ---------- DragOverlay ---------- */
 .drag-overlay {
-  width: 300px !important; /* nadpisuje min‑width 380 sekcji */
-  pointer-events: none;    /* brak interakcji w "ręku" */
-  transform: none !important; /* unikamy dodatkowej skali z Sortable */
+  width: 300px !important; /* nadpisuje min‑width 380 sekcji */
+  pointer-events: none;    /* brak interakcji w "ręku" */
+  transform: none !important; /* unikamy dodatkowej skali z Sortable */
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -173,11 +160,50 @@
 
 @media (max-width: 768px) {
   .drag-handle {
-    display: block; /* pojawia się przy hover na sekcję */
+    display: block; /* pojawia się przy hover na sekcję */
   }
   
   .drag-handle.invisible {
     visibility: hidden; /* znika w trakcie przeciągania */
   }
   
+}
+
+/* Animacje */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animacja podczas przeciągania */
+.section.dragging {
+  transform-origin: center center;
+  animation: none;
+}
+
+/* Animacja dla nowych sekcji */
+.section.new {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Animacja dla usuwanych sekcji */
+.section.removing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }

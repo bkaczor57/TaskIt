@@ -82,7 +82,6 @@
 
 .sections-grid {
   display: flex;
-  gap: 20px;
   min-width: min-content;
   height: 100%;
   overflow-y: hidden;
