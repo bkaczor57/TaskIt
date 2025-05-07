@@ -128,9 +128,9 @@ const CreateTaskModal = ({ onClose, assignedUsers = [], canAssign = false }) => 
           )}
 
           {/* --------- Przyciski --------- */}
-          <div className="modal-buttons">
-            <button className="btn-primary" type="submit">Zapisz</button>
-            <button className="btn-secondary" type="button" onClick={onClose}>Anuluj</button>
+          <div className="form-buttons">
+            <button className="btn-success" type="submit">Zapisz</button>
+            <button className="btn-cancel" type="button" onClick={onClose}>Anuluj</button>
           </div>
         </form>
       </div>

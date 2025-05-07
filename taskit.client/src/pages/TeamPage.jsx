@@ -98,7 +98,8 @@ const TeamPage = () => {
     }
   };
 
-  const isAdmin = teamUsers?.find(user => user.id === team?.ownerId)?.role === 'Admin';
+  const currentUser = teamUsers?.find(u => u.id === user?.id);
+  const isAdmin = currentUser?.role === 'Admin';
 
   if (!team) return <div className="loading">Ladowanie...</div>;
 

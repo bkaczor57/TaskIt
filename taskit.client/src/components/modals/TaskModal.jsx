@@ -209,15 +209,15 @@ const TaskModal = ({ task, onClose }) => {
         )}
 
         {isPrivileged && (
-          <div className="task-modal-buttons">
-                        <button className="task-modal-btn-success" onClick={handleSave}>
+          <div className="form-buttons">
+            <button className="btn-success" onClick={handleSave}>
               Zapisz zmiany
             </button>
-            <button className="task-modal-btn-cancel" onClick={onClose}>
+            <button className="btn-cancel" onClick={onClose}>
               Anuluj
             </button>
-            <button className="task-modal-btn-danger" onClick={handleDelete}>
-              <FaTrash style={{marginRight:6}}/> Usuń
+            <button className="btn-danger" onClick={handleDelete}>
+              <FaTrash /> Usuń
             </button>
 
 

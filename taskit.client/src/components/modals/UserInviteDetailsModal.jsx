@@ -139,7 +139,7 @@ const UserInviteDetailsModal = ({ invite, onClose }) => {
               <button className="btn btn-green" onClick={handleAccept} disabled={loading || isDisabled}>
                 <FaCheck /> Akceptuj
               </button>
-              <button className="btn btn-danger" onClick={handleDecline} disabled={loading || isDisabled}>
+              <button className="btn btn-cancel" onClick={handleDecline} disabled={loading || isDisabled}>
                 <FaTimesCircle /> Odrzuć
               </button>
             </div>

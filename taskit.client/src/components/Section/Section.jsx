@@ -19,8 +19,8 @@ const Section = ({ section, teamId }) => {
   const { teamUsers } = useUserTeam();
 
   const currentUser = teamUsers.find(u => u.id === user?.id);
-  const canAssign = currentUser?.role === 'Admin';
-  const canEditTitle = canAssign;
+  const canAssign = currentUser?.role === 'Admin' || currentUser?.role==='Manager';
+  const canEditSection = currentUser?.role === 'Admin';
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -82,7 +82,7 @@ const Section = ({ section, teamId }) => {
         ) : (
           <>
             <h3 className="section-title">{title}</h3>
-            {canEditTitle && (
+            {canEditSection && (
               <button className="edit-toggle-btn" onClick={handleEditClick}>
                 <FaPencilAlt />
               </button>

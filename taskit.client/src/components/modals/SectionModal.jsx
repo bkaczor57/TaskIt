@@ -29,8 +29,9 @@ const SectionModal = ({ onClose, onSave }) => {
             autoFocus
           />
           <div className="form-buttons">
+          <button type="submit" className="btn-green">Utwórz</button>
             <button type="button" className="btn-cancel" onClick={onClose}>Anuluj</button>
-            <button type="submit" className="btn-green">Utwórz</button>
+            
           </div>
         </form>
       </div>

@@ -143,13 +143,14 @@ namespace TaskIt.Server.Controllers
         }
 
         [HttpDelete("Task/{taskId}")]
-        public IActionResult DeleteTask(int taskId)
+        public async Task<IActionResult> DeleteTask(int taskId)
         {
-            var result = _taskService.DeleteTaskAsync(taskId, GetUserId());
-            if (!result.Result.Success)
-                return BadRequest(new { error = result.Result.ErrorMessage });
+            var result = await _taskService.DeleteTaskAsync(taskId, GetUserId());
 
-            return Ok(result);
+            if (!result.Success)
+                return BadRequest(new { error = result.ErrorMessage });
+
+            return Ok(new { success = result.Data });
         }
 
         private int GetUserId()

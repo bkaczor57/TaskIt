@@ -75,9 +75,9 @@ const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, tea
           </div>
         </div>
 
-        <div className="filter-actions">
+        <div className="form-buttons">
           <button className="btn-primary" onClick={applyFilters}>Zastosuj</button>
-          <button className="btn-secondary" onClick={onClose}>Anuluj</button>
+          <button className="btn-cancel" onClick={onClose}>Anuluj</button>
         </div>
       </div>
     </div>

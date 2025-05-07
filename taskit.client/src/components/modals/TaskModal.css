@@ -21,7 +21,7 @@
 .task-modal {
   background: #fff;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   /* jak filter-panel */
   padding: 2rem;
   border-radius: 8px;
@@ -88,63 +88,6 @@
 .task-modal-description {
   min-height: 100px;
   resize: vertical;
-}
-
-/* przyciski akcji */
-.task-modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-  flex-wrap: wrap;
-}
-
-.task-modal-buttons button {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 550;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;           
-  line-height: 1.2;              
-}
-
-/* === PRZYCISKI === */
-
-/* Primary – Zapisz zmiany */
-.task-modal-btn-success {
-  background-color: #4caf50;
-  color: white;
-  border: 1px solid #4caf50;
-  min-width: 140px;               /* większy */
-}
-.task-modal-btn-success:hover {
-  background-color: #388e3c;
-  border-color: #388e3c;
-}
-
-/* Secondary – Usuń */
-.task-modal-btn-danger {
-  background-color: #f8d7da;
-  color: #c62828;
-  border: 1px solid #c62828;
-  min-width: 90px;
-}
-.task-modal-btn-danger:hover {
-  background-color: #f1b0b7;
-}
-
-/* Secondary – Anuluj */
-.task-modal-btn-cancel {
-  background-color: #f5f5f5;
-  color: #c62828;
-  border: 1px solid #c62828;
-  min-width: 90px;
-}
-.task-modal-btn-cancel:hover {
-  background-color: #fceaea;
 }
 
 
