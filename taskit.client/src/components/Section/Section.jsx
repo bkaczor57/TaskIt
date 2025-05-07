@@ -7,6 +7,7 @@ import { useUserTeam } from '../../context/UserTeamContext';
 import { useSections } from '../../context/SectionContext';
 import './Section.css';
 import { useSortable } from '@dnd-kit/sortable';
+import ReactDOM from 'react-dom';
 
 const Section = memo(({ section, teamId, isDragOverlay = false }) => {
   const {
@@ -140,13 +141,15 @@ const Section = memo(({ section, teamId, isDragOverlay = false }) => {
         <TaskList />
       </div>
 
-      {showCreateTaskModal && (
-        <CreateTaskModal
-          onClose={() => setShowCreateTaskModal(false)}
-          assignedUsers={teamUsers}
-          canAssign={canAssign}
-        />
-      )}
+      {showCreateTaskModal &&
+  ReactDOM.createPortal(
+    <CreateTaskModal
+      onClose={() => setShowCreateTaskModal(false)}
+      assignedUsers={teamUsers}
+      canAssign={canAssign}
+    />,
+    document.getElementById('modal-root') || document.body
+  )}
     </div>
   );
 });

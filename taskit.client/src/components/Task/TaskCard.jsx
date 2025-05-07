@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './TaskCard.css';
 import TaskModal from '../modals/TaskModal';
+import ReactDOM from 'react-dom';
 
 const TaskCard = ({ task }) => {
   const [showModal, setShowModal] = useState(false);
@@ -52,7 +53,7 @@ const TaskCard = ({ task }) => {
                 <div className="user-avatar">
                   {task.assignedUserName[0].toUpperCase()}
                 </div>
-            )}
+              )}
           </div>
         </div>
 
@@ -71,7 +72,11 @@ const TaskCard = ({ task }) => {
         </p>
       </div>
 
-      {showModal && <TaskModal task={task} onClose={() => setShowModal(false)} />}
+      {showModal &&
+        ReactDOM.createPortal(
+          <TaskModal task={task} onClose={() => setShowModal(false)} />,
+          document.getElementById('modal-root') || document.body)
+      }
     </>
   );
 };
