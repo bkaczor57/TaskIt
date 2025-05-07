@@ -139,4 +139,45 @@
   background: #999;
 }
 
+/* ---------- Drag handle ---------- */
+.drag-handle {
+  background: none;
+  border: none;
+  cursor: grab;
+  color: #666;
+  padding: 4px;
+  display: none; /* domyślnie schowana */
+}
 
+.section:hover .drag-handle {
+  display: block; /* pojawia się przy hover na sekcję */
+}
+
+.drag-handle.invisible {
+  visibility: hidden; /* znika w trakcie przeciągania */
+}
+
+/* ---------- DragOverlay ---------- */
+.drag-overlay {
+  width: 300px !important; /* nadpisuje min‑width 380 sekcji */
+  pointer-events: none;    /* brak interakcji w "ręku" */
+  transform: none !important; /* unikamy dodatkowej skali z Sortable */
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  opacity: 0.95;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .drag-handle {
+    display: block; /* pojawia się przy hover na sekcję */
+  }
+  
+  .drag-handle.invisible {
+    visibility: hidden; /* znika w trakcie przeciągania */
+  }
+  
+}

@@ -46,6 +46,18 @@ const SectionService = {
       throw parseApiError(e, 'usuwania sekcji');
     }
   },
+
+  async move(teamId, sectionId, newPosition) {
+    try {
+      const { data } = await api.put(
+        `/Team/${teamId}/section/${sectionId}/move`,
+        { newPosition }, 
+      );
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'przesuwania sekcji');
+    }
+  },
 };
 
 export default SectionService;

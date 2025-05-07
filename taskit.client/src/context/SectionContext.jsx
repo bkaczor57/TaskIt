@@ -12,6 +12,26 @@ export const SectionProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+  * Optimistycznie zmienia kolejność sekcji w kontekście (0‑based).
+  * @param sectionId  id przenoszonej sekcji
+  * @param newIndex   docelowy indeks w tablicy
+  */
+ const moveSectionLocal = (sectionId, newIndex) => {
+   setSections((prev) => {
+     const list = [...prev];
+     const from = list.findIndex((s) => s.id === sectionId);
+     if (from === -1 || from === newIndex) return prev;
+
+     const [moving] = list.splice(from, 1);
+     list.splice(newIndex, 0, moving);
+
+     // zaktualizuj pola position, jeśli je przechowujesz
+     return list.map((s, i) => ({ ...s, position: i + 1 }));
+   });
+ };
+
+
   
    // fetchSections - pobiera sekcje z serwera dla danego zespołu.
    
@@ -98,7 +118,8 @@ export const SectionProvider = ({ children }) => {
       createSection,
       updateSection,
       deleteSection,
-      fetchSections
+      fetchSections,
+      moveSectionLocal,
     }}>
       {children}
     </SectionContext.Provider>

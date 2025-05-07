@@ -13,6 +13,22 @@ import { TaskProvider } from '../context/TaskContext';
 import FilterPanel from '../components/FilteredPanel/TeamFilteredPanel';
 import './TeamPage.css';
 
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  closestCenter
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import SectionService from '../services/SectionService'; // nowa metoda move
+
+
 const TeamPage = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState({
@@ -27,18 +43,24 @@ const TeamPage = () => {
     Ascending: true
   });
 
-
+  const { moveSectionLocal } = useSections();
   const { user } = useContext(UserContext);
   const { taskStatuses, taskPriorities, taskOrderBy } = useEnums();
   const { teamId } = useParams();
   const navigate = useNavigate();
   const { getTeamById, deleteTeam } = useContext(TeamContext);
-  const { teamUsers, removeUserFromTeam, fetchUserTeams} = useContext(UserTeamContext);
+  const { teamUsers, removeUserFromTeam, fetchUserTeams } = useContext(UserTeamContext);
   const { sections, createSection } = useSections();
   const [team, setTeam] = useState(null);
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showTeamSidebar, setShowTeamSidebar] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [orderedSections, setOrderedSections] = useState(sections);
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -61,7 +83,7 @@ const TeamPage = () => {
 
   const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const applyFilters = () => {
-    setAppliedFilters(draftFilters); 
+    setAppliedFilters(draftFilters);
     setFilterOpen(false);
   };
 
@@ -77,7 +99,7 @@ const TeamPage = () => {
     }
   };
 
-  const handleLeaveTeam = async() => {
+  const handleLeaveTeam = async () => {
     if (window.confirm('Czy na pewno chcesz opuścić grupę? ')) {
       try {
         await removeUserFromTeam(parseInt(teamId), user.id);
@@ -97,6 +119,35 @@ const TeamPage = () => {
       console.error('Błąd podczas tworzenia sekcji:', err);
     }
   };
+
+  useEffect(() => setOrderedSections(sections), [sections]);
+
+  const handleDragStart = ({ active }) => {
+    setActiveSectionId((active.id));
+  };
+  const handleDragEnd = async ({ active, over }) => {
+    setActiveSectionId(null);
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = orderedSections.findIndex((s) => s.id === active.id);
+    const newIndex = orderedSections.findIndex((s) => s.id === over.id);
+    const newOrder = arrayMove(orderedSections, oldIndex, newIndex);
+    setOrderedSections(newOrder);
+    moveSectionLocal(active.id, newIndex); // <- kontekst też wie o zmianie
+
+    try {
+      await SectionService.move(team.id, Number(active.id), newIndex + 1);
+    } catch (e) {
+      console.error('Błąd aktualizacji pozycji sekcji:', e);
+      //Rollback
+      setOrderedSections(orderedSections);
+      moveSectionLocal(active.id, oldIndex);
+    }
+  };
+  const activeSection = orderedSections.find((s) => s.id === activeSectionId);
+
+
 
   const currentUser = teamUsers?.find(u => u.id === user?.id);
   const isAdmin = currentUser?.role === 'Admin';
@@ -142,28 +193,56 @@ const TeamPage = () => {
         )}
 
         <div className="sections-container">
-          <div className="sections-grid">
-            {sections.map(section => (
-              <TaskProvider
-                key={section.id}
-                teamId={team.id}
-                sectionId={section.id}
-                filters={appliedFilters}
-              >
-                <Section
-                  section={section}
-                  teamId={team.id}
-                  isAdmin={isAdmin}
-                />
-              </TaskProvider>
-            ))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={orderedSections.map((s) => s.id)}
+              strategy={horizontalListSortingStrategy}>
+              <div className="sections-grid">
+                {sections.map(section => (
+                  <TaskProvider
+                    key={section.id}
+                    teamId={team.id}
+                    sectionId={section.id}
+                    filters={appliedFilters}
+                  >
+                    <Section
+                      section={section}
+                      teamId={team.id}
+                      isAdmin={isAdmin}
+                    />
+                  </TaskProvider>
+                ))}
 
-            {isAdmin && (
-              <button className="add-section-btn" onClick={() => setShowSectionModal(true)}>
-                <FaPlus /> Dodaj sekcję
-              </button>
-            )}
-          </div>
+                {isAdmin && (
+                  <button className="add-section-btn" onClick={() => setShowSectionModal(true)}>
+                    <FaPlus /> Dodaj sekcję
+                  </button>
+                )}
+              </div>
+            </SortableContext>
+            <DragOverlay dropAnimation={null}>
+              {activeSection && (
+                <TaskProvider
+                  key={`overlay-${activeSection.id}`}
+                  teamId={team.id}
+                  sectionId={activeSection.id}
+                  filters={appliedFilters}
+                >
+                  <Section
+                    section={activeSection}
+                    teamId={team.id}
+                    isAdmin={isAdmin}
+                    isDragOverlay
+                  />
+                </TaskProvider>
+              )}
+            </DragOverlay>
+          </DndContext>
         </div>
 
         {showSectionModal && (
