@@ -84,3 +84,67 @@
     align-items: stretch;
   }
 }
+
+.filter-group.wide {
+  grid-column: span 2;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.filter-dates {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-dates > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group legend {
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+
+.dropdown-checkbox {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 8px;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+
+.checkbox-item {
+  display: block;
+  margin-bottom: 4px;
+}

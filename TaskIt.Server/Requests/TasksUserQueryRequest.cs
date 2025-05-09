@@ -19,6 +19,11 @@ namespace TaskIt.Server.Requests
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public TasksPriority? Priority { get; set; }
 
+        public DateTime? DueBefore { get; set; }
+        public DateTime? DueAfter { get; set; }
+        public DateTime? CreatedBefore { get; set; }
+        public DateTime? CreatedAfter { get; set; }
+
         // Filtrowanie po wielu teamach - możliwe do wykorzystania w przypadku gdzie użytkownik zechce wyświetlić zadania z konkretnych teamów.
         public List<int>? TeamIds { get; set; }
         // Opcjonalne wyszukiwanie po konkretnym search termie
@@ -27,5 +32,7 @@ namespace TaskIt.Server.Requests
         // Opcjonalna paginacja
         public int? PageNumber { get; set; }
         public int? PageSize { get; set; }
+
+        public int? TimeZoneOffsetInMinutes { get; set; }
     }
 }

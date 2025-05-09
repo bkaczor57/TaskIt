@@ -2,9 +2,34 @@ import React, { useState } from 'react';
 import './TaskCard.css';
 import TaskModal from '../modals/TaskModal';
 import ReactDOM from 'react-dom';
+import { FaEllipsisH } from 'react-icons/fa';
+import { useDraggable } from '@dnd-kit/core';
+import { useUser } from '../../context/UserContext';
+import { useUserTeam } from '../../context/UserTeamContext';
+import UserInfoModal from '../modals/UserInfoModal';
+
 
 const TaskCard = ({ task }) => {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: task.id,
+  });
+
+  const { user } = useUser();
+  const { teamUsers } = useUserTeam();
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const currentUser = teamUsers.find(u => u.id === user?.id);
+  const canDrag =
+    currentUser?.role === 'Admin' ||
+    currentUser?.role === 'Manager' ||
+    task.assignedUserId === user?.id;
+
   const [showModal, setShowModal] = useState(false);
+
+  const handleShowUserInfo = () => {
+    const user = teamUsers.find(u => u.id === task.assignedUserId);
+    if (user) setSelectedUser(user);
+  };
 
   const formatDate = (iso) => {
     if (!iso) return 'brak daty';
@@ -31,17 +56,16 @@ const TaskCard = ({ task }) => {
   return (
     <>
       <div
+        ref={setNodeRef}
         className={`task-card border-${getStatusClass()}`}
         onClick={() => setShowModal(true)}
       >
         {/* ------------ nagłówek ------------ */}
         <div className="task-header">
-          {/* priorytet po lewej */}
           <span className={`priority-badge ${getPriorityClass()}`}>
             {getPriorityLabel()}
           </span>
 
-          {/* status + kropka + avatar po prawej */}
           <div className="status-avatar">
             <span className={`status-dot ${getStatusClass()}`} />
             <span className={`status-label ${getStatusClass()}`}>
@@ -50,7 +74,10 @@ const TaskCard = ({ task }) => {
 
             {typeof task.assignedUserName === 'string' &&
               task.assignedUserName.length > 0 && (
-                <div className="user-avatar">
+                <div className="user-avatar" onClick={(e) => {
+                  e.stopPropagation(); // żeby nie otwierać TaskModal
+                  handleShowUserInfo();
+                }}>
                   {task.assignedUserName[0].toUpperCase()}
                 </div>
               )}
@@ -70,13 +97,35 @@ const TaskCard = ({ task }) => {
         <p className="task-description">
           {task.description || '\u00A0'}
         </p>
+
+        {/* ------------ DRAG HANDLE ------------ */}
+        {canDrag && (
+          <div
+            className="task-handle"
+            {...listeners}
+            {...attributes}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FaEllipsisH />
+          </div>
+        )}
       </div>
 
       {showModal &&
         ReactDOM.createPortal(
           <TaskModal task={task} onClose={() => setShowModal(false)} />,
-          document.getElementById('modal-root') || document.body)
-      }
+          document.getElementById('modal-root') || document.body
+        )}
+      {selectedUser && 
+        ReactDOM.createPortal(
+        <UserInfoModal
+          userId={selectedUser.id}
+          teamId={task.teamId}
+          onClose={() => setSelectedUser(null)}
+          onUserUpdated={() => {/* opcjonalnie: refetch team users */ }}/>,
+        document.getElementById('modal-root') || document.body
+      )}
+
     </>
   );
 };

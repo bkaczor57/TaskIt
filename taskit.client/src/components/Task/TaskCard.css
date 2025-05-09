@@ -1,4 +1,6 @@
+/** TaskCard.css **/
 .task-card {
+  position: relative; /* ← TO DODAJ */
   border: 1px solid #ddd;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   padding: 1rem;
@@ -6,12 +8,11 @@
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  max-width: 350px;
   min-height: 180px;
-  /* równy wymiar kart */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  max-width: 350px;
 }
 
 .task-card:hover {
@@ -144,3 +145,26 @@
   border-color: #4caf50;
 }
 
+.task-handle {
+  cursor: grab;
+  padding: 4px;
+  border: none;
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+.task-handle {
+  opacity: 1 !important;
+}
+
+.task-handle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}

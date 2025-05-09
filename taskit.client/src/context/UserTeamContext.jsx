@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import UserContext from "./UserContext";
 import UserTeamService from "../services/UserTeamService";
 
@@ -26,6 +26,12 @@ export const UserTeamProvider = ({ children }) => {
       console.error("Błąd przy fetchTeamUsers:", err);
     }
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserTeams();
+    }
+  }, [user, fetchUserTeams]);
 
   const getUserInTeam = useCallback(async (teamId, userId) => {
     try {

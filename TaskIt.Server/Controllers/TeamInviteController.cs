@@ -29,7 +29,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamInviteRequest.TeamId, UserTeamRole.Manager))
             {
-                return Unauthorized(new { error = "You don't have permission to send invites to this team" });
+                return Forbid();
             }
 
             var result = await _teamInviteService.CreateTeamInvite(teamInviteRequest, GetUserId());
@@ -74,7 +74,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Admin))
             {
-                return Unauthorized(new { error = "You don't have permission to view invites for this team" });
+                return Forbid();
             }
 
             var result = await _teamInviteService.GetTeamInvitesByTeamId(teamId);
@@ -99,7 +99,7 @@ namespace TaskIt.Server.Controllers
 
             if (invite.Data.InvitedUser?.Id != GetUserId())
             {
-                return Unauthorized(new { error = "You are not authorized to accept this invite" });
+                return Forbid();
             }
 
             var result = await _teamInviteService.UpdateInviteStatus(inviteId, InviteStatus.Accepted);
@@ -124,7 +124,7 @@ namespace TaskIt.Server.Controllers
 
             if (invite.Data.InvitedUser?.Id != GetUserId())
             {
-                return Unauthorized(new { error = "You are not authorized to decline this invite" });
+                return Forbid();
             }
 
             var result = await _teamInviteService.UpdateInviteStatus(inviteId, InviteStatus.Declined);
@@ -148,7 +148,7 @@ namespace TaskIt.Server.Controllers
 
             if (!await _serviceHelper.CanPerformAction(GetUserId(), inviteResult.Data.Team.Id, inviteResult.Data.InvitedUser.Id, UserTeamRole.Admin))
             {
-                return Unauthorized(new { error = "You don't have permission to delete this invite" });
+                return Forbid();
             }
 
             var result = await _teamInviteService.DeleteInvite(inviteId);

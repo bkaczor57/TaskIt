@@ -52,7 +52,7 @@ namespace TaskIt.Server.Controllers
             var task = result.Data;
             
             if(!await _serviceHelper.CanPerformAction(GetUserId(), task.TeamId ?? 0, task.AssignedUserId, UserTeamRole.Member))
-                return Unauthorized(new { error = "You are not a member of this team" });
+                return Forbid();
 
 
             return Ok(result.Data);
@@ -67,7 +67,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> GetTasksByTeamId(int teamId, [FromQuery] TasksQueryRequest request)
         {
            if(!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
-                return Unauthorized(new { error = "You are not a member of this team" });
+                return Forbid();
 
             request.TeamId = teamId;
 
@@ -88,7 +88,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> GetTasksBySectionId(int teamId, int sectionId, [FromQuery] TasksQueryRequest request)
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
-                return Unauthorized(new { error = "You are not a member of this team" });
+                return Forbid();
 
             request.TeamId = teamId;
             request.SectionId = sectionId;
@@ -122,7 +122,7 @@ namespace TaskIt.Server.Controllers
             }
 
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, request.AssignedUserId ?? GetUserId(), UserTeamRole.Manager))
-                return Unauthorized(new { error = "You don't have permission to Create Task in this team" });
+                return Forbid();
 
             var result = await _taskService.CreateTaskAsync(teamId, sectionId ,request);
 

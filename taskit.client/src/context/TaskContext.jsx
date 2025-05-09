@@ -80,7 +80,7 @@ export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children 
   }, [teamId, sectionId, filtersSignature]);
 
   /* ---------------------------  CRUD  ------------------------------ */
-  const createTask = async (data) => {
+  const createTask = async (sectionId,data) => {
     const newTask = await TaskService.create(teamId, sectionId, data);
     setTasks(prev => [...prev, newTask]);
     return newTask;

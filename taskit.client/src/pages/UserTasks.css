@@ -1,0 +1,77 @@
+/** TeamPage.css **/
+.user-tasks-page {
+    display: flex;
+    flex: 1;
+    background-color: #f5f5f5;
+    overflow: hidden;
+  }
+  
+  .user-tasks-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .user-tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .user-tasks-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .filter-toggle{
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  .filter-toggle {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+  .user-tasks-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  .filter-toggle:hover, .team-settings-toggle:hover {
+    opacity: 0.9;
+  }
+  
+  
+  

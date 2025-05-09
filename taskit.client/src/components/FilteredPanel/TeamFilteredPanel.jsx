@@ -1,6 +1,7 @@
 import React from 'react';
 import './TeamFilteredPanel.css';
-import {  FaTimes  } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
+
 const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, teamUsers, taskStatuses, taskPriorities, taskOrderBy }) => {
   return (
     <div className="filter-overlay">
@@ -9,6 +10,7 @@ const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, tea
         <h2>Filtruj zadania</h2>
 
         <div className="filter-grid">
+
           <div className="filter-group">
             <label>Status</label>
             <select value={draftFilters.Status} onChange={e => setDraftFilters({ ...draftFilters, Status: e.target.value })}>
@@ -36,25 +38,33 @@ const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, tea
             </select>
           </div>
 
-          <div className="filter-group">
-            <label>Data utworzenia od</label>
-            <input type="date" value={draftFilters.CreatedAfter} onChange={e => setDraftFilters({ ...draftFilters, CreatedAfter: e.target.value })} />
-          </div>
+          <fieldset className="filter-group wide">
+            <legend>Data utworzenia</legend>
+            <div className="filter-dates">
+              <div>
+                <label>Od</label>
+                <input type="date" value={draftFilters.CreatedAfter} onChange={e => setDraftFilters({ ...draftFilters, CreatedAfter: e.target.value })} />
+              </div>
+              <div>
+                <label>Do</label>
+                <input type="date" value={draftFilters.CreatedBefore} onChange={e => setDraftFilters({ ...draftFilters, CreatedBefore: e.target.value })} />
+              </div>
+            </div>
+          </fieldset>
 
-          <div className="filter-group">
-            <label>Data utworzenia do</label>
-            <input type="date" value={draftFilters.CreatedBefore} onChange={e => setDraftFilters({ ...draftFilters, CreatedBefore: e.target.value })} />
-          </div>
-
-          <div className="filter-group">
-            <label>Termin od</label>
-            <input type="date" value={draftFilters.DueAfter} onChange={e => setDraftFilters({ ...draftFilters, DueAfter: e.target.value })} />
-          </div>
-
-          <div className="filter-group">
-            <label>Termin do</label>
-            <input type="date" value={draftFilters.DueBefore} onChange={e => setDraftFilters({ ...draftFilters, DueBefore: e.target.value })} />
-          </div>
+          <fieldset className="filter-group wide">
+            <legend>Termin</legend>
+            <div className="filter-dates">
+              <div>
+                <label>Od</label>
+                <input type="date" value={draftFilters.DueAfter} onChange={e => setDraftFilters({ ...draftFilters, DueAfter: e.target.value })} />
+              </div>
+              <div>
+                <label>Do</label>
+                <input type="date" value={draftFilters.DueBefore} onChange={e => setDraftFilters({ ...draftFilters, DueBefore: e.target.value })} />
+              </div>
+            </div>
+          </fieldset>
 
           <div className="filter-group">
             <label>Sortuj według</label>

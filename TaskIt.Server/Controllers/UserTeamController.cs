@@ -27,7 +27,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), userTeamAddRequest.TeamId, Core.Enums.UserTeamRole.Manager))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
 
             var result = await _userTeamService.AddUserToTeam(userTeamAddRequest);
@@ -43,7 +43,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, Core.Enums.UserTeamRole.Member))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
 
             var result = await _userTeamService.GetUserInTeam(teamId, userId);
@@ -73,7 +73,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, Core.Enums.UserTeamRole.Member))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
             var result = await _userTeamService.GetUsersByTeamId(teamId);
             if (!result.Success)
@@ -86,7 +86,7 @@ namespace TaskIt.Server.Controllers
         {
             if (!await _serviceHelper.IsSelf(GetUserId(),userId)&&!await _serviceHelper.IsGlobalAdmin(GetUserId()))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
             var result = await _userTeamService.GetTeamsByUserId(userId);
             if (!result.Success)
@@ -104,7 +104,7 @@ namespace TaskIt.Server.Controllers
             }
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, userId , Core.Enums.UserTeamRole.Admin))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
             var result = await _userTeamService.DeleteUserFromTeam(teamId, userId);
             if (!result.Success)
@@ -122,7 +122,7 @@ namespace TaskIt.Server.Controllers
 
             if (!await _serviceHelper.CanPerformAction(GetUserId(), teamId, Core.Enums.UserTeamRole.Admin))
             {
-                return Unauthorized(new { error = "You don't have permission to perform this action" });
+                return Forbid();
             }
 
             if (userId == GetUserId())

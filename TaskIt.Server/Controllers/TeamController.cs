@@ -40,7 +40,7 @@ namespace TaskIt.Server.Controllers
         {
             // Check if User is Admin or is In the Team
             if (!await _servicerHelper.CanPerformAction(GetUserId(), teamId, UserTeamRole.Member))
-                return Unauthorized(new { error = "You are not a member of this team" });
+                return Forbid();
 
             var result = await _teamService.GetTeamById(teamId);
             if (!result.Success)
@@ -52,7 +52,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> DeleteTeam(int teamId)
         {
             if (!await _servicerHelper.CanPerformAction(GetUserId(),teamId))
-                return Unauthorized(new {error = "You are not a owner of this team" });
+                return Forbid();
 
 
             var result = await _teamService.DeleteTeam(teamId);
@@ -66,7 +66,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> UpdateTeam([FromBody] TeamUpdateRequest updateRequest, int teamId)
         {
             if (!await _servicerHelper.CanPerformAction(GetUserId(), teamId))
-                return Unauthorized(new { error = "You are not a owner of this team" });
+                return Forbid();
 
             var result = await _teamService.UpdateTeam(teamId, updateRequest);
             if (!result.Success)
@@ -79,7 +79,7 @@ namespace TaskIt.Server.Controllers
         public async Task<IActionResult> ChangeOwnerOfTeam([FromBody] TeamChangeOwnerRequest updateRequest, int teamId)
         {
             if (!await _servicerHelper.CanPerformAction(GetUserId(), teamId))
-                return Unauthorized(new { error = "You are not a owner of this team" });
+                return Forbid();
 
             var result = await _teamService.ChangeOwner(teamId, updateRequest);
             if (!result.Success)

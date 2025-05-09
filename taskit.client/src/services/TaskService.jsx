@@ -1,5 +1,6 @@
 import api from './Api';
-import { parseApiError } from '../utils/parseApiError'; 
+import qs from 'qs';
+import { parseApiError } from '../utils/parseApiError';
 
 
 const TaskService = {
@@ -13,6 +14,8 @@ const TaskService = {
     }
   },
 
+
+
   async getTask(taskId) {
     try {
       const { data } = await api.get(`/Task/${taskId}`);
@@ -22,12 +25,12 @@ const TaskService = {
     }
   },
 
-  async listTeamTasks(teamId,filters) {
+  async listTeamTasks(teamId, filters) {
     try {
       const { data } = await api.get(
         `/Team/${teamId}/task`,
-      { params: filters },
-    );
+        { params: filters },
+      );
       return data;
     } catch (e) {
       throw parseApiError(e, 'pobierania zadań zespołu');
@@ -43,6 +46,18 @@ const TaskService = {
       return data;
     } catch (e) {
       throw parseApiError(e, 'pobierania zadań sekcji');
+    }
+  },
+
+  async listUserTasks(filters) {
+    try {
+      const { data } = await api.get(`/Task/user`, {
+        params: filters,
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+      });
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania zadań użytkownika');
     }
   },
 

@@ -4,7 +4,7 @@ import { useEnums } from '../../context/EnumContext';
 import { FaCalendarAlt , FaTimes  } from 'react-icons/fa';
 import './TaskModal.css';
 
-const CreateTaskModal = ({ onClose, assignedUsers = [], canAssign = false }) => {
+const CreateTaskModal = ({ onClose, sectionId, assignedUsers = [], canAssign = false }) => {
   const { createTask } = useTasks();
   const { taskPriorities } = useEnums();
 
@@ -23,7 +23,6 @@ const CreateTaskModal = ({ onClose, assignedUsers = [], canAssign = false }) => 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       title,
       description,
@@ -32,9 +31,8 @@ const CreateTaskModal = ({ onClose, assignedUsers = [], canAssign = false }) => 
       dueDate: hasDueDate && dueDate ? getDueDateUtc(dueDate) : null,
       timeZoneOffsetInMinutes: new Date().getTimezoneOffset(),
     };
-
     try {
-      await createTask(payload);
+      await createTask(sectionId, payload);
       onClose();
     } catch (err) {
       console.error('Błąd tworzenia zadania:', err);

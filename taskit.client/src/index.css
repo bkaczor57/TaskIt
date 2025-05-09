@@ -8,3 +8,21 @@
 body {
     background-color: #f4f4f4;
 }
+
+html, body {
+    height: 100%;
+    overflow: hidden; /* zapobiega niechcianemu scrollowi */
+  }
+
+  .modal,
+.task-modal,
+.filter-panel {
+  width: 100vw;
+  max-width: 600px;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  max-height: 90dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+}

@@ -149,7 +149,7 @@ public class TaskService : ITaskService
             .Include(t => t.AssignedUser)
             .Where(t => t.AssignedUserId == userId);
 
-        // Filtrowanie
+        // Filtrowanie statusu, priorytetu i zespołu
         if (request.Status.HasValue)
         {
             query = query.Where(t => t.Status == request.Status.Value);
@@ -162,6 +162,33 @@ public class TaskService : ITaskService
         {
             query = query.Where(t => request.TeamIds.Contains(t.Section.TeamId));
         }
+
+        // Filtrowanie po datach - uwzględnia strefę czasową
+        if (request.DueBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
+        {
+            var dueBeforeUtc = AdjustToUtc(request.DueBefore, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.DueDate <= dueBeforeUtc.Value);
+        }
+
+        if (request.DueAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
+        {
+            var dueAfterUtc = AdjustToUtc(request.DueAfter, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.DueDate >= dueAfterUtc.Value);
+        }
+
+        if (request.CreatedBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
+        {
+            var createdBeforeUtc = AdjustToUtc(request.CreatedBefore, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.CreatedAt <= createdBeforeUtc.Value);
+        }
+
+        if (request.CreatedAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
+        {
+            var createdAfterUtc = AdjustToUtc(request.CreatedAfter, request.TimeZoneOffsetInMinutes);
+            query = query.Where(t => t.CreatedAt >= createdAfterUtc.Value);
+        }
+
+
 
         // Wyszukiwanie
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -296,97 +323,113 @@ public class TaskService : ITaskService
 
     public async Task<ServiceResult<TaskDTO>> UpdateTaskAsync(int taskId, int userId, TaskUpdateRequest updateRequest)
     {
-
-        // Znajdź istniejący task
         var existingTask = await _taskRepository.GetByIdAsync(
             taskId,
             includeSection: true,
-            includeAssignedUser: false,
+            includeAssignedUser: false, // nie trackuj encji User
             includeTeam: false
         );
-        if (updateRequest.Priority.HasValue && !Enum.IsDefined(typeof(TasksPriority), updateRequest.Priority.Value))
-        {
-            return ServiceResult<TaskDTO>.Fail("Invalid priority specified.");
-        }
-
-        if (updateRequest.Status.HasValue && !Enum.IsDefined(typeof(TasksStatus), updateRequest.Status.Value))
-        {
-            return ServiceResult<TaskDTO>.Fail("Invalid status specified.");
-        }
 
         if (existingTask == null)
-        {
-            return ServiceResult<TaskDTO>.Fail("Task not found"); 
-        }
+            return ServiceResult<TaskDTO>.Fail("Task not found");
 
-        // Sprawdź czy użytkownik może edytować taska
+        if (updateRequest.Priority.HasValue && !Enum.IsDefined(typeof(TasksPriority), updateRequest.Priority.Value))
+            return ServiceResult<TaskDTO>.Fail("Invalid priority specified.");
+
+        if (updateRequest.Status.HasValue && !Enum.IsDefined(typeof(TasksStatus), updateRequest.Status.Value))
+            return ServiceResult<TaskDTO>.Fail("Invalid status specified.");
+
+        // sprawdzenie dostępu użytkownika do edycji
         if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId, UserTeamRole.Manager))
-        {
             return ServiceResult<TaskDTO>.Fail("You don't have permission to edit this task");
-        }
 
-        if (updateRequest.SectionId != null)
+        // zmiana sekcji
+        if (updateRequest.SectionId != null && updateRequest.SectionId != existingTask.SectionId)
         {
-            // Sprawdź czy sekcja istnieje
             var section = await _sectionService.GetSectionById(updateRequest.SectionId.Value);
             if (!section.Success || section.Data == null)
-            {
                 return ServiceResult<TaskDTO>.Fail("Section not found");
-            }
-            // Sprawdź czy sekcja należy do zespołu
+
             if (section.Data.TeamId != existingTask.Section.TeamId)
-            {
                 return ServiceResult<TaskDTO>.Fail("Section is not in the team");
-            }
-            existingTask.SectionId = updateRequest.SectionId.Value;
+
+            // przypisujemy tylko ID, nie navigation property
+            existingTask.Section = null;
+            existingTask.SectionId = section.Data.Id;
         }
-        if (updateRequest.AssignedUserId != null)
+
+        // zmiana przypisanego użytkownika
+        if (updateRequest.AssignedUserId != null && updateRequest.AssignedUserId != existingTask.AssignedUserId)
         {
-            // Sprawdź czy użytkownik istnieje
             var user = await _userService.GetUserById(updateRequest.AssignedUserId.Value);
             if (user == null)
-            {
                 return ServiceResult<TaskDTO>.Fail("User not found");
-            }
-            // Sprawdź czy użytkownik należy do zespołu
+
             var userTeam = await _userTeamService.IsUserInTeam(existingTask.Section.TeamId, updateRequest.AssignedUserId.Value);
             if (!userTeam.Success || !userTeam.Data)
-            {
                 return ServiceResult<TaskDTO>.Fail("User is not in the team");
-            }
-            existingTask.AssignedUserId = updateRequest.AssignedUserId.Value;
+
+            existingTask.AssignedUser = null;
+            existingTask.AssignedUserId = user.Data.Id;
         }
+
+        // pozostałe zmiany
         if (updateRequest.Title != null)
-        {
             existingTask.Title = updateRequest.Title;
-        }
+
         if (updateRequest.Description != null)
-        {
             existingTask.Description = updateRequest.Description;
-        }
+
         if (updateRequest.Status != null)
-        {
             existingTask.Status = updateRequest.Status.Value;
-        }
+
         if (updateRequest.Priority != null)
-        {
             existingTask.Priority = updateRequest.Priority.Value;
-        }
+
         if (updateRequest.DueDate != null)
         {
-            // Sprawdź czy data jest w przyszłości
             if (updateRequest.DueDate.Value.Date < DateTime.UtcNow.Date)
-            {
                 return ServiceResult<TaskDTO>.Fail("Due date must be today or in the future");
-            }
+
             existingTask.DueDate = updateRequest.DueDate.Value;
         }
 
         _taskRepository.UpdateTask(existingTask);
         await _taskRepository.SaveChangesAsync();
 
-        return ServiceResult<TaskDTO>.Ok(MapToDto(existingTask));
+        //  Dociągamy usera i sekcję ręcznie do DTO
+        string? assignedUserName = null;
+        string? sectionName = null;
+
+        if (existingTask.AssignedUserId != null)
+        {
+            var assignedUser = await _userService.GetUserById(existingTask.AssignedUserId);
+            assignedUserName = assignedUser?.Data?.Username;
+        }
+
+        var sectionForDto = await _sectionService.GetSectionById(existingTask.SectionId);
+        if (sectionForDto.Success && sectionForDto.Data != null)
+            sectionName = sectionForDto.Data.Title;
+
+        var dto = new TaskDTO
+        {
+            Id = existingTask.Id,
+            Title = existingTask.Title,
+            Description = existingTask.Description,
+            CreatedAt = existingTask.CreatedAt,
+            DueDate = existingTask.DueDate,
+            SectionId = existingTask.SectionId,
+            SectionName = sectionName,
+            AssignedUserId = existingTask.AssignedUserId,
+            AssignedUserName = assignedUserName,
+            Priority = existingTask.Priority,
+            Status = existingTask.Status,
+            TeamId = existingTask.Section?.TeamId ?? sectionForDto.Data?.TeamId ?? 0
+        };
+
+        return ServiceResult<TaskDTO>.Ok(dto);
     }
+
 
     public async Task<ServiceResult<bool>> DeleteTaskAsync(int taskId, int userId)
     {

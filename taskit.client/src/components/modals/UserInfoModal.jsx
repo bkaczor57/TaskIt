@@ -83,16 +83,15 @@ export const UserInfoModal = ({ onClose, teamId, userId, onUserUpdated }) => {
         return <GrUserWorker />;
     }
   };
-
-  if (loading || !userInfo || !currentTeam) {
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
-          <p className="loading-message">Ładowanie danych użytkownika...</p>
-        </div>
+if (loading || !userInfo) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal user-info-modal" onClick={(e) => e.stopPropagation()}>
+        <p className="loading-message">Ładowanie danych użytkownika...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (error) {
     return (

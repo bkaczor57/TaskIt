@@ -6,186 +6,185 @@ import TeamContext from '../context/TeamContext';
 import SectionModal from '../components/modals/SectionModal';
 import Section from '../components/Section/Section';
 import UserTeamContext from '../context/UserTeamContext';
-import UserContext from "../context/UserContext";
+import UserContext from '../context/UserContext';
 import { useSections } from '../context/SectionContext';
 import { useEnums } from '../context/EnumContext';
 import { useTasks } from '../context/TaskContext';
 import FilterPanel from '../components/FilteredPanel/TeamFilteredPanel';
+import TaskCard from '../components/Task/TaskCard';
 import './TeamPage.css';
 
 import {
   DndContext,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragOverlay,
-  closestCenter
+  closestCenter,
 } from '@dnd-kit/core';
 import {
   SortableContext,
   horizontalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import SectionService from '../services/SectionService'; // nowa metoda move
-
+import SectionService from '../services/SectionService';
 
 const TeamPage = ({ filters, setFilters }) => {
-  const [filterOpen, setFilterOpen] = useState(false);
-  const { updateTask } = useTasks();
-  const { moveSectionLocal } = useSections();
-  const { user } = useContext(UserContext);
+  /* ---------- konteksty ---------- */
+  const { updateTask, tasks } = useTasks();
+  const { moveSectionLocal, sections, createSection } = useSections();
   const { taskStatuses, taskPriorities, taskOrderBy } = useEnums();
+
+  const { user } = useContext(UserContext);
+  const { getTeamById, deleteTeam } = useContext(TeamContext);
+  const { teamUsers, removeUserFromTeam, fetchUserTeams } =
+    useContext(UserTeamContext);
+
+  /* ---------- routing / state ---------- */
   const { teamId } = useParams();
   const navigate = useNavigate();
-  const { getTeamById, deleteTeam } = useContext(TeamContext);
-  const { teamUsers, removeUserFromTeam, fetchUserTeams } = useContext(UserTeamContext);
-  const { sections, createSection } = useSections();
-  const [team, setTeam] = useState(null);
-  const [showSectionModal, setShowSectionModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [showTeamSidebar, setShowTeamSidebar] = useState(false);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-        delay: 0,
-        tolerance: 5,
-      },
-    }),
-  );
+  const [team, setTeam] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [showSectionModal, setShowSectionModal] = useState(false);
+  const [showTeamSidebar, setShowTeamSidebar] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  /* ---------- drag‑n‑drop helpers ---------- */
+  const [activeTaskId, setActiveTaskId] = useState(null);
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [orderedSections, setOrderedSections] = useState(sections);
-  const [newSectionId, setNewSectionId] = useState(null);
-  const [removingSectionId, setRemovingSectionId] = useState(null);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 }, // opóźnienie dla scrolla
+    }),
+  );
 
+  /* ---------- ef. pobrania zespołu ---------- */
   const fetchTeam = useCallback(async () => {
     try {
-      const data = await getTeamById(parseInt(teamId));
+      const data = await getTeamById(Number(teamId));
       setTeam(data);
-    } catch (error) {
-      console.error('Błąd podczas pobierania zespołu:', error);
+    } catch (err) {
+      console.error('Błąd pobierania zespołu:', err);
     }
   }, [teamId, getTeamById]);
 
-  useEffect(() => {
-    fetchTeam();
-  }, [fetchTeam]);
+  useEffect(() => { fetchTeam(); }, [fetchTeam]);
 
+  /* ---------- responsywność ---------- */
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  /* ---------- sekcje <-> state ---------- */
+  useEffect(() => { setOrderedSections(sections); }, [sections]);
+
+  /* ---------- filtry ---------- */
   const [draftFilters, setDraftFilters] = useState(filters);
-  const applyFilters = () => {
-    setFilters(draftFilters);   // this updates the filters in TaskProvider (via TeamPageWrapper)
-    setFilterOpen(false);
-  };
+  const applyFilters = () => { setFilters(draftFilters); setFilterOpen(false); };
 
-  const handleDeleteTeam = async () => {
-    if (window.confirm('Czy na pewno chcesz usunąć tę grupę?')) {
-      try {
-        await deleteTeam(parseInt(teamId));
-        await fetchUserTeams();
-        navigate('/dashboard');
-      } catch (error) {
-        console.error('Błąd podczas usuwania grupy:', error);
-      }
-    }
-  };
-
-  const handleLeaveTeam = async () => {
-    if (window.confirm('Czy na pewno chcesz opuścić grupę? ')) {
-      try {
-        await removeUserFromTeam(parseInt(teamId), user.id);
-        await fetchUserTeams();
-        navigate('/dashboard');
-      } catch (error) {
-        console.error('Błąd podczas wychodzenia z grupy', error);
-      }
-    }
-  };
-
+  /* ---------- akcje sekcji ---------- */
   const handleAddSection = async (title) => {
     try {
-      const newSection = await createSection(title);
-      setNewSectionId(newSection.id);
+      const s = await createSection(title);
       setShowSectionModal(false);
-      setTimeout(() => setNewSectionId(null), 300); 
-    } catch (err) {
-      console.error('Błąd podczas tworzenia sekcji:', err);
-    }
+      // opcjonalnie wyróżnianie nowej sekcji…  
+    } catch (err) { console.error('Błąd tworzenia sekcji:', err); }
   };
 
-
-  /* Section Drag */
-  useEffect(() => setOrderedSections(sections), [sections]);
-
-  const handleDragStart = useCallback(({ active }) => {
-    setActiveSectionId(active.id);
-  }, []);
-
-  const handleDragEnd = useCallback(async ({ active, over }) => {
-    setActiveSectionId(null);
-
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = orderedSections.findIndex((s) => s.id === active.id);
-    const newIndex = orderedSections.findIndex((s) => s.id === over.id);
-    const newOrder = arrayMove(orderedSections, oldIndex, newIndex);
-
-    try {
-      await SectionService.move(team.id, Number(active.id), newIndex + 1);
-      setOrderedSections(newOrder);
-      moveSectionLocal(active.id, newIndex);
-    } catch (e) {
-      console.error('Błąd aktualizacji pozycji sekcji:', e);
-      setOrderedSections(orderedSections);
-    }
-  }, [orderedSections, team?.id, moveSectionLocal]);
-
-  /* Task Drag*/
-  const handleTaskDrop = ({ active, over }) => {
-    const taskId = active.id;
-    const newSectionId = over?.id;
-  
-    if (taskId && newSectionId) {
-      updateTask(taskId, { sectionId: newSectionId });
-    }
+  /* ---------- drag‑n‑drop ---------- */
+  const handleDragStart = ({ active }) => {
+    if (tasks.some((t) => t.id === active.id)) setActiveTaskId(active.id);
+    else setActiveSectionId(active.id);
   };
 
-  
-  const currentUser = teamUsers?.find(u => u.id === user?.id);
-  const isAdmin = currentUser?.role === 'Admin';
+  const handleDragEnd = useCallback(
+    async ({ active, over }) => {
+      if (!over || active.id === over.id) {
+        setActiveTaskId(null);
+        setActiveSectionId(null);
+        return;
+      }
 
-  if (!team) return <div className="loading">Ladowanie...</div>;
+      /* --- TASK przenoszony --- */
+      const draggedTask = tasks.find((t) => t.id === active.id);
+      if (draggedTask) {
+        if (draggedTask.sectionId !== over.id) {
+          try {
+            await updateTask(draggedTask.id, { sectionId: over.id });
+          } catch (err) {
+            console.error('Błąd aktualizacji zadania:', err);
+          }
+        }
+        setActiveTaskId(null);
+        return;
+      }
+
+      /* --- SEKCJA przenoszona --- */
+      const oldIdx = orderedSections.findIndex((s) => s.id === active.id);
+      const newIdx = orderedSections.findIndex((s) => s.id === over.id);
+      const newOrder = arrayMove(orderedSections, oldIdx, newIdx);
+
+      try {
+        await SectionService.move(team.id, Number(active.id), newIdx + 1);
+        setOrderedSections(newOrder);
+        moveSectionLocal(active.id, newIdx);
+      } catch (err) {
+        console.error('Błąd przenoszenia sekcji:', err);
+      }
+      setActiveSectionId(null);
+    },
+    [tasks, orderedSections, team?.id, updateTask, moveSectionLocal],
+  );
+
+  /* ---------- uprawnienia ---------- */
+  const role = teamUsers.find((u) => u.id === user?.id)?.role;
+  const isAdmin = role === 'Admin';
+
+  if (!team) return <div className="loading">Ładowanie…</div>;
 
   return (
     <div className={`team-page ${showTeamSidebar ? 'sidebar-open' : ''}`}>
+      {/* ----- sidebar z info o zespole ----- */}
       <TeamSidebar
         team={team}
         isMobile={isMobile}
         isVisible={showTeamSidebar}
         onClose={() => setShowTeamSidebar(false)}
-        onDeleteTeam={handleDeleteTeam}
-        onLeaveTeam={handleLeaveTeam}
+        onDeleteTeam={async () => {
+          if (window.confirm('Usunąć zespół?')) {
+            await deleteTeam(team.id); await fetchUserTeams(); navigate('/dashboard');
+          }
+        }}
+        onLeaveTeam={async () => {
+          if (window.confirm('Opuścić zespół?')) {
+            await removeUserFromTeam(team.id, user.id); await fetchUserTeams(); navigate('/dashboard');
+          }
+        }}
         onTeamUpdated={fetchTeam}
       />
 
+      {/* ----- główna treść ----- */}
       <div className="team-content">
-        <div className="team-header">
+        <header className="team-header">
           <h1 className="team-title">{team.name}</h1>
           <div className="header-actions">
-            <button className="filter-toggle" onClick={() => setFilterOpen(true)}>
+            <button onClick={() => setFilterOpen(true)} className="filter-toggle">
               <FaFilter /> Filtracja
             </button>
-            <button className="team-settings-toggle" onClick={() => setShowTeamSidebar(!showTeamSidebar)}>
+            <button onClick={() => setShowTeamSidebar(!showTeamSidebar)} className="team-settings-toggle">
               <FaCog />
             </button>
           </div>
-        </div>
+        </header>
 
         {filterOpen && (
           <FilterPanel
@@ -200,6 +199,7 @@ const TeamPage = ({ filters, setFilters }) => {
           />
         )}
 
+        {/* ----- kanban ----- */}
         <div className="sections-container">
           <DndContext
             sensors={sensors}
@@ -212,24 +212,34 @@ const TeamPage = ({ filters, setFilters }) => {
               strategy={horizontalListSortingStrategy}
             >
               <div className="sections-grid">
-                {sections.map(section => (
+                {orderedSections.map((section) => (
                   <Section
                     key={section.id}
                     section={section}
                     teamId={team.id}
                     isAdmin={isAdmin}
-                    className={`${section.id === newSectionId ? 'new' : ''} ${section.id === removingSectionId ? 'removing' : ''
-                      }`}
                   />
                 ))}
 
                 {isAdmin && (
-                  <button className="add-section-btn" onClick={() => setShowSectionModal(true)}>
+                  <button
+                    className="add-section-btn"
+                    onClick={() => setShowSectionModal(true)}
+                  >
                     <FaPlus /> Dodaj sekcję
                   </button>
                 )}
               </div>
             </SortableContext>
+
+            <DragOverlay>
+              {activeTaskId && (
+                <TaskCard
+                  task={tasks.find((t) => t.id === activeTaskId)}
+                  isDragOverlay
+                />
+              )}
+            </DragOverlay>
           </DndContext>
         </div>
 

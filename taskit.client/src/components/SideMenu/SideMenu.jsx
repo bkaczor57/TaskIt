@@ -87,7 +87,7 @@ function SideMenu() {
               </button>
 
               <ul className={`submenu ${tasksOpen ? 'expand' : 'collapse'}`}>
-              <li onClick={() => handleNavigate('/tasks')}>
+              <li onClick={() => handleNavigate('/my-tasks')}>
                   <span className="menu-icon"><FaBorderAll /></span>
                   <span className="item-text">Wszystkie</span>
                 </li>
@@ -106,12 +106,12 @@ function SideMenu() {
               </ul>
             </li>
 
-            <li>
+            {/* <li>
               <button className="menu-item" onClick={() => handleNavigate('/notifications')}>
                 <span className="menu-icon"><MdNotifications /></span>
                 Powiadomienia
               </button>
-            </li>
+            </li> */}
             <li>
               <button className="menu-item" onClick={() => setIsUserInvitesModalOpen(true)}>
                 <span className="menu-icon"><MdMail /></span>
