@@ -112,6 +112,15 @@ namespace TaskIt.Server.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("Task/user/count")]
+        public async Task<IActionResult> CountUserTasks([FromQuery] TaskCountRequest request)
+        {
+            var result = await _taskService.CountTasksByAssignedUserAsync(GetUserId(), request);
+            if (!result.Success)
+                return NotFound(new { error = result.ErrorMessage });
+            return Ok(result.Data);
+        }
+
         [HttpPost("Team/{teamId}/section/{sectionId}/task")]
         public async Task<IActionResult> CreateTask(int teamId, int sectionId, [FromBody] TaskCreateRequest request)
         {

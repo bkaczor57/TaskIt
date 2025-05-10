@@ -233,7 +233,7 @@ public class TaskService : ITaskService
         return ServiceResult<PagedResult<TaskDTO>>.Ok(pagedResult);
     }
 
-    public async Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null)
+    public async Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TaskCountRequest taskCountRequest)
     {
         // Przykład: 
         // a) Pobrać bazowe IQueryable
@@ -241,13 +241,13 @@ public class TaskService : ITaskService
         var query = _taskRepository.GetAllQueryable()
             .Where(t => t.AssignedUserId == assignedUserId);
 
-        if (status.HasValue)
+        if (taskCountRequest.Status.HasValue)
         {
-            query = query.Where(t => t.Status == status.Value);
+            query = query.Where(t => t.Status == taskCountRequest.Status.Value);
         }
-        if (priority.HasValue)
+        if (taskCountRequest.Priority.HasValue)
         {
-            query = query.Where(t => t.Priority == priority.Value);
+            query = query.Where(t => t.Priority == taskCountRequest.Priority.Value);
         }
 
         var count = await query.CountAsync();

@@ -9,7 +9,7 @@ namespace TaskIt.Server.Services
         Task<ServiceResult<TaskDTO>> GetTaskByIdAsync(int taskId, bool includeTeam);
         Task<ServiceResult<PagedResult<TaskDTO>>> GetTasksFilteredAsync(TasksQueryRequest request);
         Task<ServiceResult<PagedResult<TaskDTO>>> GetUserTasksWithSearchAsync(int userId, TasksUserQueryRequest request);
-        Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TasksStatus? status = null, TasksPriority? priority = null);
+        Task<ServiceResult<int>> CountTasksByAssignedUserAsync(int assignedUserId, TaskCountRequest taskCountRequest);
         Task<ServiceResult<TaskDTO>> CreateTaskAsync(int teamId, int sectionId,TaskCreateRequest request);
         Task<ServiceResult<TaskDTO>> UpdateTaskAsync(int taskId, int userId, TaskUpdateRequest request);
         Task<ServiceResult<bool>> DeleteTaskAsync(int taskId, int userId);
