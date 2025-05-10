@@ -63,6 +63,7 @@ const TaskCard = ({
         ref={setNodeRef}
         className={`task-card border-${getStatusClass()}`}
         onClick={() => setShowModal(true)}
+        data-task-id={task.id}
       >
         {/* ------------ nagłówek ------------ */}
         <div className="task-header">

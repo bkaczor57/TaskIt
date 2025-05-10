@@ -4,7 +4,7 @@ import SideMenu from '../components/SideMenu/SideMenu';
 import { Outlet } from 'react-router-dom';
 import "../components/SideMenu/SideMenu.css";
 import "./ProtectedLayout.css";
-
+import { UserTasksProvider } from '../context/UserTasksContext';
 const ProtectedLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
@@ -26,7 +26,9 @@ const ProtectedLayout = () => {
       <div className={`layout-body ${!isMobile && isSidebarOpen ? 'sidebar-open' : ''}`}>
         <SideMenu />
         <main className="layout-main">
+        <UserTasksProvider>
           <Outlet />
+        </UserTasksProvider>
         </main>
       </div>
     </div>

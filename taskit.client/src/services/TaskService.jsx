@@ -90,6 +90,18 @@ const TaskService = {
       throw parseApiError(e, 'usuwania zadania');
     }
   },
+
+  async getUserTaskCount(payload = {}) {
+    try {
+      const { data } = await api.get('/Task/user/count', {
+        params: payload,
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+      });
+      return data;
+    } catch (e) {
+      throw parseApiError(e, 'pobierania statystyk zadań użytkownika');
+    }
+  },
 };
 
 export default TaskService;

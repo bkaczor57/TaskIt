@@ -15,6 +15,7 @@ import React, {
     const [error, setError] = useState(null);
     const [totalItems, setTotalItems] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [userTaskCount, setUserTaskCount] = useState(null);
   
     const filtersSignature = useMemo(() => JSON.stringify(filters), [filters]);
   
@@ -71,6 +72,46 @@ import React, {
    }
  };
   
+ const fetchUserTaskCount = async () => {
+  try {
+    // zapytania o status
+    const statusQueries = {
+      TotalTask: {},                          // bez filtrów
+      CompletedTask: { Status: 'Completed' },
+      TaskInProgress: { Status: 'InProgress' },
+      ToDo: { Status: 'Pending' },
+    };
+
+    // zapytania o priorytet
+    const priorityLevels = ['Optional', 'Low', 'Medium', 'High'];
+
+    // równoległe odpytanie backendu
+    const [statusResults, priorityResults] = await Promise.all([
+      Promise.all(
+        Object.entries(statusQueries).map(async ([label, q]) => {
+          const data = await TaskService.getUserTaskCount(q);
+          return [label, data.count ?? data];
+        }),
+      ),
+      Promise.all(
+        priorityLevels.map(async (p) => {
+          const data = await TaskService.getUserTaskCount({ Priority: p });
+          return [p, data.count ?? data];
+        }),
+      ),
+    ]);
+
+    // złożenie w jedną strukturę
+    const counts = Object.fromEntries(statusResults);
+    counts.byPriority = Object.fromEntries(priorityResults);
+
+    setUserTaskCount(counts);
+  } catch (e) {
+    console.error('Błąd pobierania statystyk zadań użytkownika:', e);
+    setUserTaskCount(null);
+  }
+};
+  
     useEffect(() => {
       fetchUserTasks();
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,6 +128,9 @@ import React, {
           fetchUserTasks,
           refetch,
           refreshTask,
+          userTaskCount,
+          fetchUserTaskCount,
+          
         }}
       >
         {children}

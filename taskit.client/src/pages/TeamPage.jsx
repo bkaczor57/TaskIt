@@ -84,7 +84,7 @@ const TeamPage = ({ filters, setFilters }) => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  /* ---------- sekcje <-> state ---------- */
+  /* ---------- sekcje <-> state ---------- */
   useEffect(() => { setOrderedSections(sections); }, [sections]);
 
   /* ---------- filtry ---------- */
@@ -102,12 +102,27 @@ const TeamPage = ({ filters, setFilters }) => {
 
   /* ---------- drag‑n‑drop ---------- */
   const handleDragStart = ({ active }) => {
-    if (tasks.some((t) => t.id === active.id)) setActiveTaskId(active.id);
-    else setActiveSectionId(active.id);
+    if (tasks.some((t) => t.id === active.id)) {
+      setActiveTaskId(active.id);
+      // Ukryj oryginalny element podczas przeciągania
+      const element = document.querySelector(`[data-task-id="${active.id}"]`);
+      if (element) element.style.opacity = '0';
+    } else {
+      setActiveSectionId(active.id);
+      // Ukryj oryginalną sekcję podczas przeciągania
+      const element = document.querySelector(`[data-section-id="${active.id}"]`);
+      if (element) element.style.opacity = '0';
+    }
   };
 
   const handleDragEnd = useCallback(
     async ({ active, over }) => {
+      // Przywróć widoczność elementów
+      const taskElement = document.querySelector(`[data-task-id="${active.id}"]`);
+      const sectionElement = document.querySelector(`[data-section-id="${active.id}"]`);
+      if (taskElement) taskElement.style.opacity = '1';
+      if (sectionElement) sectionElement.style.opacity = '1';
+
       if (!over || active.id === over.id) {
         setActiveTaskId(null);
         setActiveSectionId(null);
