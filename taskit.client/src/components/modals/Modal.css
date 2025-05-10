@@ -173,8 +173,8 @@ textarea::placeholder {
 }
 
 .user-role-badge.manager {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: #e8f5e9;
+  color:#2e7d32; 
 }
 
 .user-role-badge.admin {
@@ -183,8 +183,8 @@ textarea::placeholder {
 }
 
 .user-role-badge.owner {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: #fff3e0; 
+  color: #f57c00;
 }
 
 /* Dropdowns */

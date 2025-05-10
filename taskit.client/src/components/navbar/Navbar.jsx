@@ -15,12 +15,12 @@ function Navbar() {
   const notifRef = useRef(null);
   const navigate = useNavigate();
 
-  const sampleNotifications = [
-    { id: 1, message: 'Nowe zadanie: Zaktualizować dokumentację' },
-    { id: 2, message: 'Zaproszenie do grupy: Zespół Frontend' },
-    { id: 3, message: 'Komentarz: "Super robota!"' }
-  ];
-  const [notifications, setNotifications] = useState(sampleNotifications);
+  // const sampleNotifications = [
+  //   { id: 1, message: 'Nowe zadanie: Zaktualizować dokumentację' },
+  //   { id: 2, message: 'Zaproszenie do grupy: Zespół Frontend' },
+  //   { id: 3, message: 'Komentarz: "Super robota!"' }
+  // ];
+  // const [notifications, setNotifications] = useState(sampleNotifications);
 
   const formatName = (firstName, lastName) => {
     const maxLineLength = 22; // Maksymalna długość linii
@@ -52,13 +52,9 @@ function Navbar() {
     return { firstName, lastName, singleLine: false };
   };
 
-  const unreadCount = notifications.length;
+  // const unreadCount = notifications.length;
 
   const toggleDropdown = (type) => {
-    if (window.innerWidth < 768) {
-      navigate(type === 'notif' ? '/notifications' : '/profile');
-      return;
-    }
     setActiveDropdown(prev => (prev === type ? null : type));
   };
 
@@ -113,7 +109,7 @@ function Navbar() {
 
         <div className="navbar-right">
           {/* Notifications */}
-          <div className="navbar-item" ref={notifRef}>
+          {/* <div className="navbar-item" ref={notifRef}>
             <div className="navbar-icon" onClick={() => toggleDropdown('notif')}>
               <MdNotifications />
               {unreadCount > 0 && <div className="notif-badge">{unreadCount}</div>}
@@ -126,7 +122,7 @@ function Navbar() {
                 ))}
               </ul>
             </div>
-          </div>
+          </div> */}
 
           {/* Profile */}
           <div className="navbar-item" ref={dropdownRef}>

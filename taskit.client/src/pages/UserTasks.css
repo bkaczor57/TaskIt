@@ -15,16 +15,27 @@
     overflow: hidden;
   }
   
-  .user-tasks-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
-  }
+.user-tasks-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-bottom {
+  width: 100%;
+}
+
   
   .user-tasks-title {
     font-size: 24px;
@@ -74,4 +85,35 @@
   }
   
   
-  
+  .task-search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-right: 1rem;
+  width: 100%;
+}
+
+/* --- Desktop: obok siebie --- */
+@media (min-width: 768px) {
+  .user-tasks-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .header-top {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .header-bottom {
+    flex: 1;
+  }
+
+  .task-search-input {
+    width: 100%;
+    margin: 0;
+  }
+}

@@ -91,15 +91,15 @@ function SideMenu() {
                   <span className="menu-icon"><FaBorderAll /></span>
                   <span className="item-text">Wszystkie</span>
                 </li>
-                <li onClick={() => handleNavigate('/tasks/completed')}>
+                <li onClick={() => handleNavigate('/my-tasks/completed')}>
                   <span className="menu-icon"><MdOutlineTaskAlt /></span>
                   <span className="item-text">Ukończone</span>
                 </li>
-                <li onClick={() => handleNavigate('/tasks/in-progress')}>
+                <li onClick={() => handleNavigate('/my-tasks/inprogress')}>
                   <span className="menu-icon"><MdOutlineTask /></span>
                   <span className="item-text">W trakcie</span>
                 </li>
-                <li onClick={() => handleNavigate('/tasks/todo')}>
+                <li onClick={() => handleNavigate('/my-tasks/pending')}>
                   <span className="menu-icon"><MdTask /></span>
                   <span className="item-text">Do zrobienia</span>
                 </li>

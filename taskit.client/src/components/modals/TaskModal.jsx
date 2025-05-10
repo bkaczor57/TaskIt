@@ -1,3 +1,4 @@
+// components/modals/TaskModal.jsx
 import React, { useState, useContext, useEffect } from 'react';
 import './TaskModal.css';
 import { useTasks } from '../../context/TaskContext';
@@ -6,134 +7,146 @@ import UserTeamContext from '../../context/UserTeamContext';
 import { useEnums } from '../../context/EnumContext';
 import { FaPencilAlt, FaTimes, FaTrash } from 'react-icons/fa';
 
-const TaskModal = ({ task, onClose }) => {
+
+const TaskModal = ({
+  task,
+  onClose,
+  disableAssignEdit = false,
+  onTaskUpdated        
+}) => {
+  /* --- konteksty --- */
   const { user } = useContext(UserContext);
-  const { teamUsers } = useContext(UserTeamContext);
+  const { getUserInTeam, fetchTeamUsers } = useContext(UserTeamContext);
   const { taskStatuses, taskPriorities } = useEnums();
   const { getTask, updateTask, deleteTask } = useTasks();
 
-  const [formData, setFormData] = useState(null);
-  const [enabledFields, setEnabledFields] = useState({});
+  /* --- lokalny stan --- */
+  const [formData,       setFormData]       = useState(null);
+  const [enabledFields,  setEnabledFields]  = useState({});
+  const [currentUserRole,setCurrentUserRole]= useState(null); // Member / Manager / Admin / null
+  const [taskTeamUsers,  setTaskTeamUsers]  = useState([]);   // użytkownicy danego teamu
 
+  /* --------------------------------------------- */
+  /*  Pobierz: szczegóły zadania + rolę + (ew.) users  */
+  /* ---------------------------------------------    */
   useEffect(() => {
-    const fetch = async () => {
-      const fresh = await getTask(task.id);
-      setFormData(fresh);
-    };
-    fetch();
-  }, [task.id]);
+    let isMounted = true;
 
+    (async () => {
+      /*  zadanie */
+      const fresh = await getTask(task.id);
+      if (!isMounted) return;
+      setFormData(fresh);
+
+      /*  moja rola w zespole */
+      let role = null;
+      try {
+        const membership = await getUserInTeam(task.teamId, user.id);
+        role = membership?.role || null;
+      } catch { /* brak członkostwa */ }
+      if (!isMounted) return;
+      setCurrentUserRole(role);
+
+      /*  lista userów tylko gdy WOLNO edytować */
+      const mayEditAssignee =
+        !disableAssignEdit && ['Manager', 'Admin'].includes(role);
+
+      if (mayEditAssignee) {
+        try {
+          const users = await fetchTeamUsers(task.teamId);   // funkcja MUSI zwracać tablicę!
+          if (isMounted) setTaskTeamUsers(users);
+        } catch {
+          if (isMounted) setTaskTeamUsers([]);
+        }
+      } else {
+        setTaskTeamUsers([]);   // brak uprawnień – nie pokazuj selecta
+      }
+    })();
+
+    return () => { isMounted = false; };
+  }, [task.id, task.teamId, user.id, disableAssignEdit]);
+
+  /* ---------- jeśli nadal ładuje ---------- */
   if (!formData) return null;
 
-  const isOwner = task.assignedUserId === user.id;
-  const currentUserRole = teamUsers.find(u => u.id === user.id)?.role;
-  const isPrivileged = isOwner || ['Manager', 'Admin'].includes(currentUserRole);
-  const canEditAssignedUser = ['Manager', 'Admin'].includes(currentUserRole);
+  /* ---------- uprawnienia ---------- */
+  const isOwner   = task.assignedUserId === user.id;
+  const isManager = ['Manager', 'Admin'].includes(currentUserRole);
+
+  const isPrivileged       = isOwner || isManager;
+  const canEditAssignedUser = isManager && !disableAssignEdit;
+
+  /* ---------- helpers ---------- */
+  const handleToggleField = (name) =>
+    setEnabledFields((prev) => ({ ...prev, [name]: !prev[name] }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleToggleField = (name) => {
-    setEnabledFields(prev => ({ ...prev, [name]: !prev[name] }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm('Czy na pewno chcesz usunąć to zadanie?');
-    if (!confirmed) return;
-
-    try {
-      await deleteTask(task.id);
-      onClose();
-    } catch (err) {
-      console.error('Błąd przy usuwaniu zadania:', err);
-    }
+    if (!window.confirm('Czy na pewno chcesz usunąć to zadanie?')) return;
+    try { await deleteTask(task.id); onClose(); }
+    catch (err) { console.error('deleteTask:', err); }
   };
 
   const formatDueDate = (dateStr) => {
-    const d = new Date(dateStr);
-    d.setHours(23, 59, 59, 999);
+    const d = new Date(dateStr); d.setHours(23, 59, 59, 999);
     return d.toISOString();
   };
 
   const handleSave = async () => {
-    const payload = {};
+    const p = {};
 
-    if (enabledFields.title && formData.title !== task.title)
-      payload.title = formData.title;
-
-    if (enabledFields.description && formData.description !== task.description)
-      payload.description = formData.description;
-
-    if (enabledFields.status && formData.status !== task.status)
-      payload.status = formData.status;
-
-    if (enabledFields.priority && formData.priority !== task.priority)
-      payload.priority = formData.priority;
-
-    if (enabledFields.assignedUserId && formData.assignedUserId !== task.assignedUserId)
-      payload.assignedUserId = formData.assignedUserId ? parseInt(formData.assignedUserId) : null;
-
+    if (enabledFields.title        && formData.title        !== task.title)        p.title        = formData.title;
+    if (enabledFields.description  && formData.description  !== task.description)  p.description  = formData.description;
+    if (enabledFields.status       && formData.status       !== task.status)       p.status       = formData.status;
+    if (enabledFields.priority     && formData.priority     !== task.priority)     p.priority     = formData.priority;
+    if (enabledFields.assignedUserId &&
+        formData.assignedUserId    !== task.assignedUserId) p.assignedUserId = formData.assignedUserId
+                                                              ? Number(formData.assignedUserId) : null;
     if (enabledFields.dueDate) {
-      const formattedDueDate = formData.dueDate ? formatDueDate(formData.dueDate) : null;
-      if ((task.dueDate || '') !== (formattedDueDate || '')) {
-        payload.dueDate = formattedDueDate;
-      }
+      const due = formData.dueDate ? formatDueDate(formData.dueDate) : null;
+      if ((task.dueDate || '') !== (due || '')) p.dueDate = due;
     }
 
-    if (Object.keys(payload).length === 0) {
-      onClose();
-      return;
-    }
+    if (!Object.keys(p).length) return onClose();
 
-    try {
-      await updateTask(task.id, payload);
-      onClose();
-    } catch (err) {
-      console.error('Błąd przy aktualizacji zadania:', err);
-    }
+    try { await updateTask(task.id, p); 
+      if (typeof onTaskUpdated === 'function') onTaskUpdated();
+      onClose(); }
+    catch (err) { console.error('updateTask:', err); }
   };
 
-  const renderEditableField = (label, fieldName, fieldContent, canToggle = isPrivileged) => {
-    if (!isPrivileged && fieldName !== 'assignedUserId') {
-      return (
-        <div className="task-field">
-          <div className="task-label-row">
-            <label>{label}</label>
-          </div>
-          <div className="readonly-field">
-            {fieldContent}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="task-field">
-        <div className="task-label-row">
-          <label>{label}</label>
-          {canToggle && (
-            <button
-              className="edit-toggle-btn"
-              type="button"
-              onClick={() => handleToggleField(fieldName)}
-            >
-              <FaPencilAlt />
-            </button>
-          )}
-        </div>
-        {fieldContent}
+  /* ---------- reużywalny renderer pola ---------- */
+  const renderField = (label, name, content, canToggle = isPrivileged) => (
+    <div className="task-field">
+      <div className="task-label-row">
+        <label>{label}</label>
+        {canToggle && (
+          <button
+            type="button"
+            className="edit-toggle-btn"
+            onClick={() => handleToggleField(name)}
+          >
+            <FaPencilAlt />
+          </button>
+        )}
       </div>
-    );
-  };
+      {isPrivileged || name === 'assignedUserId' ? content : (
+        <div className="readonly-field">{content}</div>
+      )}
+    </div>
+  );
 
+  /* ---------- JSX ---------- */
   return (
     <div className="modal-overlay">
       <div className="modal-content task-modal">
         <button className="close-btn" onClick={onClose}><FaTimes /></button>
 
-        {renderEditableField("Tytuł", "title",
+        {renderField('Tytuł', 'title',
           <input
             name="title"
             value={formData.title}
@@ -143,52 +156,47 @@ const TaskModal = ({ task, onClose }) => {
           />
         )}
 
-        {renderEditableField("Opis", "description",
+        {renderField('Opis', 'description',
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="task-modal-description"
             disabled={!enabledFields.description || !isPrivileged}
+            className="task-modal-description"
           />
         )}
 
-        {renderEditableField("Status", "status",
+        {renderField('Status', 'status',
           <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="task-modal-select"
+            name="status" value={formData.status} onChange={handleChange}
             disabled={!enabledFields.status || !isPrivileged}
-          >
-            {taskStatuses.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        )}
-
-        {renderEditableField("Priorytet", "priority",
-          <select
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
             className="task-modal-select"
-            disabled={!enabledFields.priority || !isPrivileged}
           >
-            {taskPriorities.map(p => <option key={p} value={p}>{p}</option>)}
+            {taskStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         )}
 
-        {renderEditableField("Termin", "dueDate",
+        {renderField('Priorytet', 'priority',
+          <select
+            name="priority" value={formData.priority} onChange={handleChange}
+            disabled={!enabledFields.priority || !isPrivileged}
+            className="task-modal-select"
+          >
+            {taskPriorities.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+        )}
+
+        {renderField('Termin', 'dueDate',
           <input
-            type="date"
-            name="dueDate"
+            type="date" name="dueDate"
             value={formData.dueDate?.substring(0, 10) || ''}
             onChange={handleChange}
-            className="task-modal-input"
             disabled={!enabledFields.dueDate || !isPrivileged}
+            className="task-modal-input"
           />
         )}
 
-        {renderEditableField("Przypisany użytkownik", "assignedUserId",
+        {renderField('Przypisany użytkownik', 'assignedUserId',
           canEditAssignedUser ? (
             <select
               name="assignedUserId"
@@ -197,8 +205,7 @@ const TaskModal = ({ task, onClose }) => {
               disabled={!enabledFields.assignedUserId}
               className="task-modal-select"
             >
-              <option value="">Nieprzypisany</option>
-              {teamUsers.map(u => (
+              {taskTeamUsers.map((u) => (
                 <option key={u.id} value={u.id}>{u.username}</option>
               ))}
             </select>
@@ -210,18 +217,11 @@ const TaskModal = ({ task, onClose }) => {
 
         {isPrivileged && (
           <div className="form-buttons">
-            <button className="btn-success" onClick={handleSave}>
-              Zapisz zmiany
-            </button>
-            <button className="btn-cancel" onClick={onClose}>
-              Anuluj
-            </button>
-            <button className="btn-danger" onClick={handleDelete}>
+            <button className="btn-success" onClick={handleSave}>Zapisz zmiany</button>
+            <button className="btn-cancel"  onClick={onClose}>Anuluj</button>
+            <button className="btn-danger"  onClick={handleDelete}>
               <FaTrash /> Usuń
             </button>
-
-
-
           </div>
         )}
       </div>

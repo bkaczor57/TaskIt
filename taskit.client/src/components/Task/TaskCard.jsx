@@ -9,7 +9,11 @@ import { useUserTeam } from '../../context/UserTeamContext';
 import UserInfoModal from '../modals/UserInfoModal';
 
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({
+  task,
+  disableAssignEdit = false,
+  onTaskUpdated = null     
+}) => {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: task.id,
   });
@@ -71,11 +75,12 @@ const TaskCard = ({ task }) => {
             <span className={`status-label ${getStatusClass()}`}>
               {task.status}
             </span>
-
-            {typeof task.assignedUserName === 'string' &&
+            
+            {!task.teamName &&
+              typeof task.assignedUserName === 'string' &&
               task.assignedUserName.length > 0 && (
                 <div className="user-avatar" onClick={(e) => {
-                  e.stopPropagation(); // żeby nie otwierać TaskModal
+                  e.stopPropagation();
                   handleShowUserInfo();
                 }}>
                   {task.assignedUserName[0].toUpperCase()}
@@ -86,6 +91,14 @@ const TaskCard = ({ task }) => {
 
         {/* ------------ tytuł ------------ */}
         <h3 className="task-title">{task.title || 'Bez tytułu'}</h3>
+
+        {task.teamName && (
+          <span className="task-team">
+            Zespół: <strong>{task.teamName}</strong>
+          </span>
+        )}
+
+
 
         {/* ------------ daty ------------ */}
         <div className="task-meta">
@@ -113,18 +126,23 @@ const TaskCard = ({ task }) => {
 
       {showModal &&
         ReactDOM.createPortal(
-          <TaskModal task={task} onClose={() => setShowModal(false)} />,
+          <TaskModal
+            task={task}
+            onClose={() => setShowModal(false)}
+            disableAssignEdit={disableAssignEdit}
+            onTaskUpdated={onTaskUpdated}
+          />,
           document.getElementById('modal-root') || document.body
         )}
-      {selectedUser && 
+      {selectedUser &&
         ReactDOM.createPortal(
-        <UserInfoModal
-          userId={selectedUser.id}
-          teamId={task.teamId}
-          onClose={() => setSelectedUser(null)}
-          onUserUpdated={() => {/* opcjonalnie: refetch team users */ }}/>,
-        document.getElementById('modal-root') || document.body
-      )}
+          <UserInfoModal
+            userId={selectedUser.id}
+            teamId={task.teamId}
+            onClose={() => setSelectedUser(null)}
+          />,
+          document.getElementById('modal-root') || document.body
+        )}
 
     </>
   );

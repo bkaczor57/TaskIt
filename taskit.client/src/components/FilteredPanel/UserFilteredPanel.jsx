@@ -1,25 +1,25 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import './TeamFilteredPanel.css';
 import { FaTimes } from 'react-icons/fa';
 
 
 
-const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, userTeams, taskStatuses, taskPriorities, taskOrderBy }) => {
+const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, userTeams, taskStatuses, taskPriorities, taskOrderBy, readOnlyStatus = false }) => {
 
-    const clearFilters = () => {
-      setDraftFilters({
-        Status: '',
-        Priority: '',
-        TeamIds: [],
-        CreatedAfter: '',
-        CreatedBefore: '',
-        DueAfter: '',
-        DueBefore: '',
-        OrderBy: 'CreatedAt',
-        Ascending: true,
-        SearchTerm: '',
-      });
-    };
+  const clearFilters = () => {
+    setDraftFilters({
+      Status: '',
+      Priority: '',
+      TeamIds: [],
+      CreatedAfter: '',
+      CreatedBefore: '',
+      DueAfter: '',
+      DueBefore: '',
+      OrderBy: 'CreatedAt',
+      Ascending: true,
+      SearchTerm: '',
+    });
+  };
 
   return (
     <div className="filter-overlay">
@@ -29,13 +29,18 @@ const FilterPanel = ({ draftFilters, setDraftFilters, applyFilters, onClose, use
 
         <div className="filter-grid">
 
-          <div className="filter-group">
-            <label>Status</label>
-            <select value={draftFilters.Status || ''} onChange={e => setDraftFilters({ ...draftFilters, Status: e.target.value })}>
-              <option value="">--</option>
-              {taskStatuses.map(status => <option key={status} value={status}>{status}</option>)}
-            </select>
-          </div>
+          {!readOnlyStatus && (
+            <div className="filter-group">
+              <label>Status</label>
+              <select
+                value={draftFilters.Status || ''}
+                onChange={e => setDraftFilters({ ...draftFilters, Status: e.target.value })}
+              >
+                <option value="">--</option>
+                {taskStatuses.map(status => <option key={status} value={status}>{status}</option>)}
+              </select>
+            </div>
+          )}
 
           <div className="filter-group">
             <label>Priorytet</label>

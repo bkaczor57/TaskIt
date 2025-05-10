@@ -13,6 +13,7 @@ export const UserTeamProvider = ({ children }) => {
     try {
       const teams = await UserTeamService.getUserTeams();
       setUserTeams(teams);
+      
     } catch (err) {
       console.error("Błąd przy fetchUserTeams:", err);
     }
@@ -22,8 +23,10 @@ export const UserTeamProvider = ({ children }) => {
     try {
       const users = await UserTeamService.getUsersByTeamId(teamId);
       setTeamUsers(users);
+       return users;
     } catch (err) {
       console.error("Błąd przy fetchTeamUsers:", err);
+      return [];
     }
   }, []);
 
@@ -42,6 +45,10 @@ export const UserTeamProvider = ({ children }) => {
     }
   }, []);
 
+  const getUserRoleForTeam = (teamId) => {
+    return teamUsers.find(u => u.id === user?.id && u.teamId === teamId)?.role || null;
+  };
+
   const addUserToTeam = async (teamId, userId, role) => {
     try {
       return await UserTeamService.addUserToTeam({ teamId, userId, role });
@@ -51,21 +58,22 @@ export const UserTeamProvider = ({ children }) => {
     }
   };
 
-// context/UserTeamContext.jsx
-const removeUserFromTeam = async (teamId, userId) => {
-  try {
-    await UserTeamService.removeUserFromTeam(teamId, userId);
-  } catch (err) {
-    // API rzuci 404, gdy membership już nie istnieje – dla UI to też "sukces"
-    if (err.response?.status !== 404) {
-      console.error("Błąd przy removeUserFromTeam:", err);
-      throw err;           // inny błąd = pokaż użytkownikowi
+
+  // context/UserTeamContext.jsx
+  const removeUserFromTeam = async (teamId, userId) => {
+    try {
+      await UserTeamService.removeUserFromTeam(teamId, userId);
+    } catch (err) {
+      // API rzuci 404, gdy membership już nie istnieje – dla UI to też "sukces"
+      if (err.response?.status !== 404) {
+        console.error("Błąd przy removeUserFromTeam:", err);
+        throw err;           // inny błąd = pokaż użytkownikowi
+      }
+    } finally {
+      // ⬇️  ZAWSZE aktualizuj lokalny stan – również gdy była 404‑ka
+      setUserTeams(prev => prev.filter(t => t.id !== teamId));
     }
-  } finally {
-    // ⬇️  ZAWSZE aktualizuj lokalny stan – również gdy była 404‑ka
-    setUserTeams(prev => prev.filter(t => t.id !== teamId));
-  }
-};
+  };
   const updateUserRole = async (teamId, userId, newRole) => {
     try {
       return await UserTeamService.updateUserRole(teamId, userId, newRole);
@@ -86,6 +94,7 @@ const removeUserFromTeam = async (teamId, userId) => {
         addUserToTeam,
         removeUserFromTeam,
         updateUserRole,
+        getUserRoleForTeam, 
       }}
     >
       {children}

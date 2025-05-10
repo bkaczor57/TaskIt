@@ -57,6 +57,19 @@ import React, {
         setLoading(false);
       }
     };
+
+    const refetch = () => fetchUserTasks();   
+
+    const refreshTask = async (taskId) => {
+   try {
+     const updated = await TaskService.getTask(taskId);   // pojedynczy GET
+     setTasks(prev =>
+       prev.map((t) => (t.id === taskId ? updated : t))
+     );
+   } catch (err) {
+     console.error('Nie udało się odświeżyć zadania', err);
+   }
+ };
   
     useEffect(() => {
       fetchUserTasks();
@@ -72,6 +85,8 @@ import React, {
           totalItems,
           totalPages,
           fetchUserTasks,
+          refetch,
+          refreshTask,
         }}
       >
         {children}

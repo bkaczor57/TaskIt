@@ -92,7 +92,6 @@ const CreateTaskModal = ({ onClose, sectionId, assignedUsers = [], canAssign = f
                 value={assignedUserId}
                 onChange={(e) => setAssignedUserId(e.target.value)}
               >
-                <option value="">Nieprzypisane</option>
                 {assignedUsers.map(u => (
                   <option key={u.id} value={u.id}>{u.username}</option>
                 ))}

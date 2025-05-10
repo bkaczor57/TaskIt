@@ -5,9 +5,9 @@ import { useEnums } from '../context/EnumContext';
 import { useUser } from '../context/UserContext';
 import { useUserTeam } from '../context/UserTeamContext';
 import { UserTasksProvider, useUserTasks } from '../context/UserTasksContext';
-
 import UserFilteredPanel from '../components/FilteredPanel/UserFilteredPanel';
 import TaskCard from '../components/Task/TaskCard';
+import { TaskProvider } from '../context/TaskContext';
 import './UserTasks.css';
 
 const statusLabels = {
@@ -21,63 +21,103 @@ const UserTasksPage = () => {
   const { user } = useUser();
   const { userTeams } = useUserTeam();
   const { taskStatuses, taskPriorities, taskOrderBy } = useEnums();
+  const readOnlyStatus = !!status;
 
   /* ---------- FILTRY ---------- */
   const initialFilters = useMemo(() => ({
     Status: status ? status.toUpperCase() : null,
     OrderBy: 'CreatedAt',
     Ascending: true,
-    PageNumber: 1,
-    PageSize: 20,
+    SearchTerm: '',
   }), [status]);
 
   const [filters, setFilters] = useState(initialFilters);
   const [draftFilters, setDraftFilters] = useState(initialFilters);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
 
   const applyFilters = () => {
     setFilters(draftFilters);
     setFilterOpen(false);
   };
 
+  useEffect(() => {
+    const newFilters = {
+      Status: status ? status.toUpperCase() : null,
+      OrderBy: 'CreatedAt',
+      Ascending: true,
+      SearchTerm: '',
+    };
+
+    setFilters(newFilters);
+    setDraftFilters(newFilters);
+  }, [status]);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setFilters(prev => ({
+        ...prev,
+        SearchTerm: searchInput
+      }));
+    }, 1000); // 1 sekunda opóźnienia
+
+    return () => clearTimeout(delay);
+  }, [searchInput]);
 
 
   const titlePrefix = statusLabels[status?.toLowerCase()] || 'Wszystkie';
 
   return (
-    <UserTasksProvider filters={filters}>
+    <TaskProvider>
+      <UserTasksProvider filters={filters}>
 
-      <div className="user-tasks-content">
-        <header className="user-tasks-header">
-          <h1 className="user-tasks-title">{titlePrefix} zadania {user?.firstName || ''}</h1>
-          <div className="header-actions">
-            <button onClick={() => setFilterOpen(true)} className="filter-toggle">
-              <FaFilter /> Filtracja
-            </button>
-          </div>
-        </header>
+        <div className="user-tasks-content">
+<header className="user-tasks-header">
+  <div className="header-top">
+    <h1 className="user-tasks-title">{titlePrefix} zadania</h1>
+    <div className="header-actions">
+      <button onClick={() => setFilterOpen(true)} className="filter-toggle">
+        <FaFilter /> Filtracja
+      </button>
+    </div>
+  </div>
 
-        {filterOpen && (
-          <UserFilteredPanel
-            draftFilters={draftFilters}
-            setDraftFilters={setDraftFilters}
-            applyFilters={applyFilters}
-            onClose={() => setFilterOpen(false)}
-            userTeams={userTeams}
-            taskStatuses={taskStatuses}
-            taskPriorities={taskPriorities}
-            taskOrderBy={taskOrderBy}
-          />
-        )}
+  <div className="header-bottom">
+    <input
+      type="text"
+      placeholder="Szukaj..."
+      className="task-search-input"
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+    />
+  </div>
+</header>
 
-        <TasksList />
-      </div>
-    </UserTasksProvider>
+
+          {filterOpen && (
+            <UserFilteredPanel
+              draftFilters={draftFilters}
+              setDraftFilters={setDraftFilters}
+              applyFilters={applyFilters}
+              onClose={() => setFilterOpen(false)}
+              userTeams={userTeams}
+              taskStatuses={taskStatuses}
+              taskPriorities={taskPriorities}
+              taskOrderBy={taskOrderBy}
+              readOnlyStatus={readOnlyStatus}
+            />
+          )}
+
+          <TasksList />
+        </div>
+      </UserTasksProvider>
+    </TaskProvider>
   );
 };
 
 const TasksList = () => {
-  const { tasks, loading, error } = useUserTasks();
+  const { tasks, loading, error, refreshTask } = useUserTasks();
+
 
   if (loading) return <div className="loading">Ładowanie…</div>;
   if (error) return <div className="error">{error}</div>;
@@ -86,7 +126,12 @@ const TasksList = () => {
   return (
     <div className="user-tasks-list">
       {tasks.map(task => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard 
+          key={task.id}
+          task={task} 
+          disableAssignEdit 
+          onTaskUpdated={() => refreshTask(task.id)}
+          />
       ))}
     </div>
   );
