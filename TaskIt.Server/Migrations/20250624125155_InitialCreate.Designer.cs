@@ -12,115 +12,19 @@ using TaskIt.Server.Data;
 namespace TaskIt.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250220174040_UpdateValidationOfModels")]
-    partial class UpdateValidationOfModels
+    [Migration("20250624125155_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("taskit")
                 .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Comments", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Notifications", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CommentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CommentsId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("TaskId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TasksId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TeamsId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("CommentsId");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("TasksId");
-
-                    b.HasIndex("TeamId");
-
-                    b.HasIndex("TeamsId");
-
-                    b.HasIndex("Type");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications", t =>
-                        {
-                            t.HasCheckConstraint("CK_Notifications_OnlyOneReference", "\r\n            (\"TaskId\" IS NOT NULL AND \"CommentId\" IS NULL AND \"TeamId\" IS NULL) OR\r\n            (\"TaskId\" IS NULL AND \"CommentId\" IS NOT NULL AND \"TeamId\" IS NULL) OR\r\n            (\"TaskId\" IS NULL AND \"CommentId\" IS NULL AND \"TeamId\" IS NOT NULL)\r\n        ");
-                        });
-                });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Sections", b =>
                 {
@@ -133,19 +37,22 @@ namespace TaskIt.Server.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Sections");
+                    b.ToTable("Sections", "taskit");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Tasks", b =>
@@ -156,7 +63,7 @@ namespace TaskIt.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssignedUserId")
+                    b.Property<int?>("AssignedUserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CompletedAt")
@@ -186,8 +93,8 @@ namespace TaskIt.Server.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -195,7 +102,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", "taskit");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.TeamInvites", b =>
@@ -225,14 +132,18 @@ namespace TaskIt.Server.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TeamRole")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("InvitedUserId");
 
                     b.HasIndex("InvitingUserId");
 
-                    b.HasIndex("InvitedUserId", "TeamId")
-                        .IsUnique();
+                    b.HasIndex("TeamId");
 
-                    b.ToTable("TeamInvites", t =>
+                    b.ToTable("TeamInvites", "taskit", t =>
                         {
                             t.HasCheckConstraint("CK_TeamInvites_InvitingNotSelf", "\"InvitedUserId\" <> \"InvitingUserId\"");
                         });
@@ -250,12 +161,13 @@ namespace TaskIt.Server.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
@@ -264,7 +176,7 @@ namespace TaskIt.Server.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", "taskit");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Users", b =>
@@ -285,13 +197,19 @@ namespace TaskIt.Server.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -308,7 +226,7 @@ namespace TaskIt.Server.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", "taskit");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.UsersTeams", b =>
@@ -336,70 +254,7 @@ namespace TaskIt.Server.Migrations
                     b.HasIndex("UserId", "TeamId")
                         .IsUnique();
 
-                    b.ToTable("UsersTeams");
-                });
-
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Comments", b =>
-                {
-                    b.HasOne("TaskIt.Server.Core.Entities.Tasks", "Task")
-                        .WithMany("Comments")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Users", "User")
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
-                    b.Navigation("Task");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Notifications", b =>
-                {
-                    b.HasOne("TaskIt.Server.Core.Entities.Comments", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Comments", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("CommentsId");
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Tasks", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Tasks", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("TasksId");
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Teams", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Teams", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("TeamsId");
-
-                    b.HasOne("TaskIt.Server.Core.Entities.Users", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Comment");
-
-                    b.Navigation("Task");
-
-                    b.Navigation("Team");
-
-                    b.Navigation("User");
+                    b.ToTable("UsersTeams", "taskit");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Sections", b =>
@@ -418,8 +273,7 @@ namespace TaskIt.Server.Migrations
                     b.HasOne("TaskIt.Server.Core.Entities.Users", "AssignedUser")
                         .WithMany("Tasks")
                         .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("TaskIt.Server.Core.Entities.Sections", "Section")
                         .WithMany("Tasks")
@@ -446,9 +300,17 @@ namespace TaskIt.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TaskIt.Server.Core.Entities.Teams", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("InvitedUser");
 
                     b.Navigation("InvitingUser");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Teams", b =>
@@ -481,27 +343,13 @@ namespace TaskIt.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Comments", b =>
-                {
-                    b.Navigation("Notifications");
-                });
-
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Sections", b =>
                 {
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("TaskIt.Server.Core.Entities.Tasks", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Notifications");
-                });
-
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Teams", b =>
                 {
-                    b.Navigation("Notifications");
-
                     b.Navigation("Sections");
 
                     b.Navigation("UsersTeams");
@@ -509,10 +357,6 @@ namespace TaskIt.Server.Migrations
 
             modelBuilder.Entity("TaskIt.Server.Core.Entities.Users", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Notifications");
-
                     b.Navigation("OwnedTeams");
 
                     b.Navigation("Tasks");

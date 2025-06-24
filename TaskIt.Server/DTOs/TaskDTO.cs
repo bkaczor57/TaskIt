@@ -29,7 +29,7 @@ namespace TaskIt.Server.DTOs
         public string? TeamName { get; set; }
 
         // Przesyłanie Assigned UserId oraz opcjonalnie AssignedUserName
-        public int AssignedUserId { get; set; }
+        public int? AssignedUserId { get; set; }
         public string? AssignedUserName { get; set; }
     }
 

@@ -17,6 +17,8 @@ namespace TaskIt.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("taskit");
+            base.OnModelCreating(modelBuilder);
             // Tabela UsersTeams
             // Relacja User -> UserTeams, kaskadowe usuwanie 
             modelBuilder.Entity<UsersTeams>()
@@ -117,27 +119,7 @@ namespace TaskIt.Server.Data
             modelBuilder.Entity<Tasks>()
                 .HasIndex(t => t.SectionId);
 
-            // Relacja: Powiadomienie -> Task (opcjonalne)
-            modelBuilder.Entity<Notifications>()
-                .HasOne(n => n.Task)
-                .WithMany()
-                .HasForeignKey(n => n.TaskId)
-                .OnDelete(DeleteBehavior.Cascade);
-            // Relacja: Powiadomienie -> Team (opcjonalne)
-            modelBuilder.Entity<Notifications>()
-                .HasOne(n => n.Team)
-                .WithMany()
-                .HasForeignKey(n => n.TeamId)
-                .OnDelete(DeleteBehavior.Cascade);
-            // Indeksy dla optymalizacji
-            modelBuilder.Entity<Notifications>()
-                .HasIndex(n => n.UserId); // Najważniejsze indeksowanie
-            modelBuilder.Entity<Notifications>()
-                .HasIndex(n => n.Type); // Opcjonalne indeksowanie po `enum`
-            // Konwersja Enum -> String
-            modelBuilder.Entity<Notifications>()
-                .Property(n => n.Type)
-                .HasConversion<string>();
+
 
             // CHECK CONSTRAINT dla TeamInvites – użytkownik nie może zaprosić siebie
             modelBuilder.Entity<TeamInvites>()

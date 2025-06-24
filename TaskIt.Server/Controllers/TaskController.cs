@@ -51,7 +51,7 @@ namespace TaskIt.Server.Controllers
 
             var task = result.Data;
             
-            if(!await _serviceHelper.CanPerformAction(GetUserId(), task.TeamId ?? 0, task.AssignedUserId, UserTeamRole.Member))
+            if(!await _serviceHelper.CanPerformAction(GetUserId(), task.TeamId ?? 0, task.AssignedUserId.Value, UserTeamRole.Member))
                 return Forbid();
 
 

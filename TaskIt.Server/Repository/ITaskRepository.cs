@@ -13,9 +13,13 @@ public interface ITaskRepository
     /// </summary>
     Task<Tasks?> GetByIdAsync(int id, bool includeSection = false, bool includeAssignedUser = false, bool includeTeam = false);
 
+    Task<List<Tasks>> GetTasksAssignedToUserInTeamAsync(int teamId, int userId);
+
     void AddTask(Tasks task);
     void UpdateTask(Tasks task);
     void DeleteTask(Tasks task);
+
+    void DeleteTasks(List<Tasks> tasks);
 
     Task<int> SaveChangesAsync();
 }

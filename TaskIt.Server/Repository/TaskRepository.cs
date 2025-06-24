@@ -37,6 +37,15 @@ public class TasksRepository : ITaskRepository
         return await query.FirstOrDefaultAsync(t => t.Id == id);
     }
 
+    public async Task<List<Tasks>> GetTasksAssignedToUserInTeamAsync(int teamId, int userId)
+    {
+        return await _context.Tasks
+            .Where(t => t.AssignedUserId == userId && t.Section.TeamId == teamId)
+            .Include(t => t.Section)
+            .ToListAsync();
+    }
+
+
     public void AddTask(Tasks task)
     {
         _context.Tasks.Add(task);
@@ -51,6 +60,12 @@ public class TasksRepository : ITaskRepository
     {
         _context.Tasks.Remove(task);
     }
+
+    public void DeleteTasks(List<Tasks> tasks)
+    {
+        _context.Tasks.RemoveRange(tasks);
+    }
+
 
     public async Task<int> SaveChangesAsync()
     {

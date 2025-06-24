@@ -11,10 +11,12 @@ namespace TaskIt.Server.Services
     public class UserTeamService : IUserTeamService
     {
         private readonly IUserTeamRepository _userTeamRepository;
+        private readonly ITaskRepository _taskRepository;
 
-        public UserTeamService(IUserTeamRepository userTeamRepository)
+        public UserTeamService(IUserTeamRepository userTeamRepository, ITaskRepository taskRepository)
         {
             _userTeamRepository = userTeamRepository;
+            _taskRepository = taskRepository;
         }
 
 
@@ -147,6 +149,11 @@ namespace TaskIt.Server.Services
             {
                 return ServiceResult<bool>.Fail("User is not in team");
             }
+
+            // Usuń wszystkie zadania użytkownika w zespole
+            var userTasks = await _taskRepository.GetTasksAssignedToUserInTeamAsync(teamId, userId);
+            _taskRepository.DeleteTasks(userTasks);
+            await _taskRepository.SaveChangesAsync();
 
             _userTeamRepository.DeleteUserFromTeam(userTeam);
             await _userTeamRepository.SaveChangesAsync();

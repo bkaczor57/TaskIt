@@ -16,6 +16,5 @@ namespace TaskIt.Server.Core.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<UsersTeams>? UsersTeams { get; set; }
         public ICollection<Sections>? Sections { get; set; }
-        public ICollection<Notifications>? Notifications { get; set; }
     }
 }

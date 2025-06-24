@@ -10,7 +10,7 @@ namespace TaskIt.Server.Core.Entities
         [Required]
         public int SectionId { get; set; }
         public Sections? Section { get; set; }
-        public int AssignedUserId{ get; set; }
+        public int? AssignedUserId{ get; set; }
         public Users? AssignedUser { get; set; }
         public TasksStatus Status { get; set; } = TasksStatus.Pending;
         public TasksPriority Priority { get; set; } = TasksPriority.Medium;
@@ -22,7 +22,6 @@ namespace TaskIt.Server.Core.Entities
         public DateTime? DueDate { get; set; }
         public DateTime? CompletedAt { get; set; }
 
-        public ICollection<Notifications>?  Notifications { get; set; }
 
     }
 }

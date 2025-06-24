@@ -188,8 +188,6 @@ public class TaskService : ITaskService
                          .Take(request.PageSize.Value);
         }
 
-
-
         var tasks = await query.ToListAsync();
         var dtos = tasks.Select(MapToDto).ToList();
 
@@ -304,7 +302,7 @@ public class TaskService : ITaskService
             return ServiceResult<TaskDTO>.Fail("Invalid status specified.");
 
         // sprawdzenie dostępu użytkownika do edycji
-        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId, UserTeamRole.Manager))
+        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId.Value, UserTeamRole.Manager))
             return ServiceResult<TaskDTO>.Fail("You don't have permission to edit this task");
 
         // zmiana sekcji
@@ -367,7 +365,7 @@ public class TaskService : ITaskService
 
         if (existingTask.AssignedUserId != null)
         {
-            var assignedUser = await _userService.GetUserById(existingTask.AssignedUserId);
+            var assignedUser = await _userService.GetUserById(existingTask.AssignedUserId.Value);
             assignedUserName = assignedUser?.Data?.Username;
         }
 
@@ -411,14 +409,10 @@ public class TaskService : ITaskService
         }
 
         // Sprawdź czy użytkownik może usunąć taska
-        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId, UserTeamRole.Manager))
+        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId.Value, UserTeamRole.Manager))
         {
             return ServiceResult<bool>.Fail("You don't have permission to delete this task");
         }
-
-
-
-
 
 
         _taskRepository.DeleteTask(existingTask);

@@ -24,6 +24,5 @@ namespace TaskIt.Server.Core.Entities
         public ICollection<TeamInvites>? UserInvitationsSent { get; set; }
         public ICollection<TeamInvites>? UserInvitationsReceived { get; set; }
         public ICollection<Tasks>? Tasks { get; set; }
-        public ICollection<Notifications>? Notifications { get; set; }
     }
 }
