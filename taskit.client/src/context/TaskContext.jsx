@@ -24,7 +24,7 @@ export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children 
    * pozostaje taka sama – dzięki temu useEffect nie wchodzi w pętlę.  */
   const filtersSignature = useMemo(() => JSON.stringify(filters), [filters]);
 
-  /* ----------------------  HELPER: PREPARE  ------------------------ */
+  /* ----------------------  Filtry ------------------------ */
   const prepareFilters = () => {
     const parsed = JSON.parse(filtersSignature);       
     const tz     = new Date().getTimezoneOffset();
@@ -44,19 +44,15 @@ export const TaskProvider = ({ teamId, sectionId = null, filters = {}, children 
       CreatedAfter:   parsed.CreatedAfter   || null,
     };
   };
-
-  /* --------------------------  FETCH  ------------------------------ */
+  /* --------------------------  Fetch  ------------------------------ */
   const fetchTasks = async () => {
     if (!teamId) return;
-
     setLoading(true);
     try {
       const prepared = prepareFilters();
-
       const res = sectionId
         ? await TaskService.listSectionTasks(teamId, sectionId, prepared)
         : await TaskService.listTeamTasks  (teamId,           prepared);
-
       setTasks(res.items       || []);
       setTotalItems(res.totalItems || 0);
       setTotalPages(res.totalPages || 1);

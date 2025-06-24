@@ -6,13 +6,14 @@ import { FaEllipsisH } from 'react-icons/fa';
 import { useDraggable } from '@dnd-kit/core';
 import { useUser } from '../../context/UserContext';
 import { useUserTeam } from '../../context/UserTeamContext';
+import { useEnums } from '../../context/EnumContext';
 import UserInfoModal from '../modals/UserInfoModal';
 
 
 const TaskCard = ({
   task,
   disableAssignEdit = false,
-  onTaskUpdated = null     
+  onTaskUpdated = null
 }) => {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: task.id,
@@ -21,6 +22,8 @@ const TaskCard = ({
   const { user } = useUser();
   const { teamUsers } = useUserTeam();
   const [selectedUser, setSelectedUser] = useState(null);
+  const { taskStatusLabelsPL, taskPriorityLabelsPL } = useEnums();
+
 
   const currentUser = teamUsers.find(u => u.id === user?.id);
   const canDrag =
@@ -52,10 +55,15 @@ const TaskCard = ({
     typeof task.priority === 'string' ? task.priority.toLowerCase() : 'unknown';
 
   const getPriorityLabel = () =>
-    typeof task.priority === 'string' ? task.priority.toUpperCase() : 'BRAK';
+    typeof task.priority === 'string'
+      ? taskPriorityLabelsPL[task.priority] || task.priority
+      : 'BRAK';
+
 
   const getStatusClass = () =>
     typeof task.status === 'string' ? task.status.toLowerCase() : 'unknown';
+
+
 
   return (
     <>
@@ -74,9 +82,9 @@ const TaskCard = ({
           <div className="status-avatar">
             <span className={`status-dot ${getStatusClass()}`} />
             <span className={`status-label ${getStatusClass()}`}>
-              {task.status}
+              {taskStatusLabelsPL[task.status] || task.status}
             </span>
-            
+
             {!task.teamName &&
               typeof task.assignedUserName === 'string' &&
               task.assignedUserName.length > 0 && (

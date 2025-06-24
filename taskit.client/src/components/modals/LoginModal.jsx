@@ -3,52 +3,62 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import "./Modal.css";
 import { FaTimes } from "react-icons/fa";
+
 export const LoginModal = ({ onClose }) => {
-  const { login, authError } = useContext(AuthContext);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [localError, setLocalError] = useState("");
+  const { login, authError, clearAuthError } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLocalError("");
 
     try {
-      await login(email, password);
+      await login(formData.email, formData.password);
       navigate("/dashboard");
-    } catch (err) {
-      setLocalError(err.message); // logika błędu znajduje się w AuthContext/AuthService
+    } catch {
+      // Błąd już powinien być zapisany w `authError` przez AuthContext/AuthService
     }
   };
 
+  const handleClose = () => {
+    setFormData({
+      email: "",
+      password: "",
+    });
+    clearAuthError?.();
+    onClose();
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}><FaTimes /></button>
+        <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         <h2>Logowanie</h2>
         <form onSubmit={handleLogin}>
           <input
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
           />
           <input
             type="password"
             placeholder="Hasło"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required
           />
           <div className="form-buttons">
-          <button className="btn-green" type="submit">Zaloguj się</button>
+            <button className="btn-green" type="submit">Zaloguj się</button>
           </div>
         </form>
-        {(authError || localError) && (
-          <p className="error-message">{localError || authError}</p>
-        )}
+
+        {authError && <p className="error-message">{authError}</p>}
       </div>
     </div>
   );

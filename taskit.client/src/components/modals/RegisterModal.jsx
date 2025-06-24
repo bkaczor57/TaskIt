@@ -1,11 +1,11 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import "./Modal.css";
 import { RegisterSuccessModal } from "./RegisterSuccessModal";
 import AuthContext from "../../context/AuthContext";
 import { FaTimes } from "react-icons/fa";
 
 export const RegisterModal = ({ onClose, onOpenLogin }) => {
-  const { register, authError, registerResult,clearAuthError } = useContext(AuthContext);
+  const { register, registerResult, clearAuthError } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -16,17 +16,21 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
     lastName: "",
   });
 
-  
   const [errors, setErrors] = useState({});
-  const [localError, setLocalError] = useState("");
 
   const handleClose = () => {
+    setFormData({
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+    });
     setErrors({});
-    setLocalError("");
-    clearAuthError(); 
-    onClose();      
+    clearAuthError?.(); // wyczyść błąd serwera po zamknięciu
+    onClose();
   };
-
 
   const validate = () => {
     const newErrors = {};
@@ -35,6 +39,7 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Niepoprawny format email.";
 
     if (!formData.username) newErrors.username = "Nazwa użytkownika jest wymagana.";
+    else if (formData.username.length < 6) newErrors.username = "Nazwa użytkownika musi mieć co najmniej 6 znaków.";
 
     if (!formData.password) newErrors.password = "Hasło jest wymagane.";
     else if (formData.password.length < 8) newErrors.password = "Hasło musi mieć co najmniej 8 znaków.";
@@ -58,20 +63,16 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLocalError("");
     if (!validate()) return;
 
-    try {
-      await register(formData);
-    } catch (err) {
-      setLocalError(err.message); // Błąd obsługiwany globalnie i lokalnie
-    }
+    await register(formData);
+    // ewentualny błąd pojawi się w registerResult.error
   };
 
-  if (registerResult) {
+  if (registerResult?.success) {
     return (
       <RegisterSuccessModal
-        username={registerResult}
+        username={registerResult.username}
         onClose={onClose}
         onOpenLogin={onOpenLogin}
       />
@@ -81,7 +82,7 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}><FaTimes /></button>
+        <button className="close-btn" onClick={handleClose}><FaTimes /></button>
         <h2>Rejestracja</h2>
         <form onSubmit={handleRegister}>
           <input
@@ -131,12 +132,18 @@ export const RegisterModal = ({ onClose, onOpenLogin }) => {
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
           />
           {errors.lastName && <p className="error-message">{errors.lastName}</p>}
+
           <div className="form-buttons">
-          <button class="btn-green" type="submit">Zarejestruj się</button>
+            <button className="btn-green" type="submit">Zarejestruj się</button>
           </div>
         </form>
-        {(authError || localError) && (
-          <p className="error-message">{localError || authError}</p>
+
+        {registerResult?.error && (
+          <p className="error-message" title={registerResult.error}>
+            {registerResult.error.length > 120
+              ? registerResult.error.slice(0, 117) + "…"
+              : registerResult.error}
+          </p>
         )}
       </div>
     </div>

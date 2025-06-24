@@ -41,8 +41,6 @@ const Section = memo(({ section, teamId, isDragOverlay = false }) => {
   const { user } = useUser();
   const { teamUsers } = useUserTeam();
   
-
-
   const currentUser = teamUsers.find(u => u.id === user?.id);
   const canAssign = currentUser?.role === 'Admin' || currentUser?.role === 'Manager';
   const canEditSection = currentUser?.role === 'Admin';

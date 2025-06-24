@@ -101,20 +101,19 @@ const TeamPage = ({ filters, setFilters }) => {
   };
 
   /* ---------- drag‑n‑drop ---------- */
+  // Rozpoczęcie przeciągania
   const handleDragStart = ({ active }) => {
     if (tasks.some((t) => t.id === active.id)) {
       setActiveTaskId(active.id);
-      // Ukryj oryginalny element podczas przeciągania
       const element = document.querySelector(`[data-task-id="${active.id}"]`);
       if (element) element.style.opacity = '0';
     } else {
       setActiveSectionId(active.id);
-      // Ukryj oryginalną sekcję podczas przeciągania
       const element = document.querySelector(`[data-section-id="${active.id}"]`);
       if (element) element.style.opacity = '0';
     }
   };
-
+  // Zakończenie przeciągania
   const handleDragEnd = useCallback(
     async ({ active, over }) => {
       // Przywróć widoczność elementów
@@ -128,8 +127,7 @@ const TeamPage = ({ filters, setFilters }) => {
         setActiveSectionId(null);
         return;
       }
-
-      /* --- TASK przenoszony --- */
+      /* --- Zadanie przeciągane --- */
       const draggedTask = tasks.find((t) => t.id === active.id);
       if (draggedTask) {
         if (draggedTask.sectionId !== over.id) {
@@ -142,12 +140,10 @@ const TeamPage = ({ filters, setFilters }) => {
         setActiveTaskId(null);
         return;
       }
-
-      /* --- SEKCJA przenoszona --- */
+      /* --- Sekcja przeciągana --- */
       const oldIdx = orderedSections.findIndex((s) => s.id === active.id);
       const newIdx = orderedSections.findIndex((s) => s.id === over.id);
       const newOrder = arrayMove(orderedSections, oldIdx, newIdx);
-
       try {
         await SectionService.move(team.id, Number(active.id), newIdx + 1);
         setOrderedSections(newOrder);

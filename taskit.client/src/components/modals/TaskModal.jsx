@@ -12,19 +12,19 @@ const TaskModal = ({
   task,
   onClose,
   disableAssignEdit = false,
-  onTaskUpdated        
+  onTaskUpdated
 }) => {
   /* --- konteksty --- */
   const { user } = useContext(UserContext);
   const { getUserInTeam, fetchTeamUsers } = useContext(UserTeamContext);
-  const { taskStatuses, taskPriorities } = useEnums();
+  const { taskStatuses, taskPriorities, taskStatusLabelsPL, taskPriorityLabelsPL } = useEnums();
   const { getTask, updateTask, deleteTask } = useTasks();
 
   /* --- lokalny stan --- */
-  const [formData,       setFormData]       = useState(null);
-  const [enabledFields,  setEnabledFields]  = useState({});
-  const [currentUserRole,setCurrentUserRole]= useState(null); // Member / Manager / Admin / null
-  const [taskTeamUsers,  setTaskTeamUsers]  = useState([]);   // użytkownicy danego teamu
+  const [formData, setFormData] = useState(null);
+  const [enabledFields, setEnabledFields] = useState({});
+  const [currentUserRole, setCurrentUserRole] = useState(null); // Member / Manager / Admin / null
+  const [taskTeamUsers, setTaskTeamUsers] = useState([]);   // użytkownicy danego teamu
 
   /* --------------------------------------------- */
   /*  Pobierz: szczegóły zadania + rolę + (ew.) users  */
@@ -70,10 +70,10 @@ const TaskModal = ({
   if (!formData) return null;
 
   /* ---------- uprawnienia ---------- */
-  const isOwner   = task.assignedUserId === user.id;
+  const isOwner = task.assignedUserId === user.id;
   const isManager = ['Manager', 'Admin'].includes(currentUserRole);
 
-  const isPrivileged       = isOwner || isManager;
+  const isPrivileged = isOwner || isManager;
   const canEditAssignedUser = isManager && !disableAssignEdit;
 
   /* ---------- helpers ---------- */
@@ -99,13 +99,13 @@ const TaskModal = ({
   const handleSave = async () => {
     const p = {};
 
-    if (enabledFields.title        && formData.title        !== task.title)        p.title        = formData.title;
-    if (enabledFields.description  && formData.description  !== task.description)  p.description  = formData.description;
-    if (enabledFields.status       && formData.status       !== task.status)       p.status       = formData.status;
-    if (enabledFields.priority     && formData.priority     !== task.priority)     p.priority     = formData.priority;
+    if (enabledFields.title && formData.title !== task.title) p.title = formData.title;
+    if (enabledFields.description && formData.description !== task.description) p.description = formData.description;
+    if (enabledFields.status && formData.status !== task.status) p.status = formData.status;
+    if (enabledFields.priority && formData.priority !== task.priority) p.priority = formData.priority;
     if (enabledFields.assignedUserId &&
-        formData.assignedUserId    !== task.assignedUserId) p.assignedUserId = formData.assignedUserId
-                                                              ? Number(formData.assignedUserId) : null;
+      formData.assignedUserId !== task.assignedUserId) p.assignedUserId = formData.assignedUserId
+        ? Number(formData.assignedUserId) : null;
     if (enabledFields.dueDate) {
       const due = formData.dueDate ? formatDueDate(formData.dueDate) : null;
       if ((task.dueDate || '') !== (due || '')) p.dueDate = due;
@@ -113,9 +113,11 @@ const TaskModal = ({
 
     if (!Object.keys(p).length) return onClose();
 
-    try { await updateTask(task.id, p); 
+    try {
+      await updateTask(task.id, p);
       if (typeof onTaskUpdated === 'function') onTaskUpdated();
-      onClose(); }
+      onClose();
+    }
     catch (err) { console.error('updateTask:', err); }
   };
 
@@ -139,6 +141,8 @@ const TaskModal = ({
       )}
     </div>
   );
+
+
 
   /* ---------- JSX ---------- */
   return (
@@ -172,7 +176,11 @@ const TaskModal = ({
             disabled={!enabledFields.status || !isPrivileged}
             className="task-modal-select"
           >
-            {taskStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
+            {taskStatuses.map((s) => (
+              <option key={s} value={s}>
+                {taskStatusLabelsPL[s] || s}
+              </option>
+            ))}
           </select>
         )}
 
@@ -182,7 +190,11 @@ const TaskModal = ({
             disabled={!enabledFields.priority || !isPrivileged}
             className="task-modal-select"
           >
-            {taskPriorities.map((p) => <option key={p} value={p}>{p}</option>)}
+            {taskPriorities.map((p) =>(
+             <option key={p} value={p}>
+              {taskPriorityLabelsPL[p] || p}
+             </option>
+            ))}
           </select>
         )}
 
@@ -218,8 +230,8 @@ const TaskModal = ({
         {isPrivileged && (
           <div className="form-buttons">
             <button className="btn-success" onClick={handleSave}>Zapisz zmiany</button>
-            <button className="btn-cancel"  onClick={onClose}>Anuluj</button>
-            <button className="btn-danger"  onClick={handleDelete}>
+            <button className="btn-cancel" onClick={onClose}>Anuluj</button>
+            <button className="btn-danger" onClick={handleDelete}>
               <FaTrash /> Usuń
             </button>
           </div>

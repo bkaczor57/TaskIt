@@ -7,35 +7,16 @@ namespace TaskIt.Server.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
         public DbSet<Users> Users { get; set; }
         public DbSet<Teams> Teams { get; set; }
         public DbSet<UsersTeams> UsersTeams { get; set; }
         public DbSet<TeamInvites> TeamInvites { get; set; }
         public DbSet<Tasks> Tasks { get; set; }
         public DbSet<Sections> Sections { get; set; }
-        public DbSet<Notifications> Notifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-
-            // Ręczne Relacje i Atrybuty dla bazy danych
-
-            // Tabela Users
-            // Unikalność Email i Username
-            modelBuilder.Entity<Users>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-            modelBuilder.Entity<Users>()
-                .HasIndex(u => u.Username)
-                .IsUnique();
-
-            modelBuilder.Entity<Users>()
-                .Property(u => u.Role)
-                .HasConversion<string>();
-
             // Tabela UsersTeams
             // Relacja User -> UserTeams, kaskadowe usuwanie 
             modelBuilder.Entity<UsersTeams>()
@@ -58,7 +39,18 @@ namespace TaskIt.Server.Data
                 .Property(ut => ut.Role)
                 .HasConversion<string>(); // Zapisuje enum jako string w bazie
 
-
+            // Ręczne Relacje i Atrybuty dla bazy danych
+            // Tabela Users
+            // Unikalność Email i Username
+            modelBuilder.Entity<Users>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+            modelBuilder.Entity<Users>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            modelBuilder.Entity<Users>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
 
             // Tabela Teams
             // Relacje
@@ -89,7 +81,6 @@ namespace TaskIt.Server.Data
                 .Property(ti => ti.Status)
                 .HasConversion<string>(); // Zapisuje enum jako string w bazie
             
-
             //Tabela Sections
             //Relacje
             //Relacja Team -> Sections, kaskadowe usuwanie
@@ -126,15 +117,6 @@ namespace TaskIt.Server.Data
             modelBuilder.Entity<Tasks>()
                 .HasIndex(t => t.SectionId);
 
-
-
-            // Tabela Notifications
-            // Relacja: Powiadomienie -> Użytkownik (KAŻDE powiadomienie musi mieć odbiorcę)
-            modelBuilder.Entity<Notifications>()
-                .HasOne(n => n.User)
-                .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
             // Relacja: Powiadomienie -> Task (opcjonalne)
             modelBuilder.Entity<Notifications>()
                 .HasOne(n => n.Task)
@@ -157,16 +139,6 @@ namespace TaskIt.Server.Data
                 .Property(n => n.Type)
                 .HasConversion<string>();
 
-
-            // CHECK CONSTRAINT dla Notifications – tylko jedno powiązanie
-            modelBuilder.Entity<Notifications>()
-                .ToTable(tb => tb.HasCheckConstraint
-                    ("CK_Notifications_OnlyOneReference", @"
-                    (""TaskId"" IS NOT NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NULL) OR
-                    (""TaskId"" IS NULL AND ""CommentId"" IS NOT NULL AND ""TeamId"" IS NULL) OR
-                    (""TaskId"" IS NULL AND ""CommentId"" IS NULL AND ""TeamId"" IS NOT NULL)
-                    "));
-            
             // CHECK CONSTRAINT dla TeamInvites – użytkownik nie może zaprosić siebie
             modelBuilder.Entity<TeamInvites>()
                 .ToTable(tb => tb.HasCheckConstraint

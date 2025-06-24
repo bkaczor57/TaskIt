@@ -6,15 +6,28 @@ import EnumService from '../services/EnumService';
 
 const EnumContext = createContext();
 
+export const taskStatusLabelsPL = {
+  Pending: 'Oczekujące',
+  InProgress: 'W trakcie',
+  Completed: 'Zakończone',
+};
+
+export const taskPriorityLabelsPL = {
+  Optional: "Opcjonalne",
+  Low: "Niski",
+  Medium: "Średni",
+  High: "Wysoki",
+};
+
 export const EnumProvider = ({ children }) => {
   const [state, setState] = useState({
-    taskPriorities:   [],
-    taskStatuses:     [],
-    taskOrderBy:      [],
-    userRoles:        [],
-    userTeamRoles:    [],
-    inviteStatuses:   [],
-    notificationTypes:[],
+    taskPriorities: [],
+    taskStatuses: [],
+    taskOrderBy: [],
+    userRoles: [],
+    userTeamRoles: [],
+    inviteStatuses: [],
+    notificationTypes: [],
     loading: true,
     error: null,
   });
@@ -56,7 +69,11 @@ export const EnumProvider = ({ children }) => {
   useEffect(() => { fetchEnums(); }, [fetchEnums]);
 
   return (
-    <EnumContext.Provider value={state}>
+    <EnumContext.Provider value={{
+      ...state,
+      taskStatusLabelsPL,
+      taskPriorityLabelsPL
+    }}>
       {children}
     </EnumContext.Provider>
   );

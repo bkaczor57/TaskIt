@@ -19,14 +19,12 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         return;
       }
-
       const token = JSON.parse(stored);
       if (!token?.accessToken) {
         localStorage.removeItem("token");
         setIsAuthenticated(false);
         return;
       }
-
       // Próba wykonania żądania do API, które sprawdzi ważność tokenu
       await api.get('/User');
       setIsAuthenticated(true);
@@ -38,7 +36,20 @@ export const AuthProvider = ({ children }) => {
       }
     }
   };
-
+    const login = async (email, password) => {
+    try {
+      const data = await loginUser(email, password);
+      localStorage.clear();
+      localStorage.setItem("token", JSON.stringify(data));
+      setIsAuthenticated(true);
+      setAuthError(null);
+      // Wywołujemy custom event, który spowoduje ponowne załadowanie danych użytkownika
+      window.dispatchEvent(new Event('userLogin'));
+    } catch (err) {
+      setAuthError(err.message);
+      throw err;
+    }
+  };
   // Inicjalizacja po odświeżeniu strony
   useEffect(() => {
     verifyToken().finally(() => setIsLoading(false));
@@ -56,20 +67,7 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener("logout", handleLogout);
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      const data = await loginUser(email, password);
-      localStorage.clear();
-      localStorage.setItem("token", JSON.stringify(data));
-      setIsAuthenticated(true);
-      setAuthError(null);
-      // Wywołujemy custom event, który spowoduje ponowne załadowanie danych użytkownika
-      window.dispatchEvent(new Event('userLogin'));
-    } catch (err) {
-      setAuthError(err.message);
-      throw err;
-    }
-  };
+
 
   const register = async (userData) => {
     try {

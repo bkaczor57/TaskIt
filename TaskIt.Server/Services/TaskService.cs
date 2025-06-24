@@ -42,87 +42,59 @@ public class TaskService : ITaskService
     }
 
     public async Task<ServiceResult<PagedResult<TaskDTO>>> GetTasksFilteredAsync(TasksQueryRequest request)
-    {
-       
+    {  
         // Lazy loading
         var query = _taskRepository.GetAllQueryable();
-
         // Include sekcji i Assigned User - zawsze je pobieramy. Metoda wykorzystywana w poborze danych wewnątrz section oraz teamID
         query = query.Include(t => t.Section)
                      .Include(t => t.AssignedUser);
         // Opcjonalny pobór zespołu w konkretnych przypadkach - całkowicie opcjonalne
         if (request.IncludeTeam)
-        {
             query = query.Include(t => t.Section.Team);
-        }
 
         // filtrowanie 
         if (request.AssignedUserId.HasValue)
-        {
             query = query.Where(t => t.AssignedUserId == request.AssignedUserId.Value);
-        }
         if (request.SectionId.HasValue)
-        {
             query = query.Where(t => t.SectionId == request.SectionId.Value);
-        }
         if (request.TeamId.HasValue)
-        {
             query = query.Where(t => t.Section.TeamId == request.TeamId.Value);
-        }
         if (request.Status.HasValue)
-        {
             query = query.Where(t => t.Status == request.Status.Value);
-        }
         if (request.Priority.HasValue)
-        {
             query = query.Where(t => t.Priority == request.Priority.Value);
-        }
-        if (request.DueBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
-        {
+        if (request.DueBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue) {
             var dueBeforeUtc = AdjustToUtc(request.DueBefore, request.TimeZoneOffsetInMinutes);
             query = query.Where(t => t.DueDate <= dueBeforeUtc.Value);
         }
-
-        if (request.DueAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
-        {
+        if (request.DueAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue) {
             var dueAfterUtc = AdjustToUtc(request.DueAfter, request.TimeZoneOffsetInMinutes);
             query = query.Where(t => t.DueDate >= dueAfterUtc.Value);
         }
-
-        if (request.CreatedBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
-        {
+        if (request.CreatedBefore.HasValue && request.TimeZoneOffsetInMinutes.HasValue) {
             var createdBeforeUtc = AdjustToUtc(request.CreatedBefore, request.TimeZoneOffsetInMinutes);
             query = query.Where(t => t.CreatedAt <= createdBeforeUtc.Value);
         }
-
-        if (request.CreatedAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue)
-        {
+        if (request.CreatedAfter.HasValue && request.TimeZoneOffsetInMinutes.HasValue) {
             var createdAfterUtc = AdjustToUtc(request.CreatedAfter, request.TimeZoneOffsetInMinutes);
             query = query.Where(t => t.CreatedAt >= createdAfterUtc.Value);
         }
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm)) {
             query = query.Where(t => t.Title.Contains(request.SearchTerm)
                                   || t.Description.Contains(request.SearchTerm));
         }
-
         // Sortowanie - wybór konkretnej kolumny do sortowania oraz kierunku sortowania
         query = SortTasks(query, request.OrderBy, request.Ascending);
-
         // pobór danych przed paginacją - może być wykorzystywany nawet bez paginacji w celu określenia ilości tasków w teamie 
         // bez konieczności wykonywania metody CountTasksByAssignedUserAsync
         // - przydatne ponieważ nie musimy wykonywać dwóch zapytań do bazy we frontendzie
         var totalCount = await query.CountAsync();
-
         // Paginacja 
         if (request.PageNumber.HasValue && request.PageNumber > 0
-            && request.PageSize.HasValue && request.PageSize > 0)
-        {
-           
+            && request.PageSize.HasValue && request.PageSize > 0) {      
             query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value)
                          .Take(request.PageSize.Value);
         }
-
 
         // Pobranie danych i zmapowanie na DTO
         var tasks = await query.ToListAsync();
@@ -257,7 +229,8 @@ public class TaskService : ITaskService
 
     // --- Tworzenie, edycja, usuwanie ---
 
-    public async Task<ServiceResult<TaskDTO>> CreateTaskAsync(int teamId, int sectionId, TaskCreateRequest createRequest)
+    public async Task<ServiceResult<TaskDTO>> CreateTaskAsync(int teamId, int sectionId, 
+        TaskCreateRequest createRequest)
     {
         if (createRequest.AssignedUserId == null)
             return ServiceResult<TaskDTO>.Fail("AssignedUserId is required.");
@@ -268,21 +241,17 @@ public class TaskService : ITaskService
         {
             return ServiceResult<TaskDTO>.Fail("Invalid priority specified.");
         }
-
         // Sprawdź czy sekcja istnieje
         var section = await _sectionService.GetSectionById(sectionId);
         if (!section.Success || section.Data == null)
         {
             return ServiceResult<TaskDTO>.Fail("Section not found.");
         }
-
-        if(section.Data.TeamId != teamId)
+        // Sprawdź czy sekcja należy do zespołu
+        if (section.Data.TeamId != teamId)
         {
             return ServiceResult<TaskDTO>.Fail("Section is not in the team.");
         }
-
-        // Sprawdź czy sekcja nalezy do Teamu
-
         // Sprawdź czy user istnieje
         var user = await _userService.GetUserById(assignedUserId);
         if (!user.Success || user.Data == null)
@@ -295,12 +264,9 @@ public class TaskService : ITaskService
         {
             return ServiceResult<TaskDTO>.Fail("User is not in the team.");
         }
-
         if(createRequest.DueDate != null)
             if (createRequest.DueDate < DateTime.UtcNow)
                 return ServiceResult<TaskDTO>.Fail("Due date must be in the future.");
-
-
         // Tworzymy nową encję:
         var taskEntity = new Tasks
         {
@@ -312,11 +278,9 @@ public class TaskService : ITaskService
             DueDate = createRequest.DueDate ?? null,
             CreatedAt = DateTime.UtcNow
         };
-
         // Dodajemy do kontekstu
         _taskRepository.AddTask(taskEntity);
         await _taskRepository.SaveChangesAsync();
-
         // Zwracamy DTO
         return ServiceResult<TaskDTO>.Ok(MapToDto(taskEntity));
     }
@@ -436,7 +400,7 @@ public class TaskService : ITaskService
 
         var existingTask = await _taskRepository.GetByIdAsync(
             taskId,
-            includeSection: false,
+            includeSection: true,
             includeAssignedUser: false,
             includeTeam: false
         );
@@ -447,10 +411,13 @@ public class TaskService : ITaskService
         }
 
         // Sprawdź czy użytkownik może usunąć taska
-        if(!await _serviceHelper.CanPerformAction(userId, taskId, existingTask.AssignedUserId, UserTeamRole.Manager))
+        if (!await _serviceHelper.CanPerformAction(userId, existingTask.Section.TeamId, existingTask.AssignedUserId, UserTeamRole.Manager))
         {
             return ServiceResult<bool>.Fail("You don't have permission to delete this task");
         }
+
+
+
 
 
 

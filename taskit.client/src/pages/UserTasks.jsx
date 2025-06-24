@@ -13,7 +13,7 @@ import './UserTasks.css';
 const statusLabels = {
   pending: 'Oczekujące',
   inprogress: 'W trakcie',
-  completed: 'Zakończone',
+  completed: 'Ukończone',
 };
 
 const UserTasksPage = () => {
@@ -74,7 +74,7 @@ const UserTasksPage = () => {
         <div className="user-tasks-content">
 <header className="user-tasks-header">
   <div className="header-top">
-    <h1 className="user-tasks-title">{titlePrefix} zadania</h1>
+    <h1 className="user-tasks-title">{titlePrefix}</h1>
     <div className="header-actions">
       <button onClick={() => setFilterOpen(true)} className="filter-toggle">
         <FaFilter /> Filtracja
